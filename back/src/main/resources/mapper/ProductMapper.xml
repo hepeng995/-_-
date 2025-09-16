@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cinema.booking.mapper.ProductMapper">
+
+    <!-- 分页查询商品列表 -->
+    <select id="selectProductPage" resultType="com.cinema.booking.entity.Product">
+        SELECT * FROM products 
+        WHERE deleted = 0
+        <if test="categoryId != null">
+            AND category_id = #{categoryId}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND (name LIKE CONCAT('%', #{keyword}, '%') OR description LIKE CONCAT('%', #{keyword}, '%'))
+        </if>
+        <if test="status != null">
+            AND status = #{status}
+        </if>
+        <if test="isFeatured != null">
+            AND is_featured = #{isFeatured}
+        </if>
+        ORDER BY sort_order ASC, created_at DESC
+    </select>
+
+    <!-- 获取推荐商品列表 -->
+    <select id="selectFeaturedProducts" resultType="com.cinema.booking.entity.Product">
+        SELECT * FROM products 
+        WHERE deleted = 0 AND status = 1 AND is_featured = 1
+        ORDER BY sort_order ASC, created_at DESC
+        <if test="limit != null">
+            LIMIT #{limit}
+        </if>
+    </select>
+
+    <!-- 获取热销商品列表 -->
+    <select id="selectHotProducts" resultType="com.cinema.booking.entity.Product">
+        SELECT * FROM products 
+        WHERE deleted = 0 AND status = 1
+        ORDER BY sales_count DESC, rating DESC
+        <if test="limit != null">
+            LIMIT #{limit}
+        </if>
+    </select>
+
+    <!-- 根据分类ID查询商品列表 -->
+    <select id="selectByCategoryId" resultType="com.cinema.booking.entity.Product">
+        SELECT * FROM products 
+        WHERE deleted = 0 AND status = 1 AND category_id = #{categoryId}
+        ORDER BY sort_order ASC, created_at DESC
+    </select>
+
+    <!-- 更新库存数量 -->
+    <update id="updateStock">
+        UPDATE products 
+        SET stock = stock + #{quantity}
+        WHERE id = #{productId} AND stock + #{quantity} >= 0
+    </update>
+
+    <!-- 增加销量 -->
+    <update id="incrementSalesCount">
+        UPDATE products 
+        SET sales_count = sales_count + #{quantity}
+        WHERE id = #{productId}
+    </update>
+
+</mapper>

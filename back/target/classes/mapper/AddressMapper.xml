@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cinema.booking.mapper.AddressMapper">
+
+    <!-- 根据用户ID查询地址列表 -->
+    <select id="selectByUserId" resultType="com.cinema.booking.entity.Address">
+        SELECT * FROM address 
+        WHERE user_id = #{userId}
+        ORDER BY is_default DESC, created_at DESC
+    </select>
+
+    <!-- 根据ID和用户ID查询地址 -->
+    <select id="selectByIdAndUserId" resultType="com.cinema.booking.entity.Address">
+        SELECT * FROM address 
+        WHERE id = #{id} AND user_id = #{userId}
+    </select>
+
+    <!-- 取消用户的所有默认地址 -->
+    <update id="cancelDefaultByUserId">
+        UPDATE address 
+        SET is_default = 0, updated_at = NOW()
+        WHERE user_id = #{userId} AND is_default = 1
+    </update>
+
+    <!-- 设置默认地址 -->
+    <update id="setDefaultAddress">
+        UPDATE address 
+        SET is_default = 1, updated_at = NOW()
+        WHERE id = #{id} AND user_id = #{userId}
+    </update>
+
+    <!-- 删除用户地址 -->
+    <delete id="deleteByIdAndUserId">
+        DELETE FROM address 
+        WHERE id = #{id} AND user_id = #{userId}
+    </delete>
+
+</mapper>

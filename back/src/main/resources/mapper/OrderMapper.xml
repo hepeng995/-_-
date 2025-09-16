@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cinema.booking.mapper.OrderMapper">
+
+    <!-- 分页查询订单列表 -->
+    <select id="selectOrderPage" resultType="com.cinema.booking.entity.Order">
+        SELECT * FROM orders 
+        WHERE deleted = 0
+        <if test="userId != null">
+            AND user_id = #{userId}
+        </if>
+        <if test="orderStatus != null">
+            AND order_status = #{orderStatus}
+        </if>
+        <if test="paymentStatus != null">
+            AND payment_status = #{paymentStatus}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND order_no LIKE CONCAT('%', #{keyword}, '%')
+        </if>
+        ORDER BY created_at DESC
+    </select>
+
+    <!-- 根据用户ID查询订单列表 -->
+    <select id="selectByUserId" resultType="com.cinema.booking.entity.Order">
+        SELECT * FROM orders 
+        WHERE deleted = 0 AND user_id = #{userId}
+        ORDER BY created_at DESC
+    </select>
+
+    <!-- 根据订单号查询订单 -->
+    <select id="selectByOrderNo" resultType="com.cinema.booking.entity.Order">
+        SELECT * FROM orders 
+        WHERE deleted = 0 AND order_no = #{orderNo}
+    </select>
+
+    <!-- 更新订单状态 -->
+    <update id="updateOrderStatus">
+        UPDATE orders 
+        SET order_status = #{orderStatus}, updated_at = NOW()
+        WHERE id = #{orderId}
+    </update>
+
+    <!-- 更新支付状态 -->
+    <update id="updatePaymentStatus">
+        UPDATE orders 
+        SET payment_status = #{paymentStatus}, 
+            payment_time = CASE WHEN #{paymentStatus} = 1 THEN NOW() ELSE payment_time END,
+            updated_at = NOW()
+        WHERE id = #{orderId}
+    </update>
+
+    <!-- 查询待支付超时订单 -->
+    <select id="selectTimeoutOrders" resultType="com.cinema.booking.entity.Order">
+        SELECT * FROM orders 
+        WHERE deleted = 0 
+        AND order_status = 1 
+        AND payment_status = 0
+        AND created_at &lt; DATE_SUB(NOW(), INTERVAL #{timeoutMinutes} MINUTE)
+    </select>
+
+</mapper>

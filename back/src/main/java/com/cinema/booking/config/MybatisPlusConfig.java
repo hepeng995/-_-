@@ -1,0 +1,31 @@
+package com.cinema.booking.config;
+
+import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.inner.BlockAttackInnerInterceptor;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+/**
+ * MyBatis-Plus配置
+ */
+@Configuration
+public class MybatisPlusConfig {
+
+    /**
+     * 配置MyBatis-Plus插件
+     */
+    @Bean
+    public MybatisPlusInterceptor mybatisPlusInterceptor() {
+        MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
+        
+        // 添加分页插件
+        interceptor.addInnerInterceptor(new PaginationInnerInterceptor(DbType.MYSQL));
+        
+        // 添加防止全表更新与删除插件
+        interceptor.addInnerInterceptor(new BlockAttackInnerInterceptor());
+        
+        return interceptor;
+    }
+} 

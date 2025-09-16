@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cinema.booking.mapper.ReviewHelpfulMapper">
+
+    <!-- 检查用户是否已点赞评价 -->
+    <select id="checkUserHelpful" resultType="integer">
+        SELECT COUNT(*) 
+        FROM review_helpful 
+        WHERE user_id = #{userId} AND review_id = #{reviewId}
+    </select>
+
+    <!-- 删除用户点赞记录 -->
+    <delete id="deleteUserHelpful">
+        DELETE FROM review_helpful 
+        WHERE user_id = #{userId} AND review_id = #{reviewId}
+    </delete>
+
+</mapper>

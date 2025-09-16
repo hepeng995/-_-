@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cinema.booking.mapper.NewsMapper">
+
+    <!-- 分页查询资讯列表 -->
+    <select id="selectNewsPage" resultType="com.cinema.booking.entity.News">
+        SELECT * FROM news 
+        WHERE deleted = 0
+        <if test="category != null and category != ''">
+            AND category = #{category}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND (title LIKE CONCAT('%', #{keyword}, '%') OR summary LIKE CONCAT('%', #{keyword}, '%'))
+        </if>
+        <if test="status != null">
+            AND status = #{status}
+        </if>
+        <if test="isTop != null">
+            AND is_top = #{isTop}
+        </if>
+        <if test="isFeatured != null">
+            AND is_featured = #{isFeatured}
+        </if>
+        ORDER BY is_top DESC, sort_order ASC, publish_time DESC
+    </select>
+
+    <!-- 获取置顶资讯列表 -->
+    <select id="selectTopNews" resultType="com.cinema.booking.entity.News">
+        SELECT * FROM news 
+        WHERE deleted = 0 AND status = 1 AND is_top = 1
+        ORDER BY sort_order ASC, publish_time DESC
+        <if test="limit != null">
+            LIMIT #{limit}
+        </if>
+    </select>
+
+    <!-- 获取推荐资讯列表 -->
+    <select id="selectFeaturedNews" resultType="com.cinema.booking.entity.News">
+        SELECT * FROM news 
+        WHERE deleted = 0 AND status = 1 AND is_featured = 1
+        ORDER BY sort_order ASC, publish_time DESC
+        <if test="limit != null">
+            LIMIT #{limit}
+        </if>
+    </select>
+
+    <!-- 根据分类查询资讯列表 -->
+    <select id="selectByCategory" resultType="com.cinema.booking.entity.News">
+        SELECT * FROM news 
+        WHERE deleted = 0 AND status = 1 AND category = #{category}
+        ORDER BY is_top DESC, sort_order ASC, publish_time DESC
+        <if test="limit != null">
+            LIMIT #{limit}
+        </if>
+    </select>
+
+    <!-- 增加浏览次数 -->
+    <update id="incrementViewCount">
+        UPDATE news SET view_count = view_count + 1 WHERE id = #{id}
+    </update>
+
+    <!-- 获取热门资讯列表 -->
+    <select id="selectHotNews" resultType="com.cinema.booking.entity.News">
+        SELECT * FROM news 
+        WHERE deleted = 0 AND status = 1
+        ORDER BY view_count DESC, publish_time DESC
+        <if test="limit != null">
+            LIMIT #{limit}
+        </if>
+    </select>
+
+    <!-- 获取资讯总数 -->
+    <select id="selectTotalCount" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM news WHERE deleted = 0 AND status = 1
+    </select>
+
+    <!-- 获取今日资讯数量 -->
+    <select id="selectTodayCount" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM news 
+        WHERE deleted = 0 AND status = 1 
+        AND DATE(created_at) = CURDATE()
+    </select>
+
+    <!-- 获取总浏览量 -->
+    <select id="selectTotalViews" resultType="java.lang.Long">
+        SELECT COALESCE(SUM(view_count), 0) FROM news 
+        WHERE deleted = 0 AND status = 1
+    </select>
+
+</mapper>
