@@ -33,6 +33,13 @@ public class GlobalExceptionHandler {
         log.error("业务异常: {}", e.getMessage(), e);
         return Result.fail(e.getCode(), e.getMessage());
     }
+    // 你的GlobalExceptionHandler添加
+    @ExceptionHandler(RuntimeException.class)
+    public Result<?> handleAiException(RuntimeException e) {
+        log.error("AI服务异常：{}", e.getMessage());
+        // 🔥 前端友好提示，不暴露系统错误
+        return Result.fail(500, "AI服务繁忙，请稍后再试~", null);
+    }
 
     /**
      * 处理认证异常
@@ -97,21 +104,21 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(org.springframework.dao.DataIntegrityViolationException.class)
     public Result<Object> handleDataIntegrityViolationException(org.springframework.dao.DataIntegrityViolationException e) {
         log.error("数据完整性约束违反: {}", e.getMessage());
-        
+
         // 处理外键约束错误
         if (e.getMessage() != null && e.getMessage().contains("foreign key constraint fails")) {
             if (e.getMessage().contains("orders") && e.getMessage().contains("fk_orders_schedule")) {
-                return Result.fail(ResultCode.FAILED.getCode(), 
+                return Result.fail(ResultCode.FAILED.getCode(),
                     "该场次已有关联订单，不能直接删除！请先处理相关订单或将场次设置为已取消状态。");
             }
             return Result.fail(ResultCode.FAILED.getCode(), "该数据有关联数据，不能直接删除");
         }
-        
+
         // 处理唯一约束错误
         if (e.getMessage() != null && e.getMessage().contains("Duplicate entry")) {
             return Result.fail(ResultCode.FAILED.getCode(), "数据已存在，请勿重复添加");
         }
-        
+
         return Result.fail(ResultCode.FAILED.getCode(), "数据操作失败，可能违反了数据库约束");
     }
 
@@ -124,4 +131,4 @@ public class GlobalExceptionHandler {
         log.error("系统异常: {}", e.getMessage(), e);
         return Result.fail(500, "系统内部错误，请联系管理员");
     }
-} 
+}

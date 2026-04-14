@@ -1,29 +1,50 @@
 server:
   port: 7070
 
+# LangChain4j 自动配置插件
+langchain4j:
+  open-ai:
+    chat-model:
+      api-key: sk-67eae102ebec4dc99464ef08e40635bd  # 你的DashScope API Key（无需修改格式，直接填）
+      model-name: qwen-turbo                         # 千问模型名（qwen-turbo/qwen-plus/qwen-max等）
+      log-responses: true                           # 可选：打印响应日志
+      log-requests: true                            # 可选：打印请求日志
+      base-url: https://dashscope.aliyuncs.com/compatible-mode/v1  # 千问OpenAI兼容接口地址
+      # 🔥 重试次数：1次（平衡容错+不触发SSL握手报错，不设0也不设2）
+      max-retries: 1
+      # 超时时间：10秒（本地开发稳定）
+      timeout: 60s
+      # 🔥 温度：0.7（默认值！回答自然、能理解问题，不僵硬、不发懵）
+      temperature: 0.7
+      # 最大返回token：限制长度，提速响应
+      max-tokens: 3092
+chroma:
+  url: http://localhost:7003
+  collection-name: village_knowledge
 spring:
   application:
     name: cinema-booking-system
-  
+
   # 数据库配置
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/village?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://localhost:3307/village?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
     username: root
-    password: 123456
-  
+    password: 20030905Jinyang!
+
   # 文件上传配置
   servlet:
     multipart:
       max-file-size: 10MB
       max-request-size: 100MB
-  
+
   # Redis配置
   data:
     redis:
       host: localhost
       port: 6379
       database: 0
+      password: 123456
       timeout: 10000ms
 
 # MyBatis配置
@@ -67,4 +88,4 @@ cinema:
 # 文件上传配置
 file:
   upload:
-    path: ../files  # 文件上传保存路径（与back同级的files目录） 
+    path: ../files  # 文件上传保存路径（与back同级的files目录）
