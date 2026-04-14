@@ -1,7 +1,10 @@
 package com.cinema.booking.service.ai.impl;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.cinema.booking.dto.ProductDTO;
+import com.cinema.booking.entity.Attraction;
+import com.cinema.booking.entity.News;
 import com.cinema.booking.service.AttractionService;
 import com.cinema.booking.service.ForumPostService;
 import com.cinema.booking.service.NewsService;
@@ -48,9 +51,9 @@ public class VectorSyncService {
 
         // 获取四大模块的 Document 数据
         List<Document> allDocuments = new ArrayList<>();
-        allDocuments.addAll(fetchProductDocs());
-//        allDocuments.addAll(fetchAttractionDocs());
-//        allDocuments.addAll(fetchNewsDocs());
+//        allDocuments.addAll(fetchProductDocs());
+        allDocuments.addAll(fetchAttractionDocs());
+        allDocuments.addAll(fetchNewsDocs());
 //        allDocuments.addAll(fetchForumDocs());
 
         if (allDocuments.isEmpty()) {
@@ -80,81 +83,131 @@ public class VectorSyncService {
     /**
      * 提取【特产商城】数据
      */
-    private List<Document> fetchProductDocs() {
-        // 仅查询未删除 (deleted=0) 且已上架 (status=1) 的特产
+//    private List<Document> fetchProductDocs() {
+//        // 仅查询未删除 (deleted=0) 且已上架 (status=1) 的特产
+//
+//        List<ProductDTO> products = productService.listProductDTO(0, 1);
+//
+//        return products.stream()
+//                .filter(Objects::nonNull) // 过滤空对象（防止空指针）
+//                .map(p -> {
+//                    // 1. 构造富文本语义（优化：更自然的语言，提升向量检索准确性）
+//                    String content = String.format(
+//                            "【特产商城】商品名称：%s。产地：%s。商品描述：%s。价格：%s元。",
+//                            handleNull(p.getName()),
+//                            handleNull(p.getOrigin()),
+//                            handleNull(p.getDescription()),
+//                            p.getPrice() != null ? String.format("%.2f", p.getPrice()) : "暂无"
+//                    );
+//
+//                    // 2. 【核心优化】构造 Metadata（保留所有关键信息，后续检索直接用）
+//                    Metadata metadata = Metadata.from("id", p.getId().toString()) // 必须：真实ID，反查MySQL
+//                            .put("type", "PRODUCT")               // 必须：区分商品/景点
+//                            .put("name", handleNull(p.getName()))  // 商品名称，检索结果直接显示
+//                            .put("origin", handleNull(p.getOrigin())) // 产地
+//                            .put("price", p.getPrice() != null ? String.valueOf(p.getPrice()) : "0.0") // 转String
+//                            .put("categoryId", p.getCategoryId() != null ? String.valueOf(p.getCategoryId()) : "0"); // 转String
+//
+//                    // 3. 返回 Document（保留原有逻辑）
+//                    return Document.from(content, metadata);
+//                })
+//                .toList();
+//    }
 
-        List<ProductDTO> products = productService.listProductDTO(0, 1);
+    /**
+     * 提取【景点导览】数据
+     */
+    /**
+     * 提取【景点导览】数据
+     */
+    private List<Document> fetchAttractionDocs() {
+        // 1. 仅查询未删除 (deleted=0) 且已启用 (status=1) 的景点（和商品保持一致）
+        List<Attraction> attractions = attractionService.listAttractionDTO(0, 1);
 
-        return products.stream()
-                .filter(Objects::nonNull) // 过滤空对象（防止空指针）
-                .map(p -> {
-                    // 1. 构造富文本语义（优化：更自然的语言，提升向量检索准确性）
+        return attractions.stream()
+                .filter(Objects::nonNull) // 过滤空对象，防止空指针
+                .map(a -> {
+                    // 2. 构造富文本语义（和商品格式统一，提升向量检索准确率）
                     String content = String.format(
-                            "【特产商城】商品名称：%s。产地：%s。商品描述：%s。价格：%s元。",
-                            handleNull(p.getName()),
-                            handleNull(p.getOrigin()),
-                            handleNull(p.getDescription()),
-                            p.getPrice() != null ? String.format("%.2f", p.getPrice()) : "暂无"
+                            "【景点导览】景点名称：%s。地址：%s。景点描述：%s。开放时间：%s。门票价格：%s元。交通指引：%s。评分：%s分。全景图链接：%s。",
+                            handleNull(a.getName()),
+                            handleNull(a.getAddress()),
+                            handleNull(a.getDescription()),
+                            handleNull(a.getOpeningHours()),
+                            a.getTicketPrice() != null ? String.format("%.2f", a.getTicketPrice()) : "免费/暂无",
+                            handleNull(a.getTrafficGuide()),
+                            a.getRating() != null ? String.valueOf(a.getRating()) : "暂无评分",
+                            handleNull(a.getPanoramaUrl())
                     );
 
-                    // 2. 【核心优化】构造 Metadata（保留所有关键信息，后续检索直接用）
-                    Metadata metadata = Metadata.from("id", p.getId().toString()) // 必须：真实ID，反查MySQL
-                            .put("type", "PRODUCT")               // 必须：区分商品/景点
-                            .put("name", handleNull(p.getName()))  // 商品名称，检索结果直接显示
-                            .put("origin", handleNull(p.getOrigin())) // 产地
-                            .put("price", p.getPrice() != null ? String.valueOf(p.getPrice()) : "0.0") // 转String
-                            .put("categoryId", p.getCategoryId() != null ? String.valueOf(p.getCategoryId()) : "0"); // 转String
+                    // 3. 【核心】完善 Metadata（和商品结构统一，保留所有关键业务字段）
+                    Metadata metadata = Metadata.from("id", a.getId().toString()) // 景点唯一ID
+                            .put("type", "SCENIC")               // 模块类型：匹配枚举SCENIC
+                            .put("name", handleNull(a.getName())) // 景点名称
+                            .put("address", handleNull(a.getAddress())) // 详细地址
+                            .put("description", handleNull(a.getDescription())) // 景点描述
+                            .put("openingHours", handleNull(a.getOpeningHours())) // 开放时间
+                            .put("ticketPrice", a.getTicketPrice() != null ? String.valueOf(a.getTicketPrice()) : "0.0") // 门票价格
+                            .put("trafficGuide", handleNull(a.getTrafficGuide())) // 交通指引
+                            .put("panoramaUrl", handleNull(a.getPanoramaUrl())) // 360°全景链接
+                            .put("rating", a.getRating() != null ? String.valueOf(a.getRating()) : "0.00") // 评分
+                            .put("longitude", a.getLongitude() != null ? String.valueOf(a.getLongitude()) : "0.000000") // 经度
+                            .put("latitude", a.getLatitude() != null ? String.valueOf(a.getLatitude()) : "0.000000") // 纬度
+                            .put("categoryId", a.getCategoryId() != null ? String.valueOf(a.getCategoryId()) : "0"); // 分类ID
 
-                    // 3. 返回 Document（保留原有逻辑）
+                    // 4. 返回 Document（和商品完全一致）
                     return Document.from(content, metadata);
                 })
                 .toList();
     }
 
     /**
-     * 提取【景点导览】数据
-     */
-//    private List<Document> fetchAttractionDocs() {
-//        List<Attraction> attractions = attractionService.list(new LambdaQueryWrapper<Attraction>()
-//                .eq(Attraction::getDeleted, 0)
-//                .eq(Attraction::getStatus, 1));
-//
-//        return attractions.stream().map(a -> {
-//            String content = String.format("【景点导览】名称：%s。地址：%s。介绍：%s",
-//                    a.getName(),
-//                    handleNull(a.getAddress()),
-//                    handleNull(a.getDescription()));
-//
-//            Metadata metadata = Metadata.from("id", a.getId().toString())
-//                    .add("type", "ATTRACTION");
-//
-//            return Document.from(content, metadata);
-//        }).toList();
-//    }
-
-    /**
      * 提取【动态资讯】数据 (包含 HTML 清洗逻辑)
      */
-//    private List<Document> fetchNewsDocs() {
-//        List<News> newsList = newsService.list(new LambdaQueryWrapper<News>()
-//                .eq(News::getDeleted, 0)
-//                .eq(News::getStatus, 1));
-//
-//        return newsList.stream().map(n -> {
-//            // 务必清洗掉正文里的 HTML 标签，否则会严重破坏向量匹配的精确度
-//            String cleanContent = stripHtmlTags(n.getContent());
-//
-//            String content = String.format("【乡村资讯】标题：%s。摘要：%s。正文：%s",
-//                    n.getTitle(),
-//                    handleNull(n.getSummary()),
-//                    cleanContent);
-//
-//            Metadata metadata = Metadata.from("id", n.getId().toString())
-//                    .add("type", "NEWS");
-//
-//            return Document.from(content, metadata);
-//        }).toList();
-//    }
+    /**
+     * 提取【动态资讯】数据
+     */
+    private List<Document> fetchNewsDocs() {
+        // 1. 仅查询未删除 (deleted=0) 且已发布 (status=1) 的资讯（统一业务规则）
+        List<News> newsList = newsService.listNewsDTO(0, 1);
+
+        return newsList.stream()
+                .filter(Objects::nonNull) // 统一过滤空对象，防止空指针
+                .map(n -> {
+                    // 2. 清洗HTML标签（保留原有核心逻辑，保证向量检索精准度）
+                    String cleanContent = stripHtmlTags(n.getContent());
+
+                    // 3. 统一富文本语义格式（和商品/景点完全对齐）
+                    String content = String.format(
+                            "【乡村资讯】资讯标题：%s。摘要：%s。分类：%s。作者：%s。来源：%s。发布时间：%s。正文内容：%s。",
+                            handleNull(n.getTitle()),
+                            handleNull(n.getSummary()),
+                            handleNull(n.getCategory()),
+                            handleNull(n.getAuthor()),
+                            handleNull(n.getSource()),
+                            // 格式化发布时间，无时间则显示暂无
+                            n.getPublishTime() != null ? n.getPublishTime().toLocalDate().toString() : "暂无发布时间",
+                            cleanContent
+                    );
+
+                    // 4. 【核心】完善Metadata（和商品/景点结构统一，全关键字段入库）
+                    Metadata metadata = Metadata.from("id", n.getId().toString()) // 资讯唯一ID
+                            .put("type", "NEWS") // 模块类型：严格匹配枚举NEWS
+                            .put("title", handleNull(n.getTitle())) // 资讯标题
+                            .put("summary", handleNull(n.getSummary())) // 资讯摘要
+                            .put("category", handleNull(n.getCategory())) // 分类：news/policy/activity
+                            .put("author", handleNull(n.getAuthor())) // 作者
+                            .put("source", handleNull(n.getSource())) // 来源
+                            .put("publishTime", n.getPublishTime() != null ? n.getPublishTime().toString() : "暂无") // 发布时间
+                            .put("viewCount", String.valueOf(n.getViewCount() != null ? n.getViewCount() : 0)) // 浏览次数
+                            .put("isTop", String.valueOf(n.getIsTop() != null ? n.getIsTop() : 0)) // 是否置顶
+                            .put("isFeatured", String.valueOf(n.getIsFeatured() != null ? n.getIsFeatured() : 0)); // 是否推荐
+
+                    // 5. 统一返回Document格式
+                    return Document.from(content, metadata);
+                })
+                .toList();
+    }
 
     /**
      * 提取【建言献策】数据

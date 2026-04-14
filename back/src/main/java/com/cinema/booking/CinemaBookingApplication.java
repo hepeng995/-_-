@@ -19,8 +19,9 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableAspectJAutoProxy
 @Slf4j
 @RequiredArgsConstructor
-public class CinemaBookingApplication {
-//    private final VectorSyncService vectorSyncService; // 注入同步服务
+//public class CinemaBookingApplication implements CommandLineRunner{
+public class CinemaBookingApplication{
+    private final VectorSyncService vectorSyncService; // 注入同步服务
 
     public static void main(String[] args) {
         SpringApplication.run(CinemaBookingApplication.class, args);
