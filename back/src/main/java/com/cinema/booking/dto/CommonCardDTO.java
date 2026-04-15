@@ -39,7 +39,7 @@ public class CommonCardDTO {
     private String extra;
 
     @Schema(description = "图片地址")
-    private String image;
+    private String images;
 
     @Schema(description = "前端详情页跳转链接")
     private String detailUrl;
