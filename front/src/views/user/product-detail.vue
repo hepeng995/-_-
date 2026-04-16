@@ -436,7 +436,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick, computed } from 'vue'
+import { ref, onMounted, nextTick, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElImageViewer } from 'element-plus'
 import { 
@@ -962,6 +962,24 @@ const handlePageSizeChange = (size) => {
 onMounted(() => {
   loadProduct()
 })
+
+// 监听路由参数变化（从 /products/1 跳转到 /products/2 时组件复用，onMounted 不会再次触发）
+watch(
+  () => route.params.id,
+  (newId, oldId) => {
+    if (newId && newId !== oldId) {
+      // 重置状态
+      activeTab.value = 'detail'
+      quantity.value = 1
+      selectedSpec.value = ''
+      currentImage.value = ''
+      // 重新加载商品数据
+      loadProduct()
+      // 滚动到页面顶部
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  }
+)
 </script>
 
 <style scoped>

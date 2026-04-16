@@ -113,6 +113,9 @@
         </div>
       </div>
     </footer>
+
+    <!-- AI聊天助手 -->
+    <AiChatAssistant />
   </div>
 </template>
 
@@ -122,7 +125,8 @@ import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { useCartStore } from '@/stores/cart'
 import { getConfigByKey } from '@/api/system-config'
-import { 
+import AiChatAssistant from '@/components/AiChatAssistant.vue'
+import {
   House, 
   MapLocation, 
   ShoppingBag, 

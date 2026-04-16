@@ -284,171 +284,30 @@ const routes = [
       requiresAuth: false
     }
   },
+  // 管理后台已迁移至 React 版 (froont-admin)，所有 /admin 路径重定向到 3001 端口
   {
     path: '/admin',
     name: 'admin',
-    component: () => import('@/views/admin/layout.vue'),
+    beforeEnter: (to, from, next) => {
+      window.location.href = 'http://localhost:3001' + to.fullPath
+    },
     meta: {
       title: '后台管理',
       requiresAuth: true,
       roles: ['ADMIN']
+    }
+  },
+  {
+    path: '/admin/:pathMatch(.*)*',
+    name: 'adminCatchAll',
+    beforeEnter: (to, from, next) => {
+      window.location.href = 'http://localhost:3001' + to.fullPath
     },
-    children: [
-      {
-        path: '',
-        name: 'dashboard',
-        component: () => import('@/views/admin/dashboard.vue'),
-        meta: {
-          title: '',
-          requiresAuth: true,
-          roles: ['ADMIN']
-        }
-      },
-      
-      // 个人中心路由
-      {
-        path: 'profile',
-        name: 'adminProfile',
-        component: () => import('@/views/admin/person.vue'),
-        meta: {
-          title: '个人中心',
-          requiresAuth: true,
-          roles: ['ADMIN']
-        }
-      },
-      
-      // 修改密码路由
-      {
-        path: 'change-password',
-        name: 'changePassword',
-        component: () => import('@/views/admin/changepassword.vue'),
-        meta: {
-          title: '修改密码',
-          requiresAuth: true,
-          roles: ['ADMIN']
-        }
-      },
-      
-      // 用户管理路由
-      {
-        path: 'users',
-        name: 'userManagement',
-        component: () => import('@/views/admin/users.vue'),
-        meta: {
-          title: '用户管理',
-          requiresAuth: true,
-          roles: ['ADMIN']
-        }
-      },
-      
-      // 系统日志路由
-      {
-        path: 'system-logs',
-        name: 'SystemLogs',
-        component: () => import('@/views/admin/system-logs.vue'),
-        meta: {
-          title: '系统日志',
-          roles: ['ADMIN'],
-          needAuth: true
-        }
-      },
-      
-      // 系统参数路由
-      {
-        path: 'system-config',
-        name: 'SystemConfig',
-        component: () => import('@/views/admin/system-config.vue'),
-        meta: {
-          title: '系统参数',
-          roles: ['ADMIN'],
-          needAuth: true
-        }
-      },
-
-      // 乡村振兴相关管理路由
-      {
-        path: 'attractions',
-        name: 'AttractionManagement',
-        component: () => import('@/views/admin/attractions.vue'),
-        meta: {
-          title: '景点管理',
-          roles: ['ADMIN'],
-          requiresAuth: true
-        }
-      },
-      {
-        path: 'products',
-        name: 'ProductManagement',
-        component: () => import('@/views/admin/products.vue'),
-        meta: {
-          title: '商品管理',
-          roles: ['ADMIN'],
-          requiresAuth: true
-        }
-      },
-      {
-        path: 'product-categories',
-        name: 'ProductCategoryManagement',
-        component: () => import('@/views/admin/product-categories.vue'),
-        meta: {
-          title: '商品分类管理',
-          roles: ['ADMIN'],
-          requiresAuth: true
-        }
-      },
-      {
-        path: 'orders',
-        name: 'OrderManagement',
-        component: () => import('@/views/admin/orders.vue'),
-        meta: {
-          title: '订单管理',
-          roles: ['ADMIN'],
-          requiresAuth: true
-        }
-      },
-      {
-        path: 'news',
-        name: 'NewsManagement',
-        component: () => import('@/views/admin/news.vue'),
-        meta: {
-          title: '资讯管理',
-          roles: ['ADMIN'],
-          requiresAuth: true
-        }
-      },
-      
-      // 论坛管理路由
-      {
-        path: 'forum-posts',
-        name: 'ForumPostManagement',
-        component: () => import('@/views/admin/forum-posts.vue'),
-        meta: {
-          title: '帖子管理',
-          roles: ['ADMIN'],
-          requiresAuth: true
-        }
-      },
-      {
-        path: 'forum-comments',
-        name: 'ForumCommentManagement',
-        component: () => import('@/views/admin/forum-comments.vue'),
-        meta: {
-          title: '评论管理',
-          roles: ['ADMIN'],
-          requiresAuth: true
-        }
-      },
-      {
-        path: 'forum-statistics',
-        name: 'ForumStatistics',
-        component: () => import('@/views/admin/forum-statistics.vue'),
-        meta: {
-          title: '论坛统计',
-          roles: ['ADMIN'],
-          requiresAuth: true
-        }
-      }
-    ]
+    meta: {
+      title: '后台管理',
+      requiresAuth: true,
+      roles: ['ADMIN']
+    }
   },
   
   // 错误页面路由
@@ -500,8 +359,9 @@ router.beforeEach(async (to, from, next) => {
     console.log('路由守卫: 用户角色:', userStore.userRole)
     
     if (isLoggedIn && userStore.userRole === 'ADMIN') {
-      console.log('路由守卫: 管理员用户，跳转到 /admin')
-      next('/admin')
+      console.log('路由守卫: 管理员用户，跳转到 React 管理后台')
+      window.location.href = 'http://localhost:3001'
+      return
     } else {
       console.log('路由守卫: 跳转到首页 /home')
       next('/home')
@@ -551,8 +411,8 @@ router.beforeEach(async (to, from, next) => {
   // 特殊处理：如果管理员访问前台页面，允许访问（管理员也可以浏览前台）
   // 但如果是需要登录的用户功能页面，则重定向到管理后台
   if (userStore.userRole === 'ADMIN' && (to.path.startsWith('/user') || to.path.startsWith('/cart') || to.path.startsWith('/order'))) {
-    console.log('路由守卫: 管理员试图访问用户功能页面，重定向到管理后台')
-    next('/admin')
+    console.log('路由守卫: 管理员试图访问用户功能页面，重定向到 React 管理后台')
+    window.location.href = 'http://localhost:3001'
     return
   }
 

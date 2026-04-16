@@ -5,9 +5,9 @@ import com.cinema.booking.mapper.ProductReviewMapper;
 import com.cinema.booking.service.ai.RuralDigitalAgent;
 import com.cinema.booking.service.ai.impl.HybridRetrievalService;
 import com.cinema.booking.service.ai.impl.RuralDigitalTools;
+import dev.langchain4j.community.model.dashscope.QwenEmbeddingModel;
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.embedding.EmbeddingModel;
-import dev.langchain4j.model.embedding.onnx.bgesmallzhv15.BgeSmallZhV15EmbeddingModel;
 import dev.langchain4j.service.AiServices;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.data.segment.TextSegment;
@@ -25,14 +25,19 @@ public class AIConfig {
     private final ChatMemoryConfig chatMemoryConfig;
 
     /**
-     * 1. 配置本地向量嵌入模型 (完全免费，基于 ONNX 在 JVM 运行)
+     *
      */
     /**
      * 配置入模型
      */
     @Bean
     public EmbeddingModel embeddingModel() {
-        return new BgeSmallZhV15EmbeddingModel();
+        return QwenEmbeddingModel.builder()
+                .apiKey("sk-67eae102ebec4dc99464ef08e40635bd")
+                .modelName("text-embedding-v3") // 通义向量v3
+                .build();
+
+//        return new BgeSmallZhV15EmbeddingModel();
     }
 
     /**
