@@ -52,16 +52,23 @@
 
         <!-- ==================== 向量模型 ==================== -->
         <!-- 注意：如果你已经用 all-minilm 生成了向量，必须保留这个依赖 -->
+<!--        <dependency>-->
+<!--            <groupId>dev.langchain4j</groupId>-->
+<!--            <artifactId>langchain4j-embeddings-all-minilm-l6-v2</artifactId>-->
+<!--            <version>${langchain4j.version}</version>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; BGE 模型：用于重排序（Rerank） &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>dev.langchain4j</groupId>-->
+<!--            <artifactId>langchain4j-embeddings-bge-small-zh-v15</artifactId>-->
+<!--            <version>${langchain4j.version}</version>-->
+<!--        </dependency>-->
+        <!-- 通义千问 远程向量模型（无本地文件，团队通用） -->
+        <!-- 通义千问（DashScope）社区版，含聊天+向量模型 -->
         <dependency>
             <groupId>dev.langchain4j</groupId>
-            <artifactId>langchain4j-embeddings-all-minilm-l6-v2</artifactId>
-            <version>${langchain4j.version}</version>
-        </dependency>
-        <!-- BGE 模型：用于重排序（Rerank） -->
-        <dependency>
-            <groupId>dev.langchain4j</groupId>
-            <artifactId>langchain4j-embeddings-bge-small-zh-v15</artifactId>
-            <version>${langchain4j.version}</version>
+            <artifactId>langchain4j-community-dashscope</artifactId>
+            <version>${langchain4j.version}</version> <!-- 目前最新稳定beta，别用1.3.0 -->
         </dependency>
 
         <!-- ==================== Apache Lucene（BM25 算法原生实现） ==================== -->

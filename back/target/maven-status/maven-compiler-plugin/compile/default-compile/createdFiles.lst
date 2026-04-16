@@ -106,7 +106,6 @@ com/cinema/booking/config/RedisChatMemoryStore.class
 com/cinema/booking/mapper/ProductMapper.class
 com/cinema/booking/dto/AiChatRequestDTO.class
 com/cinema/booking/entity/ReviewHelpful$ReviewHelpfulBuilder.class
-com/cinema/booking/controller/AiChatController$2.class
 com/cinema/booking/utils/BeanCopyUtils.class
 com/cinema/booking/controller/ShoppingCartController.class
 com/cinema/booking/service/impl/ProductReviewServiceImpl.class
@@ -155,7 +154,6 @@ com/cinema/booking/dto/AiChatProductDTO.class
 com/cinema/booking/mapper/SystemLogMapper.class
 com/cinema/booking/controller/ProductController.class
 com/cinema/booking/service/NewsService.class
-com/cinema/booking/service/ai/impl/VectorSyncService.class
 com/cinema/booking/dto/AiAttractionDTO.class
 com/cinema/booking/controller/SystemConfigController.class
 com/cinema/booking/entity/AttractionCategory.class

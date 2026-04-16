@@ -20,14 +20,13 @@ import java.util.Map;
  * AI智能对话统一接口（四大模块：商品/景点/资讯/建言）
  */
 @RestController
-@RequestMapping("/api/ai") // 统一接口前缀，符合REST规范
+@RequestMapping("/api/ai")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "AI对话接口", description = "会话式AI智能助手（商品/景点/资讯/建言）")
 public class AiChatController {
 
     // 注入你已完成的路由服务（核心：分发到四大模块）
-//    private final AiRouterService aiRouterService;
     private final RuralDigitalAgent ruralDigitalAgent;
     private final ObjectMapper objectMapper;
 

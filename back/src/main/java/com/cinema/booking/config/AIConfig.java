@@ -7,11 +7,13 @@ import com.cinema.booking.service.ai.impl.HybridRetrievalService;
 import com.cinema.booking.service.ai.impl.RuralDigitalTools;
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.embedding.EmbeddingModel;
-import dev.langchain4j.model.embedding.onnx.bgesmallzhv15.BgeSmallZhV15EmbeddingModel;
+//import dev.langchain4j.model.embedding.onnx.bgesmallzhv15.BgeSmallZhV15EmbeddingModel;
 import dev.langchain4j.service.AiServices;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.store.embedding.qdrant.QdrantEmbeddingStore;
+// 正确的LangChain4j社区版向量类
+import dev.langchain4j.community.model.dashscope.QwenEmbeddingModel;
 import io.qdrant.client.QdrantClient;
 import io.qdrant.client.QdrantGrpcClient;
 import lombok.AllArgsConstructor;
@@ -32,7 +34,12 @@ public class AIConfig {
      */
     @Bean
     public EmbeddingModel embeddingModel() {
-        return new BgeSmallZhV15EmbeddingModel();
+        return QwenEmbeddingModel.builder()
+                .apiKey("sk-67eae102ebec4dc99464ef08e40635bd")
+                .modelName("text-embedding-v3") // 通义向量v3
+                .build();
+
+//        return new BgeSmallZhV15EmbeddingModel();
     }
 
     /**

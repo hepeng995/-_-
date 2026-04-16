@@ -1,5 +1,4 @@
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/dto/UserRegisterDTO.java
-/Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/service/ai/impl/ScenicModuleHandler.java
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/config/ChatMemoryConfig.java
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/mapper/ProductCategoryMapper.java
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/dto/AiNewsDTO.java
@@ -11,11 +10,9 @@
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/mapper/AttractionMapper.java
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/service/ProductReviewService.java
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/controller/OrderController.java
-/Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/service/ai/VillageAiAssistant.java
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/service/impl/ForumCommentServiceImpl.java
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/mapper/AddressMapper.java
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/service/impl/SystemConfigServiceImpl.java
-/Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/service/ai/NewsAiAssistant.java
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/dto/UserQueryDTO.java
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/security/UserDetailsServiceImpl.java
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/controller/UserController.java
@@ -26,7 +23,6 @@
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/entity/ProductCategory.java
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/dto/ForumCommentQueryDTO.java
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/dto/ForumStatisticsDTO.java
-/Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/service/ai/impl/VectorSyncService.java
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/model/entity/SystemConfig.java
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/service/ai/impl/DataIndexingService.java
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/mapper/SystemConfigMapper.java
@@ -36,7 +32,6 @@
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/service/impl/OrderServiceImpl.java
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/entity/AttractionCategory.java
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/controller/AuthController.java
-/Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/service/ai/ScenicAiAssistant.java
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/entity/Address.java
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/dto/ForumPostQueryDTO.java
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/dto/ReviewReplyDTO.java
@@ -47,7 +42,6 @@
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/dto/AiChatProductDTO.java
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/controller/AddressController.java
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/mapper/OrderItemMapper.java
-/Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/service/ai/impl/AdviceModuleHandler.java
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/dto/AiProductDTO.java
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/dto/LoginRequest.java
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/model/dto/SystemConfigDTO.java
@@ -61,17 +55,14 @@
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/model/entity/AiChatRequest.java
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/mapper/SystemLogMapper.java
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/mapper/ForumPostMapper.java
-/Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/service/ai/AiModuleHandler.java
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/config/SecurityConfig.java
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/controller/ForumStatisticsController.java
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/aspect/SystemLogAspect.java
-/Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/VectorDataInitializer.java
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/service/AddressService.java
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/service/UserService.java
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/service/ForumCommentService.java
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/controller/ForumPostController.java
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/service/impl/AttractionServiceImpl.java
-/Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/service/ai/impl/ProductModuleHandler.java
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/dto/ProductDTO.java
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/entity/News.java
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/dto/PageRequest.java
@@ -119,7 +110,6 @@
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/dto/ForumPostDTO.java
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/controller/SystemConfigController.java
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/config/AIConfig.java
-/Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/service/ai/impl/NewsModuleHandler.java
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/controller/HomeController.java
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/service/SystemConfigService.java
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/mapper/ForumCommentLikeMapper.java
@@ -145,10 +135,8 @@
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/CinemaBookingApplication.java
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/utils/JwtUtils.java
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/dto/CategoryDTO.java
-/Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/service/ai/impl/RagChatService.java
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/entity/ForumPost.java
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/security/SecurityService.java
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/entity/ProductReview.java
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/dto/ForumCommentDTO.java
 /Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/service/AttractionService.java
-/Users/yy/Documents/代码项目/rural-digital/back/src/main/java/com/cinema/booking/service/ai/impl/AiRouterService.java
