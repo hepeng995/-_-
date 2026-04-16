@@ -1,6 +1,7 @@
 package com.cinema.booking.service.ai.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.cinema.booking.config.AIConfig;
 import com.cinema.booking.entity.Attraction;
 import com.cinema.booking.entity.News;
 import com.cinema.booking.entity.Product;
@@ -12,6 +13,8 @@ import dev.langchain4j.data.document.Metadata;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.store.embedding.EmbeddingStore;
+import io.qdrant.client.QdrantClient;
+import io.qdrant.client.grpc.Collections;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
@@ -21,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
@@ -30,6 +34,7 @@ public class DataIndexingService implements CommandLineRunner {
     private final ProductMapper productMapper;
     private final AttractionMapper attractionMapper;
     private final NewsMapper newsMapper;
+    private final QdrantClient qdrantClient;
     private final EmbeddingStore<TextSegment> embeddingStore;
     private final EmbeddingModel embeddingModel;
     private final LuceneBM25Manager luceneBM25Manager;
@@ -106,10 +111,44 @@ public class DataIndexingService implements CommandLineRunner {
             luceneDocs.add(new LuceneBM25Manager.LuceneDocument(String.valueOf(n.getId()), "NEWS", text));
         }
 
-        // 4. 存入 Qdrant 向量库
-        embeddingStore.addAll(embeddingModel.embedAll(textSegments).content(), textSegments);
-
-        // 5. 存入 Lucene 关键词检索库
+        // 4. 先构建 BM25，保证向量库异常时仍可检索
         luceneBM25Manager.buildIndex(luceneDocs);
+
+        // 5. 再写入向量库。每次启动都重建知识库集合，避免旧维度和历史重复数据污染。
+        if (textSegments.isEmpty()) {
+            log.warn("【数据索引】未发现可写入的知识片段，跳过向量索引构建");
+            return;
+        }
+
+        try {
+            recreateKnowledgeCollection();
+            embeddingStore.addAll(embeddingModel.embedAll(textSegments).content(), textSegments);
+            log.info("【数据索引】向量索引构建完成，共写入 {} 条文档", textSegments.size());
+        } catch (Exception e) {
+            log.warn("【数据索引】向量索引构建失败，系统将自动降级为 BM25 检索。请检查 Qdrant 集合是否需要重建", e);
+        }
+    }
+
+    private void recreateKnowledgeCollection() throws Exception {
+        Collections.VectorParams vectorParams = Collections.VectorParams.newBuilder()
+                .setSize(AIConfig.KNOWLEDGE_VECTOR_SIZE)
+                .setDistance(Collections.Distance.Cosine)
+                .build();
+
+        boolean exists = qdrantClient.collectionExistsAsync(AIConfig.KNOWLEDGE_COLLECTION)
+                .get(15, TimeUnit.SECONDS);
+        if (exists) {
+            qdrantClient.deleteCollectionAsync(AIConfig.KNOWLEDGE_COLLECTION)
+                    .get(15, TimeUnit.SECONDS);
+            log.info("【数据索引】已删除旧的 Qdrant 集合：{}", AIConfig.KNOWLEDGE_COLLECTION);
+        }
+
+        qdrantClient.createCollectionAsync(AIConfig.KNOWLEDGE_COLLECTION, vectorParams)
+                .get(15, TimeUnit.SECONDS);
+
+        log.info("【数据索引】Qdrant 集合已重建：{}，维度：{}，距离：{}",
+                AIConfig.KNOWLEDGE_COLLECTION,
+                AIConfig.KNOWLEDGE_VECTOR_SIZE,
+                Collections.Distance.Cosine);
     }
 }

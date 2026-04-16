@@ -1,19 +1,20 @@
 package com.cinema.booking.config;
 
+import com.cinema.booking.mapper.AttractionMapper;
+import com.cinema.booking.mapper.NewsMapper;
 import com.cinema.booking.mapper.ProductMapper;
 import com.cinema.booking.mapper.ProductReviewMapper;
 import com.cinema.booking.service.ai.RuralDigitalAgent;
 import com.cinema.booking.service.ai.impl.HybridRetrievalService;
 import com.cinema.booking.service.ai.impl.RuralDigitalTools;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.langchain4j.community.model.dashscope.QwenEmbeddingModel;
+import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.service.AiServices;
 import dev.langchain4j.store.embedding.EmbeddingStore;
-import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.store.embedding.qdrant.QdrantEmbeddingStore;
-// 正确的LangChain4j社区版向量类
-import dev.langchain4j.community.model.dashscope.QwenEmbeddingModel;
 import io.qdrant.client.QdrantClient;
 import io.qdrant.client.QdrantGrpcClient;
 import lombok.AllArgsConstructor;
@@ -23,6 +24,14 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @AllArgsConstructor
 public class AIConfig {
+
+    /**
+     * 旧版本知识库曾使用 512 维 BGE 向量。
+     * 这里显式切换到新的集合名，避免与当前 text-embedding-v3 的 1024 维向量混用。
+     */
+    public static final String KNOWLEDGE_COLLECTION = "village_knowledge_base_qwen_v3_1024";
+    public static final long KNOWLEDGE_VECTOR_SIZE = 1024L;
+
     // 注入你原有的会话配置
     private final ChatMemoryConfig chatMemoryConfig;
 
@@ -43,19 +52,24 @@ public class AIConfig {
     }
 
     /**
-     * 配置  向量存储
+     * 配置 Qdrant 客户端。
+     * 第四个布尔参数关闭版本兼容检查，避免 1.13 客户端对 1.17 服务端持续告警。
      */
     @Bean
-    public EmbeddingStore<TextSegment> embeddingStore() {
-        // 连接你已有的 Qdrant 容器（端口 6334）
-        QdrantClient qdrantClient = new QdrantClient(
-                QdrantGrpcClient.newBuilder("localhost", 6334, false).build()
+    public QdrantClient qdrantClient() {
+        return new QdrantClient(
+                QdrantGrpcClient.newBuilder("localhost", 6334, false, false).build()
         );
+    }
 
-
+    /**
+     * 配置向量存储
+     */
+    @Bean
+    public EmbeddingStore<TextSegment> embeddingStore(QdrantClient qdrantClient) {
         return QdrantEmbeddingStore.builder()
                 .client(qdrantClient)
-                .collectionName("village_knowledge_base")
+                .collectionName(KNOWLEDGE_COLLECTION)
                 .build();
     }
 
@@ -64,9 +78,19 @@ public class AIConfig {
     @Bean
     public RuralDigitalTools ruralDigitalTools(
             HybridRetrievalService hybridRetrievalService,
+            AttractionMapper attractionMapper,
+            NewsMapper newsMapper,
             ProductMapper productMapper,
-            ProductReviewMapper productReviewMapper) {
-        return new RuralDigitalTools(hybridRetrievalService, productMapper, productReviewMapper);
+            ProductReviewMapper productReviewMapper,
+            ObjectMapper objectMapper) {
+        return new RuralDigitalTools(
+                hybridRetrievalService,
+                attractionMapper,
+                newsMapper,
+                productMapper,
+                productReviewMapper,
+                objectMapper
+        );
     }
 
 

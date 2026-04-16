@@ -3,13 +3,15 @@ package com.cinema.booking.controller;
 import com.cinema.booking.dto.AiChatResponse;
 import com.cinema.booking.dto.CommonCardDTO;
 import com.cinema.booking.service.ai.RuralDigitalAgent;
-
+import com.cinema.booking.service.ai.impl.RuralDigitalTools;
 import com.cinema.booking.utils.Result;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -20,7 +22,7 @@ import java.util.Map;
  * AI智能对话统一接口（四大模块：商品/景点/资讯/建言）
  */
 @RestController
-@RequestMapping("/api/ai") // 统一接口前缀，符合REST规范
+@RequestMapping("/ai") // 统一接口前缀，符合REST规范
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "AI对话接口", description = "会话式AI智能助手（商品/景点/资讯/建言）")
@@ -28,6 +30,7 @@ public class AiChatController {
 
     // 注入你已完成的路由服务（核心：分发到四大模块）
     private final RuralDigitalAgent ruralDigitalAgent;
+    private final RuralDigitalTools ruralDigitalTools;
     private final ObjectMapper objectMapper;
 
     /**
@@ -41,11 +44,15 @@ public class AiChatController {
             @RequestHeader("userId") Long userId,
             @RequestBody String userMessage
     ) {
-        log.info("【AI对话请求】用户ID：{}，内容：{}", userId, userMessage);
+        String normalizedMessage = normalizeUserMessage(userMessage);
+        log.info("【AI对话请求】用户ID：{}，原始内容：{}，规范化后：{}", userId, userMessage, normalizedMessage);
 
         try {
-            // 1. 调用AI Agent（自动携带上下文、自动调用工具）
-            String aiJson = ruralDigitalAgent.chat(String.valueOf(userId), userMessage);
+            // 1. 对确定性推荐类问题直接走本地工具，避免大模型工具调用不稳定导致空卡片
+            String aiJson = routeByTool(normalizedMessage);
+            if (aiJson == null) {
+                aiJson = ruralDigitalAgent.chat(String.valueOf(userId), normalizedMessage);
+            }
             log.info("【AI返回原始JSON】：{}", aiJson);
 
             // 2. 解析AI返回的JSON（提取文本 + 卡片列表）
@@ -79,6 +86,69 @@ public class AiChatController {
             return Result.fail(500,"抱歉，AI服务暂时异常，请稍后再试~" ,errorResponse);
         }
     }
+
+    private String normalizeUserMessage(String rawMessage) {
+        if (rawMessage == null) {
+            return "";
+        }
+
+        String trimmed = rawMessage.trim();
+        if (trimmed.isEmpty()) {
+            return trimmed;
+        }
+
+        try {
+            JsonNode root = objectMapper.readTree(trimmed);
+            if (root.isTextual()) {
+                return root.asText().trim();
+            }
+
+            JsonNode userMessageNode = root.get("userMessage");
+            if (userMessageNode != null && userMessageNode.isTextual()) {
+                return userMessageNode.asText().trim();
+            }
+        } catch (Exception ignored) {
+            // 原始请求体不是 JSON 时，直接按普通文本处理
+        }
+
+        if (trimmed.length() >= 2 && trimmed.startsWith("\"") && trimmed.endsWith("\"")) {
+            return trimmed.substring(1, trimmed.length() - 1).trim();
+        }
+        return trimmed;
+    }
+
+    private String routeByTool(String message) {
+        if (!StringUtils.hasText(message)) {
+            return null;
+        }
+
+        if (containsAny(message, "景点", "旅游", "景区", "游玩", "一日游", "好玩的")) {
+            return ruralDigitalTools.retrieveScenics(message);
+        }
+        if (containsAny(message, "资讯", "政策", "新闻", "动态", "公告")) {
+            return ruralDigitalTools.retrieveNews(message);
+        }
+        if (containsAny(message, "好评", "口碑")) {
+            return ruralDigitalTools.retrieveProductsWithGoodReviews(message);
+        }
+        if (containsAny(message, "特产", "商品", "购买", "买", "商城", "农产品", "蜂蜜", "茶叶")) {
+            return ruralDigitalTools.retrieveProducts(message);
+        }
+        return null;
+    }
+
+    private boolean containsAny(String text, String... keywords) {
+        if (!StringUtils.hasText(text)) {
+            return false;
+        }
+        for (String keyword : keywords) {
+            if (text.contains(keyword)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * 万能解析AI返回结果
      * 自动适配：productList/scenicList/newsList

@@ -39,6 +39,12 @@ public class HybridRetrievalService {
         List<Content> allCandidates = new ArrayList<>(mergedMap.values());
         log.info("【三级混合检索】双路粗召回完成，向量{}条 + BM25{}条，合并去重后{}条",
                 vectorResults.size(), bm25Results.size(), allCandidates.size());
+
+        if (allCandidates.isEmpty()) {
+            log.warn("【三级混合检索】未召回到任何候选内容，类型：{}，问题：{}", type, userQuestion);
+            return List.of();
+        }
+
         // ============== 第二阶段：BGE 强语义精排 ==============
         List<Content> top10Contents = allCandidates.stream()
                 .map(content -> {
@@ -78,15 +84,19 @@ public class HybridRetrievalService {
     }
 
     private List<Content> vectorRetrieve(String userQuestion, String type, int topK) {
-        var retriever = EmbeddingStoreContentRetriever.builder()
-                .embeddingStore(embeddingStore)
-                .embeddingModel(embeddingModel)
-                .maxResults(topK)
-                .filter(MetadataFilterBuilder.metadataKey("type").isEqualTo(type))
-                .minScore(0.5)
-                .build();
-        List<Content> resultList = retriever.retrieve(Query.from(userQuestion));
-        return resultList;
+        try {
+            var retriever = EmbeddingStoreContentRetriever.builder()
+                    .embeddingStore(embeddingStore)
+                    .embeddingModel(embeddingModel)
+                    .maxResults(topK)
+                    .filter(MetadataFilterBuilder.metadataKey("type").isEqualTo(type))
+                    .minScore(0.5)
+                    .build();
+            return retriever.retrieve(Query.from(userQuestion));
+        } catch (Exception e) {
+            log.warn("【向量检索】执行失败，已自动降级为 BM25 检索。常见原因：集合不存在、集合维度与当前嵌入模型不一致", e);
+            return List.of();
+        }
     }
 
     private List<Content> bm25Retrieve(String userQuestion, String type, int topK) {
@@ -105,19 +115,42 @@ public class HybridRetrievalService {
     }
 
     private double calculateBgeSimilarity(String query, String text) {
-        var queryEmbedding = embeddingModel.embed(query).content();
-        var textEmbedding = embeddingModel.embed(text).content();
+        try {
+            var queryEmbedding = embeddingModel.embed(query).content();
+            var textEmbedding = embeddingModel.embed(text).content();
 
-        double dotProduct = 0.0;
-        double norm1 = 0.0;
-        double norm2 = 0.0;
+            if (queryEmbedding == null || textEmbedding == null) {
+                return 0.0;
+            }
 
-        for (int i = 0; i < queryEmbedding.vector().length; i++) {
-            dotProduct += queryEmbedding.vector()[i] * textEmbedding.vector()[i];
-            norm1 += Math.pow(queryEmbedding.vector()[i], 2);
-            norm2 += Math.pow(textEmbedding.vector()[i], 2);
+            float[] queryVector = queryEmbedding.vector();
+            float[] textVector = textEmbedding.vector();
+            if (queryVector == null || textVector == null || queryVector.length == 0 || textVector.length == 0) {
+                return 0.0;
+            }
+            if (queryVector.length != textVector.length) {
+                log.warn("【语义精排】向量维度不一致，query={}，text={}", queryVector.length, textVector.length);
+                return 0.0;
+            }
+
+            double dotProduct = 0.0;
+            double norm1 = 0.0;
+            double norm2 = 0.0;
+
+            for (int i = 0; i < queryVector.length; i++) {
+                dotProduct += queryVector[i] * textVector[i];
+                norm1 += Math.pow(queryVector[i], 2);
+                norm2 += Math.pow(textVector[i], 2);
+            }
+
+            if (norm1 == 0.0 || norm2 == 0.0) {
+                return 0.0;
+            }
+
+            return dotProduct / (Math.sqrt(norm1) * Math.sqrt(norm2));
+        } catch (Exception e) {
+            log.warn("【语义精排】嵌入计算失败，当前候选将按 0 分处理", e);
+            return 0.0;
         }
-
-        return dotProduct / (Math.sqrt(norm1) * Math.sqrt(norm2));
     }
 }

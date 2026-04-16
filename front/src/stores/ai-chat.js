@@ -3,36 +3,7 @@ import { ref } from 'vue'
 import aiChatApi from '@/api/ai-chat'
 import { useUserStore } from './user'
 
-/**
- * 商品推荐模拟数据（后端未返回卡片时的兜底展示）
- * 图片使用项目 files 目录下的实际文件，通过后端 /api/file/download/{name} 接口访问
- */
-const MOCK_PRODUCT_CARDS = [
-  {
-    id: 1,
-    title: '桃源蜂蜜',
-    content: '采自桃源深山百花，天然纯正，口感醇厚回甘。',
-    extra: '价格：68.00元，产地：桃源县，评分：4.8分',
-    images: '/api/file/download/76cd5b84-3dad-47ec-b47a-d36ac4d5ba98.jpg',
-    detailUrl: '/products/1'
-  },
-  {
-    id: 2,
-    title: '手工竹编篮',
-    content: '桃源传统竹编工艺，精选高山毛竹，编织精美耐用。',
-    extra: '价格：45.00元，产地：桃源县，评分：4.5分',
-    images: '/api/file/download/edd57240-e91b-4674-8e2e-4cf520bcd1e4.jpg',
-    detailUrl: '/products/2'
-  },
-  {
-    id: 3,
-    title: '桃源茶叶',
-    content: '高山云雾茶，清香甘甜，富含天然茶多酚。',
-    extra: '价格：128.00元，产地：桃源县，评分：4.7分',
-    images: '/api/file/download/5cceba6d-eda2-40fb-abdd-8cb3ba6755b7.png',
-    detailUrl: '/products/3'
-  }
-]
+const DEFAULT_CARD_LIMIT = 3
 
 /**
  * AI聊天助手状态管理
@@ -128,9 +99,7 @@ export const useAiChatStore = defineStore('ai-chat', () => {
 
       if (res.code === 200 && res.data) {
         const data = res.data
-
-        // 判断后端是否返回了有效的卡片数据
-        const hasCards = data.cardList && data.cardList.length > 0
+        const realCards = Array.isArray(data.cardList) ? data.cardList.slice(0, DEFAULT_CARD_LIMIT) : []
 
         // 4. 替换AI占位消息为真实回复
         const index = messages.value.findIndex(m => m.id === aiPlaceholder.id)
@@ -138,8 +107,8 @@ export const useAiChatStore = defineStore('ai-chat', () => {
           messages.value[index] = {
             ...messages.value[index],
             content: data.recommendText || '抱歉，暂无推荐结果。',
-            cards: hasCards ? data.cardList : MOCK_PRODUCT_CARDS,
-            moduleType: hasCards ? (data.moduleType || 'AUTO') : 'PRODUCT',
+            cards: realCards,
+            moduleType: data.moduleType || 'AUTO',
             loading: false
           }
         }
@@ -153,30 +122,27 @@ export const useAiChatStore = defineStore('ai-chat', () => {
         if (!isOpen.value) {
           unreadCount.value++
         }
+      } else {
+        const index = messages.value.findIndex(m => m.id === aiPlaceholder.id)
+        if (index !== -1) {
+          messages.value[index] = {
+            ...messages.value[index],
+            content: '抱歉，暂无推荐结果。',
+            cards: [],
+            moduleType: 'AUTO',
+            loading: false
+          }
+        }
       }
     } catch (error) {
-      // 替换占位消息为模拟数据兜底（后端不可用时仍可展示商品推荐）
-      const isProductQuery = /特产|商品|推荐|买|购|美食|农产品/.test(text.trim())
       const index = messages.value.findIndex(m => m.id === aiPlaceholder.id)
       if (index !== -1) {
-        if (isProductQuery) {
-          // 商品相关查询：展示模拟数据
-          messages.value[index] = {
-            ...messages.value[index],
-            content: '根据您的需求，为您推荐以下桃源县的特色商品：',
-            cards: MOCK_PRODUCT_CARDS,
-            moduleType: 'PRODUCT',
-            loading: false
-          }
-        } else {
-          // 非商品查询：提示服务不可用
-          messages.value[index] = {
-            ...messages.value[index],
-            content: '抱歉，AI服务暂时不可用，请稍后再试~',
-            cards: [],
-            moduleType: 'ERROR',
-            loading: false
-          }
+        messages.value[index] = {
+          ...messages.value[index],
+          content: '抱歉，AI服务暂时不可用，请稍后再试~',
+          cards: [],
+          moduleType: 'ERROR',
+          loading: false
         }
       }
       console.error('AI聊天请求失败:', error)
