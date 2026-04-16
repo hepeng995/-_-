@@ -12,6 +12,8 @@ import dev.langchain4j.service.AiServices;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.store.embedding.qdrant.QdrantEmbeddingStore;
+// 正确的LangChain4j社区版向量类
+import dev.langchain4j.community.model.dashscope.QwenEmbeddingModel;
 import io.qdrant.client.QdrantClient;
 import io.qdrant.client.QdrantGrpcClient;
 import lombok.AllArgsConstructor;
