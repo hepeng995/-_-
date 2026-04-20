@@ -6,10 +6,6 @@ import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.rag.content.Content;
 import dev.langchain4j.rag.content.ContentMetadata;
-import dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever;
-import dev.langchain4j.rag.query.Query;
-import dev.langchain4j.store.embedding.EmbeddingStore;
-import dev.langchain4j.store.embedding.filter.MetadataFilterBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,9 +17,9 @@ import java.util.*;
 @RequiredArgsConstructor
 public class HybridRetrievalService {
 
-    private final EmbeddingStore<TextSegment> embeddingStore;
     private final EmbeddingModel embeddingModel;
     private final LuceneBM25Manager luceneBM25Manager;
+    private final QdrantVectorSearchAdapter qdrantVectorSearchAdapter;
 
     public List<Content> threeStageHybridRetrieval(String userQuestion, String type) {
         log.info("【三级混合检索】开始，用户问题：{}，类型：{}", userQuestion, type);
@@ -83,16 +79,9 @@ public class HybridRetrievalService {
         return top10Contents;
     }
 
-    private List<Content> vectorRetrieve(String userQuestion, String type, int topK) {
+    List<Content> vectorRetrieve(String userQuestion, String type, int topK) {
         try {
-            var retriever = EmbeddingStoreContentRetriever.builder()
-                    .embeddingStore(embeddingStore)
-                    .embeddingModel(embeddingModel)
-                    .maxResults(topK)
-                    .filter(MetadataFilterBuilder.metadataKey("type").isEqualTo(type))
-                    .minScore(0.5)
-                    .build();
-            return retriever.retrieve(Query.from(userQuestion));
+            return qdrantVectorSearchAdapter.search(userQuestion, type, topK);
         } catch (Exception e) {
             log.warn("【向量检索】执行失败，已自动降级为 BM25 检索。常见原因：集合不存在、集合维度与当前嵌入模型不一致", e);
             return List.of();

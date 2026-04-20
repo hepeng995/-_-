@@ -10,30 +10,56 @@ import com.cinema.booking.service.ai.impl.RuralDigitalTools;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.langchain4j.community.model.dashscope.QwenEmbeddingModel;
 import dev.langchain4j.data.segment.TextSegment;
+import dev.langchain4j.http.client.jdk.JdkHttpClientBuilder;
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.embedding.EmbeddingModel;
+import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.service.AiServices;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.embedding.qdrant.QdrantEmbeddingStore;
 import io.qdrant.client.QdrantClient;
 import io.qdrant.client.QdrantGrpcClient;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-@Configuration
-@AllArgsConstructor
-public class AIConfig {
+import java.time.Duration;
 
-    /**
-     * 旧版本知识库曾使用 512 维 BGE 向量。
-     * 这里显式切换到新的集合名，避免与当前 text-embedding-v3 的 1024 维向量混用。
-     */
-    public static final String KNOWLEDGE_COLLECTION = "village_knowledge_base_qwen_v3_1024";
-    public static final long KNOWLEDGE_VECTOR_SIZE = 1024L;
+@Configuration
+@RequiredArgsConstructor
+public class AIConfig {
 
     // 注入你原有的会话配置
     private final ChatMemoryConfig chatMemoryConfig;
+    private final AiVectorProperties aiVectorProperties;
+
+    @Value("${langchain4j.open-ai.chat-model.api-key}")
+    private String dashscopeApiKey;
+
+    @Value("${langchain4j.open-ai.chat-model.model-name:qwen}")
+    private String chatModelName;
+
+    @Value("${langchain4j.open-ai.chat-model.base-url:https://dashscope.aliyuncs.com/compatible-mode/v1}")
+    private String chatBaseUrl;
+
+    @Value("${langchain4j.open-ai.chat-model.temperature:0.7}")
+    private Double chatTemperature;
+
+    @Value("${langchain4j.open-ai.chat-model.max-tokens:3092}")
+    private Integer chatMaxTokens;
+
+    @Value("${langchain4j.open-ai.chat-model.timeout:PT60S}")
+    private Duration chatTimeout;
+
+    @Value("${langchain4j.open-ai.chat-model.max-retries:1}")
+    private Integer chatMaxRetries;
+
+    @Value("${langchain4j.open-ai.chat-model.log-requests:false}")
+    private Boolean chatLogRequests;
+
+    @Value("${langchain4j.open-ai.chat-model.log-responses:false}")
+    private Boolean chatLogResponses;
 
     /**
      *
@@ -44,8 +70,8 @@ public class AIConfig {
     @Bean
     public EmbeddingModel embeddingModel() {
         return QwenEmbeddingModel.builder()
-                .apiKey("sk-67eae102ebec4dc99464ef08e40635bd")
-                .modelName("text-embedding-v3") // 通义向量v3
+                .apiKey(dashscopeApiKey)
+                .modelName(aiVectorProperties.getEmbeddingModelName())
                 .build();
 
 //        return new BgeSmallZhV15EmbeddingModel();
@@ -58,7 +84,12 @@ public class AIConfig {
     @Bean
     public QdrantClient qdrantClient() {
         return new QdrantClient(
-                QdrantGrpcClient.newBuilder("localhost", 6334, false, false).build()
+                QdrantGrpcClient.newBuilder(
+                        aiVectorProperties.getQdrantHost(),
+                        aiVectorProperties.getQdrantGrpcPort(),
+                        false,
+                        false
+                ).build()
         );
     }
 
@@ -69,7 +100,25 @@ public class AIConfig {
     public EmbeddingStore<TextSegment> embeddingStore(QdrantClient qdrantClient) {
         return QdrantEmbeddingStore.builder()
                 .client(qdrantClient)
-                .collectionName(KNOWLEDGE_COLLECTION)
+                .collectionName(aiVectorProperties.getKnowledgeCollection())
+                .build();
+    }
+
+    @Bean
+    public ChatModel chatLanguageModel() {
+        return OpenAiChatModel.builder()
+                .httpClientBuilder(new JdkHttpClientBuilder()
+                        .connectTimeout(chatTimeout)
+                        .readTimeout(chatTimeout))
+                .apiKey(dashscopeApiKey)
+                .modelName(chatModelName)
+                .baseUrl(chatBaseUrl)
+                .temperature(chatTemperature)
+                .maxTokens(chatMaxTokens)
+                .timeout(chatTimeout)
+                .maxRetries(chatMaxRetries)
+                .logRequests(chatLogRequests)
+                .logResponses(chatLogResponses)
                 .build();
     }
 

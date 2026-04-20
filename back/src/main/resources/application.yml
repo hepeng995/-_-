@@ -83,6 +83,17 @@ cinema:
     username: admin
     password: 123456
     email: admin@cinema.com
+  ai:
+    embedding-model-name: text-embedding-v3
+    qdrant-host: localhost
+    qdrant-http-port: 6333
+    qdrant-grpc-port: 6334
+    knowledge-collection: village_knowledge_base_qwen_v3_1024
+    knowledge-vector-size: 1024
+    vector-min-score: 0.5
+    smoke-test-query: 有什么特色特产推荐？
+    legacy-collections:
+      - village_knowledge_base
 
 # 文件上传配置
 file:

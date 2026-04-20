@@ -1,7 +1,7 @@
 package com.cinema.booking.service.ai.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.cinema.booking.config.AIConfig;
+import com.cinema.booking.config.AiVectorProperties;
 import com.cinema.booking.entity.Attraction;
 import com.cinema.booking.entity.News;
 import com.cinema.booking.entity.Product;
@@ -12,6 +12,7 @@ import com.cinema.booking.utils.LuceneBM25Manager;
 import dev.langchain4j.data.document.Metadata;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.model.embedding.EmbeddingModel;
+import dev.langchain4j.rag.content.Content;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import io.qdrant.client.QdrantClient;
 import io.qdrant.client.grpc.Collections;
@@ -38,10 +39,16 @@ public class DataIndexingService implements CommandLineRunner {
     private final EmbeddingStore<TextSegment> embeddingStore;
     private final EmbeddingModel embeddingModel;
     private final LuceneBM25Manager luceneBM25Manager;
+    private final AiVectorProperties aiVectorProperties;
+    private final QdrantVectorSearchAdapter qdrantVectorSearchAdapter;
 
     @Override
     public void run(String... args) {
-        log.info("【数据索引】开始构建向量索引和 BM25 索引...");
+        log.info("【数据索引】开始构建向量索引和 BM25 索引，Qdrant={} HTTP:{} gRPC:{}，目标集合={}",
+                aiVectorProperties.getQdrantHost(),
+                aiVectorProperties.getQdrantHttpPort(),
+                aiVectorProperties.getQdrantGrpcPort(),
+                aiVectorProperties.getKnowledgeCollection());
         indexAllData();
         log.info("【数据索引】构建完成！");
     }
@@ -117,6 +124,7 @@ public class DataIndexingService implements CommandLineRunner {
         // 5. 再写入向量库。每次启动都重建知识库集合，避免旧维度和历史重复数据污染。
         if (textSegments.isEmpty()) {
             log.warn("【数据索引】未发现可写入的知识片段，跳过向量索引构建");
+            qdrantVectorSearchAdapter.disableVectorSearch("当前没有可建立向量索引的知识片段");
             return;
         }
 
@@ -124,31 +132,93 @@ public class DataIndexingService implements CommandLineRunner {
             recreateKnowledgeCollection();
             embeddingStore.addAll(embeddingModel.embedAll(textSegments).content(), textSegments);
             log.info("【数据索引】向量索引构建完成，共写入 {} 条文档", textSegments.size());
+            runVectorSmokeTest();
+            cleanupLegacyCollections();
         } catch (Exception e) {
-            log.warn("【数据索引】向量索引构建失败，系统将自动降级为 BM25 检索。请检查 Qdrant 集合是否需要重建", e);
+            String reason = e.getMessage() == null ? e.getClass().getSimpleName() : e.getMessage();
+            qdrantVectorSearchAdapter.disableVectorSearch(reason);
+            log.warn("【数据索引】向量索引构建或烟测失败，向量检索已禁用，系统将自动降级为 BM25 检索", e);
         }
     }
 
     private void recreateKnowledgeCollection() throws Exception {
         Collections.VectorParams vectorParams = Collections.VectorParams.newBuilder()
-                .setSize(AIConfig.KNOWLEDGE_VECTOR_SIZE)
+                .setSize(aiVectorProperties.getKnowledgeVectorSize())
                 .setDistance(Collections.Distance.Cosine)
                 .build();
 
-        boolean exists = qdrantClient.collectionExistsAsync(AIConfig.KNOWLEDGE_COLLECTION)
+        boolean exists = qdrantClient.collectionExistsAsync(aiVectorProperties.getKnowledgeCollection())
                 .get(15, TimeUnit.SECONDS);
         if (exists) {
-            qdrantClient.deleteCollectionAsync(AIConfig.KNOWLEDGE_COLLECTION)
+            qdrantClient.deleteCollectionAsync(aiVectorProperties.getKnowledgeCollection())
                     .get(15, TimeUnit.SECONDS);
-            log.info("【数据索引】已删除旧的 Qdrant 集合：{}", AIConfig.KNOWLEDGE_COLLECTION);
+            log.info("【数据索引】已删除旧的 Qdrant 集合：{}", aiVectorProperties.getKnowledgeCollection());
         }
 
-        qdrantClient.createCollectionAsync(AIConfig.KNOWLEDGE_COLLECTION, vectorParams)
+        qdrantClient.createCollectionAsync(aiVectorProperties.getKnowledgeCollection(), vectorParams)
                 .get(15, TimeUnit.SECONDS);
 
         log.info("【数据索引】Qdrant 集合已重建：{}，维度：{}，距离：{}",
-                AIConfig.KNOWLEDGE_COLLECTION,
-                AIConfig.KNOWLEDGE_VECTOR_SIZE,
+                aiVectorProperties.getKnowledgeCollection(),
+                aiVectorProperties.getKnowledgeVectorSize(),
                 Collections.Distance.Cosine);
+    }
+
+    private void runVectorSmokeTest() throws Exception {
+        boolean collectionExists = qdrantClient.collectionExistsAsync(aiVectorProperties.getKnowledgeCollection())
+                .get(15, TimeUnit.SECONDS);
+        if (!collectionExists) {
+            throw new IllegalStateException("Qdrant 集合重建后不可见");
+        }
+
+        long pointCount = qdrantClient.countAsync(aiVectorProperties.getKnowledgeCollection())
+                .get(15, TimeUnit.SECONDS);
+        if (pointCount <= 0) {
+            throw new IllegalStateException("Qdrant 集合中没有任何点位");
+        }
+
+        int queryDimension = qdrantVectorSearchAdapter.getQueryVectorDimension(aiVectorProperties.getSmokeTestQuery());
+        if (queryDimension != aiVectorProperties.getKnowledgeVectorSize()) {
+            throw new IllegalStateException(String.format(
+                    "烟测查询向量维度异常，期望=%d，实际=%d",
+                    aiVectorProperties.getKnowledgeVectorSize(),
+                    queryDimension
+            ));
+        }
+
+        List<Content> productResults = qdrantVectorSearchAdapter.search(aiVectorProperties.getSmokeTestQuery(), "PRODUCT", 3);
+        if (productResults.isEmpty()) {
+            throw new IllegalStateException("向量烟测未召回任何 PRODUCT 内容");
+        }
+
+        qdrantVectorSearchAdapter.enableVectorSearch();
+        log.info("【数据索引】向量烟测通过，集合：{}，点位：{}，查询维度：{}，PRODUCT召回：{}",
+                aiVectorProperties.getKnowledgeCollection(),
+                pointCount,
+                queryDimension,
+                productResults.size());
+    }
+
+    private void cleanupLegacyCollections() {
+        for (String legacyCollection : aiVectorProperties.getLegacyCollections()) {
+            if (legacyCollection == null || legacyCollection.isBlank()) {
+                continue;
+            }
+            if (legacyCollection.equals(aiVectorProperties.getKnowledgeCollection())) {
+                continue;
+            }
+
+            try {
+                boolean exists = qdrantClient.collectionExistsAsync(legacyCollection)
+                        .get(15, TimeUnit.SECONDS);
+                if (exists) {
+                    qdrantClient.deleteCollectionAsync(legacyCollection)
+                            .get(15, TimeUnit.SECONDS);
+                    log.info("【数据索引】已清理遗留 Qdrant 集合：{}", legacyCollection);
+                }
+            } catch (Exception e) {
+                log.warn("【数据索引】清理遗留集合失败：{}", legacyCollection, e);
+            }
+        }
     }
 }
