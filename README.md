@@ -59,10 +59,6 @@
 - **动画**: Motion (Framer Motion)
 - **HTTP客户端**: Axios 1.15
 
-### 微信小程序
-
-- 独立仓库：基于 uni-app + Vue 3 + TypeScript 开发，已从本仓库分离
-
 ## 项目结构
 
 ```
@@ -443,7 +439,6 @@ chore: 构建过程或辅助工具的变动
 - 管理后台目录重命名 froont-admin → front-admin
 - 管理后台新增溯源、路线、活动管理页面
 - 数据库脚本合并规范化（统一为 village.sql）
-- 微信小程序前端独立分离
 
 ### v1.1.0 (2025-04)
 - 新增 AI 智能助手（RAG + LangChain4j + 通义千问）
