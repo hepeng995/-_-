@@ -26,8 +26,8 @@ export const MAP_STYLES = {
   fresh: 'amap://styles/fresh'         // 清新地图
 }
 
-// 默认地图中心点（桃源县）
-export const DEFAULT_CENTER = [112.345678, 28.123456]
+// 默认地图中心点（全国中心）
+export const DEFAULT_CENTER = [106.551557, 29.563009]
 
 // 默认地图缩放级别
 export const DEFAULT_ZOOM = 13
@@ -116,7 +116,7 @@ export function createInfoWindow(content, options = {}) {
  * @param {string} city - 城市（可选）
  * @returns {Promise<Object>}
  */
-export function geocode(address, city = '桃源县') {
+export function geocode(address, city = '') {
   return new Promise((resolve, reject) => {
     const geocoder = new window.AMap.Geocoder({ city })
     
@@ -167,7 +167,7 @@ export function reverseGeocode(lng, lat) {
  * @param {Object} options - 搜索选项
  * @returns {Promise<Array>}
  */
-export function searchPlace(keyword, city = '桃源县', options = {}) {
+export function searchPlace(keyword, city = '', options = {}) {
   return new Promise((resolve, reject) => {
     const defaultOptions = {
       city,
@@ -212,7 +212,7 @@ export function searchNearby(center, radius = 2000, type = '') {
       type: type || '风景名胜|旅游景点|餐饮服务|购物服务|生活服务',
       pageSize: 20,
       pageIndex: 1,
-      city: '桃源县'
+      city: ''
     })
     
     placeSearch.searchNearBy('', center, radius, (status, result) => {

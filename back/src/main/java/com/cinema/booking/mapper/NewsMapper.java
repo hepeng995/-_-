@@ -45,6 +45,13 @@ public interface NewsMapper extends BaseMapper<News> {
      * @return 推荐资讯列表
      */
     List<News> selectFeaturedNews(@Param("limit") Integer limit);
+
+    /**
+     * 获取最新资讯列表
+     * @param limit 限制数量
+     * @return 最新资讯列表
+     */
+    List<News> selectLatestNews(@Param("limit") Integer limit);
     
     /**
      * 根据分类查询资讯列表

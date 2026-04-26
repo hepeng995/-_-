@@ -24,7 +24,11 @@ public class Attraction {
     
     @TableId(type = IdType.AUTO)
     private Long id;
-    
+
+    /** 高德 POI ID（数据来源标识） */
+    @TableField("amap_poi_id")
+    private String amapPoiId;
+
     /**
      * 景点名称
      */

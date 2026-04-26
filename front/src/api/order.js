@@ -35,27 +35,6 @@ export default {
   },
 
   /**
-   * 更新订单
-   */
-  updateOrder(id, data) {
-    return request({
-      url: `/orders/${id}`,
-      method: 'put',
-      data
-    })
-  },
-
-  /**
-   * 删除订单
-   */
-  deleteOrder(id) {
-    return request({
-      url: `/orders/${id}`,
-      method: 'delete'
-    })
-  },
-
-  /**
    * 取消订单
    */
   cancelOrder(id, reason) {
@@ -73,17 +52,6 @@ export default {
     return request({
       url: `/orders/${id}/confirm`,
       method: 'put'
-    })
-  },
-
-  /**
-   * 更新订单状态
-   */
-  updateOrderStatus(id, status) {
-    return request({
-      url: `/orders/${id}/status`,
-      method: 'put',
-      params: { orderStatus: status }
     })
   },
 
@@ -110,28 +78,6 @@ export default {
   },
 
   /**
-   * 获取订单统计
-   */
-  getOrderStats(params = {}) {
-    return request({
-      url: '/orders/stats',
-      method: 'get',
-      params
-    })
-  },
-
-  /**
-   * 批量处理订单
-   */
-  batchProcessOrders(orderIds, action, data = {}) {
-    return request({
-      url: '/orders/batch',
-      method: 'post',
-      data: { orderIds, action, ...data }
-    })
-  },
-
-  /**
    * 获取商品信息用于订单确认
    */
   getProductForOrder(productId, params) {
@@ -152,7 +98,7 @@ export default {
       data: { itemIds }
     })
   },
-  
+
   /**
    * 从购物车创建订单
    */

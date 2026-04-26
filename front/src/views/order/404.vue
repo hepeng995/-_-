@@ -22,11 +22,9 @@ const userStore = useUserStore();
 // 根据用户角色返回相应的首页
 const goHome = () => {
   const role = userStore.userRole;
-  
+
   if (role === 'ADMIN') {
     router.push('/admin');
-  } else if (role === 'STAFF') {
-    router.push('/staff');
   } else {
     router.push('/home');
   }
@@ -44,15 +42,15 @@ const goBack = () => {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #f5f7fa;
+  background-color: var(--color-bg-body);
 }
 
 .error-box {
   text-align: center;
   padding: 40px;
-  background-color: #fff;
+  background-color: var(--color-bg-surface);
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-card);
   width: 90%;
   max-width: 500px;
 }
@@ -60,7 +58,7 @@ const goBack = () => {
 .error-code {
   font-size: 120px;
   font-weight: bold;
-  color: #f56c6c;
+  color: var(--color-danger);
   line-height: 1.2;
 }
 
@@ -68,12 +66,12 @@ const goBack = () => {
   font-size: 32px;
   font-weight: bold;
   margin-bottom: 20px;
-  color: #303133;
+  color: var(--color-text-primary);
 }
 
 .error-message {
   font-size: 16px;
-  color: #606266;
+  color: var(--color-text-secondary);
   margin-bottom: 30px;
 }
 
@@ -82,4 +80,4 @@ const goBack = () => {
   justify-content: center;
   gap: 20px;
 }
-</style> 
+</style>

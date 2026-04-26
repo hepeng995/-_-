@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cinema.booking.mapper.TraceRecordMapper">
+
+    <select id="selectTracePage" resultType="com.cinema.booking.entity.TraceRecord">
+        SELECT * FROM trace_records
+        WHERE deleted = 0
+        <if test="productId != null">
+            AND product_id = #{productId}
+        </if>
+        <if test="batchNo != null and batchNo != ''">
+            AND batch_no = #{batchNo}
+        </if>
+        <if test="stage != null and stage != ''">
+            AND stage = #{stage}
+        </if>
+        ORDER BY FIELD(stage, 'logistics', 'packaging', 'quality', 'processing', 'harvesting', 'growing', 'planting'),
+                 operation_date ASC
+    </select>
+
+    <select id="selectByBatchNo" resultType="com.cinema.booking.entity.TraceRecord">
+        SELECT * FROM trace_records
+        WHERE batch_no = #{batchNo} AND deleted = 0
+        ORDER BY FIELD(stage, 'logistics', 'packaging', 'quality', 'processing', 'harvesting', 'growing', 'planting')
+    </select>
+
+    <select id="selectByProductId" resultType="com.cinema.booking.entity.TraceRecord">
+        SELECT * FROM trace_records
+        WHERE product_id = #{productId} AND deleted = 0
+        ORDER BY FIELD(stage, 'logistics', 'packaging', 'quality', 'processing', 'harvesting', 'growing', 'planting')
+    </select>
+
+</mapper>

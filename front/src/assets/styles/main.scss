@@ -1,36 +1,50 @@
-// 全局样式
+// ============================================================
+// 全局样式入口
+// ============================================================
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+// 设计Token (CSS自定义属性)
+@use './tokens.scss';
+
+// 全局布局 (reset / 侧边栏 / 工具栏 / 内容区 / Footer)
+@use './layout.scss';
+
+// 通用组件样式 (卡片 / Banner / 标签栏 / 面包屑 / 网格)
+@use './components.scss';
+
+// 工具类 (spacing / typography / display / responsive)
+@use './utilities.scss';
+
+// 若依遗留工具类 (向后兼容)
+.mt5  { margin-top: 5px; }
+.mr5  { margin-right: 5px; }
+.mb5  { margin-bottom: 5px; }
+.ml5  { margin-left: 5px; }
+.mt10 { margin-top: 10px; }
+.mr10 { margin-right: 10px; }
+.mb10 { margin-bottom: 10px; }
+.ml10 { margin-left: 10px; }
+.mt20 { margin-top: 20px; }
+.mr20 { margin-right: 20px; }
+.mb20 { margin-bottom: 20px; }
+.ml20 { margin-left: 20px; }
+.pt5  { padding-top: 5px; }
+.pr5  { padding-right: 5px; }
+.pb5  { padding-bottom: 5px; }
+
+// Element Plus 全局覆写
+.el-message__content {
+  word-break: break-all;
 }
 
-body {
-  font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  color: #333;
-  background-color: #f5f5f5;
-}
-
-.container {
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
-}
-
-.card {
-  background: #fff;
-  border-radius: 4px;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-  padding: 20px;
-}
-
-// 响应式布局
-@media screen and (max-width: 768px) {
-  .container {
-    padding: 0 10px;
+.el-table {
+  .el-table__header-wrapper,
+  .el-table__fixed-header-wrapper {
+    th {
+      word-break: break-word;
+      background-color: var(--color-bg-muted);
+      color: var(--color-text-secondary);
+      height: 40px;
+      font-size: var(--text-sm);
+    }
   }
-} 
+}

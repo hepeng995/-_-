@@ -1,16 +1,21 @@
 package com.cinema.booking.controller;
 
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.cinema.booking.annotation.SystemOperation;
 import com.cinema.booking.dto.ForumPostDTO;
 import com.cinema.booking.dto.ForumPostQueryDTO;
 import com.cinema.booking.dto.ForumStatisticsDTO;
+import com.cinema.booking.entity.ForumPost;
+import com.cinema.booking.mapper.ForumPostMapper;
 import com.cinema.booking.service.ForumPostService;
 import com.cinema.booking.utils.Result;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -28,6 +33,7 @@ import org.springframework.web.bind.annotation.*;
 public class ForumPostController {
     
     private final ForumPostService forumPostService;
+    private final ForumPostMapper forumPostMapper;
     
     /**
      * 创建帖子
@@ -101,6 +107,35 @@ public class ForumPostController {
             @RequestParam(required = false) String rejectReason,
             @RequestParam(required = false) String adminReply) {
         forumPostService.auditPost(id, status, rejectReason, adminReply);
+        return Result.success();
+    }
+
+    /**
+     * 批量审核帖子
+     */
+    @Operation(summary = "批量审核帖子")
+    @PostMapping("/batch-audit")
+    @PreAuthorize("hasRole('ADMIN')")
+    @SystemOperation(module = "论坛管理", operation = "批量审核帖子", description = "管理员批量审核论坛帖子")
+    public Result<Void> batchAuditPosts(@RequestBody Map<String, Object> params) {
+        @SuppressWarnings("unchecked")
+        List<Long> ids = (List<Long>) params.get("ids");
+        Integer status = (Integer) params.get("status");
+        LambdaUpdateWrapper<ForumPost> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.in(ForumPost::getId, ids).set(ForumPost::getStatus, status);
+        forumPostMapper.update(null, wrapper);
+        return Result.success();
+    }
+
+    /**
+     * 批量删除帖子
+     */
+    @Operation(summary = "批量删除帖子")
+    @DeleteMapping("/batch")
+    @PreAuthorize("hasRole('ADMIN')")
+    @SystemOperation(module = "论坛管理", operation = "批量删除帖子", description = "批量删除论坛帖子")
+    public Result<Void> batchDeletePosts(@RequestBody List<Long> ids) {
+        forumPostMapper.deleteBatchIds(ids);
         return Result.success();
     }
     

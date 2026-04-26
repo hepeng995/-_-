@@ -25,3 +25,8 @@ Thumbs.db
 # 环境配置
 .env
 *.env.local
+
+#文档
+docs/
+.spec-workflow
+CLAUDE.md

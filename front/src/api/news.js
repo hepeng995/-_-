@@ -24,58 +24,6 @@ export default {
   },
 
   /**
-   * 创建资讯
-   */
-  createNews(data) {
-    return request({
-      url: '/news',
-      method: 'post',
-      data
-    })
-  },
-
-  /**
-   * 更新资讯
-   */
-  updateNews(id, data) {
-    return request({
-      url: `/news/${id}`,
-      method: 'put',
-      data
-    })
-  },
-
-  /**
-   * 删除资讯
-   */
-  deleteNews(id) {
-    return request({
-      url: `/news/${id}`,
-      method: 'delete'
-    })
-  },
-
-  /**
-   * 发布资讯
-   */
-  publishNews(id) {
-    return request({
-      url: `/news/${id}/publish`,
-      method: 'put'
-    })
-  },
-
-  /**
-   * 下线资讯
-   */
-  unpublishNews(id) {
-    return request({
-      url: `/news/${id}/unpublish`,
-      method: 'put'
-    })
-  },
-
-  /**
    * 获取推荐资讯列表
    */
   getFeaturedNews(limit = 6) {
@@ -119,7 +67,6 @@ export default {
     })
   },
 
-
   /**
    * 增加浏览量
    */
@@ -129,7 +76,6 @@ export default {
       method: 'post'
     })
   },
-
 
   /**
    * 获取最新资讯列表（用于首页展示）

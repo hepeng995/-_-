@@ -8,7 +8,6 @@ import router from './router'
 // import * as echarts from 'echarts'
 
 import './assets/styles/main.scss'
-import './assets/styles/ruoyi.scss' // 引入若依样式
 
 const app = createApp(App)
 

@@ -1,7 +1,8 @@
 <template>
   <div class="attractions-page">
     <!-- 页面头部 -->
-    <div class="page-header">
+    <div class="page-header" :style="{ backgroundImage: `url(${headerBg})` }">
+      <div class="header-overlay"></div>
       <div class="container">
         <h1>景点导览</h1>
         <p>探索美丽乡村风光，感受自然与文化的魅力</p>
@@ -49,14 +50,14 @@
     <div class="category-tabs">
       <div class="container">
         <div class="tabs-wrapper">
-          <div 
+          <div
             class="category-tab"
             :class="{ active: searchParams.categoryId === null }"
             @click="selectCategory(null)"
           >
             全部
           </div>
-          <div 
+          <div
             v-for="category in categories"
             :key="category.id"
             class="category-tab"
@@ -73,7 +74,7 @@
     <div class="attractions-content">
       <div class="container">
         <div class="attractions-grid" v-loading="loading">
-          <div 
+          <div
             v-for="attraction in attractions"
             :key="attraction.id"
             class="attraction-card"
@@ -95,19 +96,8 @@
                 </div>
                 <div class="location">
                   <el-icon><MapLocation /></el-icon>
-                  <span>{{ attraction.location }}</span>
+                  <span>{{ attraction.address }}</span>
                 </div>
-              </div>
-              <div class="attraction-features" v-if="attraction.features">
-                <el-tag
-                  v-for="feature in attraction.features.split(',')"
-                  :key="feature"
-                  size="small"
-                  type="info"
-                  class="feature-tag"
-                >
-                  {{ feature.trim() }}
-                </el-tag>
               </div>
             </div>
           </div>
@@ -142,6 +132,7 @@ import { ref, reactive, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { Search, MapLocation } from '@element-plus/icons-vue'
 import attractionApi from '@/api/attraction'
+import headerBg from '@/assets/image/景点导览背景.png'
 
 const router = useRouter()
 const route = useRoute()
@@ -248,60 +239,55 @@ onMounted(() => {
 <style scoped>
 .attractions-page {
   min-height: 100vh;
-  background: #f8fafc;
+  background: var(--color-bg-body);
 }
 
 .container {
-  max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
 }
 
 /* 页面头部 */
 .page-header {
-  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-  color: #065f46;
-  padding: 50px 0;
+  background-size: cover;
+  background-position: center;
+  color: #ffffff;
+  padding: 70px 0;
   text-align: center;
   position: relative;
   overflow: hidden;
 }
 
-.page-header::before {
-  content: '';
+.header-overlay {
   position: absolute;
-  top: -50%;
-  right: -20%;
-  width: 400px;
-  height: 400px;
-  background: radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, transparent 70%);
-  border-radius: 50%;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  pointer-events: none;
 }
 
 .page-header h1 {
   font-size: 48px;
   font-weight: 700;
   margin-bottom: 16px;
-  background: linear-gradient(45deg, #065f46, #059669);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #ffffff;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   position: relative;
   z-index: 1;
 }
 
 .page-header p {
   font-size: 18px;
-  color: #6b7280;
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
   position: relative;
   z-index: 1;
 }
 
 /* 搜索区域 */
 .search-section {
-  background: white;
+  background: var(--color-bg-surface);
   padding: 30px 0;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .search-form {
@@ -319,9 +305,9 @@ onMounted(() => {
 
 /* 分类标签 */
 .category-tabs {
-  background: white;
+  background: var(--color-bg-surface);
   padding: 20px 0;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .tabs-wrapper {
@@ -336,21 +322,21 @@ onMounted(() => {
   flex-shrink: 0;
   padding: 8px 20px;
   border-radius: 20px;
-  background: #f1f5f9;
-  color: #64748b;
+  background: var(--color-bg-muted);
+  color: var(--color-text-tertiary);
   cursor: pointer;
   transition: all 0.3s ease;
   font-weight: 500;
 }
 
 .category-tab:hover {
-  background: #e2e8f0;
-  color: #475569;
+  background: var(--color-border);
+  color: var(--color-text-secondary);
 }
 
 .category-tab.active {
-  background: #10b981;
-  color: white;
+  background: var(--color-primary-500);
+  color: var(--color-text-inverse);
 }
 
 /* 景点内容区域 */
@@ -366,17 +352,17 @@ onMounted(() => {
 }
 
 .attraction-card {
-  background: white;
-  border-radius: 16px;
+  background: var(--color-bg-surface);
+  border-radius: var(--radius-xl);
   overflow: hidden;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  box-shadow: var(--shadow-card);
   transition: all 0.3s ease;
   cursor: pointer;
 }
 
 .attraction-card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+  box-shadow: var(--shadow-card-hover);
 }
 
 .attraction-image {
@@ -419,9 +405,9 @@ onMounted(() => {
   top: 12px;
   left: 12px;
   background: rgba(16, 185, 129, 0.9);
-  color: white;
+  color: var(--color-text-inverse);
   padding: 4px 12px;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   font-size: 12px;
   font-weight: 600;
 }
@@ -433,7 +419,7 @@ onMounted(() => {
 .attraction-info h3 {
   font-size: 20px;
   font-weight: 600;
-  color: #1e293b;
+  color: var(--color-text-primary);
   margin-bottom: 12px;
   display: -webkit-box;
   -webkit-line-clamp: 1;
@@ -442,7 +428,7 @@ onMounted(() => {
 }
 
 .attraction-desc {
-  color: #64748b;
+  color: var(--color-text-tertiary);
   line-height: 1.6;
   margin-bottom: 16px;
   display: -webkit-box;
@@ -462,7 +448,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 4px;
-  color: #64748b;
+  color: var(--color-text-tertiary);
   font-size: 14px;
 }
 
@@ -494,21 +480,21 @@ onMounted(() => {
   .page-header h1 {
     font-size: 32px;
   }
-  
+
   .search-form {
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .search-form .el-input {
     width: 100%;
   }
-  
+
   .attractions-grid {
     grid-template-columns: 1fr;
     gap: 20px;
   }
-  
+
   .attraction-meta {
     flex-direction: column;
     align-items: flex-start;
@@ -520,11 +506,11 @@ onMounted(() => {
   .attraction-info {
     padding: 20px;
   }
-  
+
   .tabs-wrapper {
     gap: 12px;
   }
-  
+
   .category-tab {
     padding: 6px 16px;
     font-size: 14px;

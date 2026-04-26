@@ -7,10 +7,14 @@ import com.cinema.booking.entity.News;
 import com.cinema.booking.entity.Product;
 import com.cinema.booking.entity.ProductReview;
 import com.cinema.booking.entity.ProductWithReviewStats;
+import com.cinema.booking.entity.TourRoute;
 import com.cinema.booking.mapper.AttractionMapper;
 import com.cinema.booking.mapper.NewsMapper;
 import com.cinema.booking.mapper.ProductMapper;
 import com.cinema.booking.mapper.ProductReviewMapper;
+import com.cinema.booking.mapper.TourRouteMapper;
+import com.cinema.booking.mapper.RouteItemMapper;
+import com.cinema.booking.dto.RouteItemDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.langchain4j.agent.tool.P;
@@ -31,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -47,21 +52,23 @@ public class RuralDigitalTools {
     private final NewsMapper newsMapper;
     private final ProductMapper productMapper;
     private final ProductReviewMapper productReviewMapper;
+    private final TourRouteMapper tourRouteMapper;
+    private final RouteItemMapper routeItemMapper;
     private final ObjectMapper objectMapper;
 
-    @Tool("用于检索桃源县的特色商品信息，输入用户的商品需求，返回最相关的商品")
+    @Tool("用于检索乡村特色商品信息，输入用户的商品需求，返回最相关的商品")
     public String retrieveProducts(@P("用户的商品需求，比如‘我想购买蜂蜜’") String userQuestion) {
         log.info("【Tool-商品检索】被调用，用户问题：{}", userQuestion);
         return buildRecommendPayload("PRODUCT", userQuestion);
     }
 
-    @Tool("用于检索桃源县的旅游景点信息，输入用户的景点需求，返回最相关的景点")
-    public String retrieveScenics(@P("用户的景点需求，比如‘我想去桃花源玩’") String userQuestion) {
+    @Tool("用于检索乡村旅游景点信息，输入用户的景点需求，返回最相关的景点")
+    public String retrieveScenics(@P("用户的景点需求，比如‘我想去生态景区玩’") String userQuestion) {
         log.info("【Tool-景点检索】被调用，用户问题：{}", userQuestion);
         return buildRecommendPayload("SCENIC", userQuestion);
     }
 
-    @Tool("用于检索桃源县的乡村资讯和政策信息，输入用户的资讯需求，返回最相关的资讯")
+    @Tool("用于检索乡村资讯和政策信息，输入用户的资讯需求，返回最相关的资讯")
     public String retrieveNews(@P("用户的资讯需求，比如‘最新的乡村振兴政策’") String userQuestion) {
         log.info("【Tool-资讯检索】被调用，用户问题：{}", userQuestion);
         return buildRecommendPayload("NEWS", userQuestion);
@@ -79,13 +86,13 @@ public class RuralDigitalTools {
                 .toList();
 
         return buildPayload(
-                cards.isEmpty() ? "暂未找到符合条件的高口碑商品，您也可以换个关键词再试试。" : "根据您的需求，为您推荐以下口碑较好的桃源县商品：",
+                cards.isEmpty() ? "暂未找到符合条件的高口碑商品，您也可以换个关键词再试试。" : "根据您的需求，为您推荐以下口碑较好的乡村商品：",
                 cards
         );
     }
 
     @Tool("用于查看某款商品的具体用户评论，输入商品名称，返回最新的10条评论")
-    public String retrieveProductReviews(@P("商品名称，比如‘桃源蜂蜜’") String productName) {
+    public String retrieveProductReviews(@P("商品名称，比如’山野土蜂蜜’") String productName) {
         log.info("【Tool-商品评论查询】被调用，商品名称：{}", productName);
 
         Product product = productMapper.selectOne(
@@ -118,6 +125,102 @@ public class RuralDigitalTools {
                         .map(r -> String.format("- [%d星] %s", r.getRating(), r.getContent()))
                         .collect(Collectors.joining("\n"))
         );
+    }
+
+    @Tool("用于检索乡村旅游路线推荐，输入用户出行需求，返回最匹配的旅游路线")
+    public String retrieveRoutes(@P("用户的出行需求，比如'我想玩两天，适合家庭'") String userQuestion) {
+        log.info("【Tool-路线推荐】被调用，用户问题：{}", userQuestion);
+
+        List<TourRoute> routes = tourRouteMapper.selectRoutePage(
+                new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(1, CARD_LIMIT),
+                normalizeKeyword(userQuestion), null, null, null, 1
+        ).getRecords();
+
+        if (routes.isEmpty()) {
+            routes = tourRouteMapper.selectRecommendRoutes(CARD_LIMIT);
+        }
+
+        List<CommonCardDTO> cards = routes.stream()
+                .limit(CARD_LIMIT)
+                .map(this::toRouteCard)
+                .toList();
+
+        return buildPayload(
+                cards.isEmpty()
+                        ? "暂未检索到符合条件的旅游路线，您可以换个关键词再试试。"
+                        : "根据您的需求，为您推荐以下乡村旅游路线：",
+                cards
+        );
+    }
+
+    @Tool("用于查询某条旅游路线的详细行程安排，输入路线名称，返回该路线每天的景点安排和交通方式")
+    public String retrieveRouteDetail(@P("路线名称，比如'田园经典一日游'") String routeName) {
+        log.info("【Tool-路线详情】被调用，路线名称：{}", routeName);
+
+        TourRoute route = tourRouteMapper.selectOne(
+                new LambdaQueryWrapper<TourRoute>()
+                        .eq(TourRoute::getName, normalizeKeyword(routeName))
+                        .eq(TourRoute::getDeleted, Boolean.FALSE)
+                        .eq(TourRoute::getStatus, 1)
+                        .last("LIMIT 1")
+        );
+
+        if (route == null) {
+            return "未找到路线：" + routeName;
+        }
+
+        List<RouteItemDTO> items = routeItemMapper.selectItemsByRouteId(route.getId());
+        if (items.isEmpty()) {
+            return "路线【" + routeName + "】暂无行程安排详情";
+        }
+
+        Map<Integer, List<RouteItemDTO>> grouped = items.stream()
+                .collect(Collectors.groupingBy(RouteItemDTO::getDayNumber, TreeMap::new, Collectors.toList()));
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("路线：").append(route.getName()).append("\n");
+        sb.append("天数：").append(route.getDays()).append("天\n");
+        sb.append("难度：").append(getDifficultyLabel(route.getDifficulty())).append("\n");
+        sb.append("预算：").append(formatAmount(route.getBudgetMin())).append("-").append(formatAmount(route.getBudgetMax())).append("元\n\n");
+
+        grouped.forEach((day, dayItems) -> {
+            sb.append("=== 第").append(day).append("天 ===\n");
+            for (RouteItemDTO item : dayItems) {
+                sb.append("- ").append(item.getAttractionName() != null ? item.getAttractionName() : "景点")
+                  .append("（游玩").append(item.getSuggestedDuration() != null ? item.getSuggestedDuration() : "约1小时").append("）");
+                if (StringUtils.hasText(item.getTransportMethod())) {
+                    sb.append("，交通：").append(item.getTransportMethod());
+                }
+                if (StringUtils.hasText(item.getNote())) {
+                    sb.append("，提示：").append(item.getNote());
+                }
+                sb.append("\n");
+            }
+        });
+
+        return sb.toString();
+    }
+
+    private CommonCardDTO toRouteCard(TourRoute route) {
+        return CommonCardDTO.builder()
+                .id(route.getId())
+                .title(defaultText(route.getName(), "未命名路线"))
+                .content(defaultText(truncate(route.getDescription(), 80), "暂无路线描述"))
+                .extra(String.format("天数：%d天，难度：%s，预算：%s-%s元",
+                        route.getDays(),
+                        getDifficultyLabel(route.getDifficulty()),
+                        formatAmount(route.getBudgetMin()),
+                        formatAmount(route.getBudgetMax())))
+                .images(route.getCoverImage())
+                .detailUrl("/routes/" + route.getId())
+                .build();
+    }
+
+    private String getDifficultyLabel(String difficulty) {
+        if ("easy".equals(difficulty)) return "简单";
+        if ("medium".equals(difficulty)) return "中等";
+        if ("hard".equals(difficulty)) return "困难";
+        return difficulty;
     }
 
     private String buildRecommendPayload(String type, String userQuestion) {
@@ -303,12 +406,12 @@ public class RuralDigitalTools {
         return CommonCardDTO.builder()
                 .id(product.getId())
                 .title(defaultText(product.getName(), "未命名商品"))
-                .content(defaultText(product.getDescription(), "暂无商品描述"))
+                .content(defaultText(truncate(stripHtml(product.getDescription()), 80), "暂无商品描述"))
                 .extra(String.format("价格：%s元，产地：%s，评分：%s分",
                         formatAmount(product.getPrice()),
-                        defaultText(product.getOrigin(), "桃源县"),
+                        defaultText(product.getOrigin(), "乡村振兴示范县"),
                         formatAmount(firstNonNull(product.getAvgRating(), product.getRating()))))
-                .images(firstNonBlank(product.getImages(), product.getCoverImage()))
+                .images(product.getCoverImage())
                 .detailUrl("/products/" + product.getId())
                 .build();
     }
@@ -317,12 +420,12 @@ public class RuralDigitalTools {
         return CommonCardDTO.builder()
                 .id(attraction.getId())
                 .title(defaultText(attraction.getName(), "未命名景点"))
-                .content(defaultText(attraction.getDescription(), "暂无景点介绍"))
+                .content(defaultText(truncate(stripHtml(attraction.getDescription()), 80), "暂无景点介绍"))
                 .extra(String.format("地址：%s，门票：%s元，评分：%s分",
-                        defaultText(attraction.getAddress(), "桃源县"),
+                        defaultText(attraction.getAddress(), "乡村振兴示范县"),
                         formatAmount(attraction.getTicketPrice()),
                         formatAmount(attraction.getRating())))
-                .images(firstNonBlank(attraction.getImages(), attraction.getCoverImage()))
+                .images(attraction.getCoverImage())
                 .detailUrl("/attractions/" + attraction.getId())
                 .build();
     }
@@ -331,7 +434,9 @@ public class RuralDigitalTools {
         return CommonCardDTO.builder()
                 .id(news.getId())
                 .title(defaultText(news.getTitle(), "未命名资讯"))
-                .content(defaultText(firstNonBlank(news.getSummary(), truncate(news.getContent(), 100)), "暂无资讯摘要"))
+                .content(defaultText(
+                        firstNonBlank(news.getSummary(), truncate(stripHtml(news.getContent()), 80)),
+                        "暂无资讯摘要"))
                 .extra(String.format("分类：%s，发布时间：%s",
                         defaultText(news.getCategory(), "乡村资讯"),
                         formatDateTime(news.getPublishTime())))
@@ -344,11 +449,15 @@ public class RuralDigitalTools {
         return CommonCardDTO.builder()
                 .id(product.getId())
                 .title(defaultText(product.getName(), "未命名商品"))
-                .content(defaultText(firstNonBlank(product.getDescription(), product.getTopReview()), "暂无商品描述"))
+                .content(defaultText(
+                        truncate(stripHtml(
+                                firstNonBlank(product.getDescription(), product.getTopReview())), 80),
+                        "暂无商品描述"))
                 .extra(String.format("价格：%s元，产地：%s，评分：%s分",
                         formatAmount(product.getPrice()),
-                        defaultText(product.getOrigin(), "桃源县"),
+                        defaultText(product.getOrigin(), "乡村振兴示范县"),
                         formatAmount(product.getAvgRating())))
+                .images(product.getCoverImage())
                 .detailUrl("/products/" + product.getId())
                 .build();
     }
@@ -364,9 +473,9 @@ public class RuralDigitalTools {
         }
 
         return switch (type) {
-            case "PRODUCT" -> "根据您的需求，为您推荐以下桃源县的特色商品：";
-            case "SCENIC" -> "根据您的需求，为您推荐以下桃源县的热门景点：";
-            case "NEWS" -> "根据您的需求，为您推荐以下桃源县的相关资讯：";
+            case "PRODUCT" -> "根据您的需求，为您推荐以下乡村特色商品：";
+            case "SCENIC" -> "根据您的需求，为您推荐以下乡村热门景点：";
+            case "NEWS" -> "根据您的需求，为您推荐以下乡村相关资讯：";
             default -> "根据您的需求，为您推荐以下内容：";
         };
     }
@@ -428,5 +537,20 @@ public class RuralDigitalTools {
             return "";
         }
         return text.length() <= maxLength ? text : text.substring(0, maxLength) + "...";
+    }
+
+    private String stripHtml(String text) {
+        if (!StringUtils.hasText(text)) {
+            return "";
+        }
+        return text
+                .replaceAll("<[^>]+>", "")
+                .replaceAll("&nbsp;", " ")
+                .replaceAll("&amp;", "&")
+                .replaceAll("&lt;", "<")
+                .replaceAll("&gt;", ">")
+                .replaceAll("&quot;", "\"")
+                .replaceAll("\\s+", " ")
+                .trim();
     }
 }

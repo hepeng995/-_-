@@ -36,9 +36,19 @@
 
     <!-- 获取推荐资讯列表 -->
     <select id="selectFeaturedNews" resultType="com.cinema.booking.entity.News">
-        SELECT * FROM news 
+        SELECT * FROM news
         WHERE deleted = 0 AND status = 1 AND is_featured = 1
         ORDER BY sort_order ASC, publish_time DESC
+        <if test="limit != null">
+            LIMIT #{limit}
+        </if>
+    </select>
+
+    <!-- 获取最新资讯列表 -->
+    <select id="selectLatestNews" resultType="com.cinema.booking.entity.News">
+        SELECT * FROM news
+        WHERE deleted = 0 AND status = 1
+        ORDER BY publish_time DESC
         <if test="limit != null">
             LIMIT #{limit}
         </if>

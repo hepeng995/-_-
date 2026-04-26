@@ -245,12 +245,11 @@ onBeforeUnmount(() => {
 <style scoped>
 .payment-page {
   min-height: 100vh;
-  background: #f8fafc;
+  background: var(--color-bg-body);
   padding: 40px 0;
 }
 
 .container {
-  max-width: 1000px;
   margin: 0 auto;
   padding: 0 20px;
 }
@@ -263,14 +262,14 @@ onBeforeUnmount(() => {
 
 .page-header h1 {
   font-size: 32px;
-  color: #1e293b;
+  color: var(--color-text-primary);
   margin-bottom: 8px;
   font-weight: 700;
 }
 
 .page-header p {
   font-size: 16px;
-  color: #64748b;
+  color: var(--color-text-tertiary);
 }
 
 /* 支付内容 */
@@ -283,17 +282,17 @@ onBeforeUnmount(() => {
 
 .payment-info,
 .payment-qr {
-  background: white;
-  border-radius: 12px;
+  background: var(--color-bg-surface);
+  border-radius: var(--radius-lg);
   padding: 30px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  box-shadow: var(--shadow-card);
 }
 
 /* 订单信息 */
 .order-info {
   margin-bottom: 30px;
   padding-bottom: 20px;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .order-no,
@@ -303,17 +302,17 @@ onBeforeUnmount(() => {
 }
 
 .label {
-  color: #64748b;
+  color: var(--color-text-tertiary);
   margin-right: 10px;
 }
 
 .value {
-  color: #1e293b;
+  color: var(--color-text-primary);
   font-weight: 500;
 }
 
 .price {
-  color: #e74c3c;
+  color: var(--color-danger);
   font-weight: 600;
   font-size: 20px;
 }
@@ -321,7 +320,7 @@ onBeforeUnmount(() => {
 /* 支付方式 */
 .payment-methods h2 {
   font-size: 18px;
-  color: #1e293b;
+  color: var(--color-text-primary);
   margin-bottom: 20px;
   font-weight: 600;
 }
@@ -342,7 +341,7 @@ onBeforeUnmount(() => {
   align-items: center;
   padding: 16px;
   margin-bottom: 12px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   width: 100%;
 }
@@ -356,7 +355,7 @@ onBeforeUnmount(() => {
 
 .payment-icon {
   font-size: 20px;
-  color: #3b82f6;
+  color: var(--color-info);
 }
 
 /* 支付操作 */
@@ -369,8 +368,8 @@ onBeforeUnmount(() => {
 .payment-tips {
   margin-top: 20px;
   padding-top: 20px;
-  border-top: 1px solid #e2e8f0;
-  color: #64748b;
+  border-top: 1px solid var(--color-border);
+  color: var(--color-text-tertiary);
   font-size: 14px;
 }
 
@@ -381,7 +380,7 @@ onBeforeUnmount(() => {
 
 .payment-qr h3 {
   font-size: 18px;
-  color: #1e293b;
+  color: var(--color-text-primary);
   margin-bottom: 20px;
   font-weight: 600;
 }
@@ -389,7 +388,7 @@ onBeforeUnmount(() => {
 .qr-code {
   margin-bottom: 20px;
   padding: 20px;
-  background: #f8fafc;
+  background: var(--color-bg-body);
   border-radius: 8px;
   display: inline-block;
 }
@@ -401,7 +400,7 @@ onBeforeUnmount(() => {
 
 .qr-tips {
   margin-bottom: 30px;
-  color: #64748b;
+  color: var(--color-text-tertiary);
 }
 
 .qr-tips .price {
@@ -411,12 +410,12 @@ onBeforeUnmount(() => {
 .mock-payment {
   margin-top: 30px;
   padding-top: 20px;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--color-border);
 }
 
 .mock-payment p {
   margin-bottom: 10px;
-  color: #64748b;
+  color: var(--color-text-tertiary);
 }
 
 /* 响应式设计 */
@@ -424,11 +423,11 @@ onBeforeUnmount(() => {
   .payment-content {
     grid-template-columns: 1fr;
   }
-  
+
   .payment-qr {
     order: -1;
   }
-  
+
   .payment-actions {
     flex-direction: column;
   }

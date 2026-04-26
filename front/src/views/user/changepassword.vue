@@ -199,7 +199,7 @@ const changePassword = async () => {
 <style scoped>
 .change-password {
   min-height: 100vh;
-  background: #f8fafc;
+  background: var(--color-bg-body);
   padding: 40px 0;
 }
 
@@ -217,22 +217,22 @@ const changePassword = async () => {
 
 .page-header h1 {
   font-size: 32px;
-  color: #1e293b;
+  color: var(--color-text-primary);
   margin-bottom: 8px;
   font-weight: 700;
 }
 
 .page-header p {
   font-size: 16px;
-  color: #64748b;
+  color: var(--color-text-tertiary);
 }
 
 /* 密码修改卡片 */
 .password-card {
-  background: white;
-  border-radius: 16px;
+  background: var(--color-bg-surface);
+  border-radius: var(--radius-xl);
   padding: 32px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  box-shadow: var(--shadow-card);
   margin-bottom: 24px;
 }
 
@@ -240,14 +240,14 @@ const changePassword = async () => {
 .password-tips {
   margin-top: 12px;
   padding: 16px;
-  background: #f8fafc;
+  background: var(--color-bg-body);
   border-radius: 8px;
-  border-left: 4px solid #3b82f6;
+  border-left: 4px solid var(--color-info);
 }
 
 .password-tips p {
   font-size: 14px;
-  color: #1e293b;
+  color: var(--color-text-primary);
   font-weight: 600;
   margin: 0 0 8px 0;
 }
@@ -259,22 +259,22 @@ const changePassword = async () => {
 
 .password-tips li {
   font-size: 13px;
-  color: #64748b;
+  color: var(--color-text-tertiary);
   margin-bottom: 4px;
   transition: color 0.3s ease;
 }
 
 .password-tips li.valid {
-  color: #10b981;
+  color: var(--color-primary-500);
   font-weight: 500;
 }
 
 /* 安全提示 */
 .security-tips {
-  background: white;
-  border-radius: 16px;
+  background: var(--color-bg-surface);
+  border-radius: var(--radius-xl);
   padding: 24px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  box-shadow: var(--shadow-card);
 }
 
 .security-tips h3 {
@@ -282,13 +282,13 @@ const changePassword = async () => {
   align-items: center;
   gap: 8px;
   font-size: 18px;
-  color: #1e293b;
+  color: var(--color-text-primary);
   margin-bottom: 16px;
   font-weight: 600;
 }
 
 .security-tips h3 .el-icon {
-  color: #f59e0b;
+  color: var(--color-warning);
 }
 
 .security-tips ul {
@@ -298,7 +298,7 @@ const changePassword = async () => {
 
 .security-tips li {
   font-size: 14px;
-  color: #4b5563;
+  color: var(--color-text-secondary);
   line-height: 1.6;
   margin-bottom: 8px;
 }
@@ -308,12 +308,12 @@ const changePassword = async () => {
   .page-header h1 {
     font-size: 24px;
   }
-  
+
   .password-card,
   .security-tips {
     padding: 20px;
   }
-  
+
   .el-form :deep(.el-form-item__label) {
     width: 100px !important;
   }

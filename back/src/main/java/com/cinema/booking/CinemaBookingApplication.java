@@ -9,7 +9,7 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
- * 乡村振兴·新桃源智界系统启动类
+ * 乡村振兴·智兴乡村平台系统启动类
  */
 @SpringBootApplication
 @EnableTransactionManagement

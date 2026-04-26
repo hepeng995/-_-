@@ -147,6 +147,14 @@ public class NewsServiceImpl implements NewsService {
     }
 
     @Override
+    public List<NewsDTO> getLatestNews(Integer limit) {
+        List<News> newsList = newsMapper.selectLatestNews(limit);
+        return newsList.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public List<NewsDTO> getHotNews(Integer limit) {
         List<News> newsList = newsMapper.selectHotNews(limit);
         return newsList.stream()

@@ -216,7 +216,7 @@ const districtMap = {
   '常德市': [
     { value: '武陵区', label: '武陵区' },
     { value: '鼎城区', label: '鼎城区' },
-    { value: '桃源县', label: '桃源县' },
+    { value: '乡村振兴示范县', label: '乡村振兴示范县' },
     { value: '汉寿县', label: '汉寿县' }
   ],
   '武汉市': [
@@ -409,12 +409,12 @@ onMounted(() => {
 <style scoped>
 .user-addresses {
   min-height: 100vh;
-  background: #f8fafc;
+  background: var(--color-bg-body);
   padding: 40px 0;
 }
 
 .container {
-  max-width: 1000px;
+  margin: 0 auto;
   margin: 0 auto;
   padding: 0 20px;
 }
@@ -427,14 +427,14 @@ onMounted(() => {
 
 .page-header h1 {
   font-size: 32px;
-  color: #1e293b;
+  color: var(--color-text-primary);
   margin-bottom: 12px;
   font-weight: 700;
 }
 
 .page-header p {
   font-size: 16px;
-  color: #64748b;
+  color: var(--color-text-tertiary);
 }
 
 /* 地址列表 */
@@ -445,10 +445,10 @@ onMounted(() => {
 }
 
 .address-card {
-  background: white;
-  border-radius: 12px;
+  background: var(--color-bg-surface);
+  border-radius: var(--radius-lg);
   padding: 24px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  box-shadow: var(--shadow-card);
   transition: all 0.3s ease;
   border: 2px solid transparent;
 }
@@ -458,8 +458,8 @@ onMounted(() => {
 }
 
 .address-card.default-address {
-  border-color: #10b981;
-  background: linear-gradient(135deg, #f0fdfa 0%, #ffffff 100%);
+  border-color: var(--color-primary-500);
+  background: linear-gradient(135deg, #f0fdfa 0%, var(--color-bg-surface) 100%);
 }
 
 .address-header {
@@ -478,16 +478,16 @@ onMounted(() => {
 .receiver-name {
   font-size: 16px;
   font-weight: 600;
-  color: #1e293b;
+  color: var(--color-text-primary);
 }
 
 .receiver-phone {
   font-size: 14px;
-  color: #64748b;
+  color: var(--color-text-tertiary);
 }
 
 .address-detail {
-  color: #4b5563;
+  color: var(--color-text-secondary);
   line-height: 1.6;
   margin-bottom: 16px;
 }
@@ -500,9 +500,9 @@ onMounted(() => {
 
 /* 添加地址卡片 */
 .add-address-card {
-  background: white;
+  background: var(--color-bg-surface);
   border: 2px dashed #cbd5e1;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   padding: 40px;
   display: flex;
   flex-direction: column;
@@ -514,18 +514,18 @@ onMounted(() => {
 }
 
 .add-address-card:hover {
-  border-color: #10b981;
+  border-color: var(--color-primary-500);
   background: #f0fdfa;
 }
 
 .add-icon {
   font-size: 32px;
-  color: #94a3b8;
+  color: var(--color-text-placeholder);
   margin-bottom: 8px;
 }
 
 .add-address-card span {
-  color: #64748b;
+  color: var(--color-text-tertiary);
   font-size: 16px;
 }
 

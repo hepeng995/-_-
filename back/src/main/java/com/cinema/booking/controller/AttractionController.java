@@ -1,11 +1,16 @@
 package com.cinema.booking.controller;
 
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.cinema.booking.annotation.SystemOperation;
+import com.cinema.booking.dto.AmapSyncRequest;
 import com.cinema.booking.dto.AttractionDTO;
 import com.cinema.booking.dto.CategoryDTO;
 import com.cinema.booking.dto.PageRequest;
+import com.cinema.booking.entity.Attraction;
+import com.cinema.booking.mapper.AttractionMapper;
 import com.cinema.booking.service.AttractionService;
+import com.cinema.booking.service.amap.AmapSyncService;
 import com.cinema.booking.utils.Result;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -17,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 景点控制器
@@ -29,6 +35,8 @@ import java.util.List;
 public class AttractionController {
     
     private final AttractionService attractionService;
+    private final AmapSyncService amapSyncService;
+    private final AttractionMapper attractionMapper;
     
     @Operation(summary = "分页查询景点列表")
     @GetMapping("/page")
@@ -77,6 +85,29 @@ public class AttractionController {
     @SystemOperation(module = "景点管理", operation = "删除景点", description = "删除景点信息")
     public Result<Void> deleteAttraction(@PathVariable Long id) {
         attractionService.deleteAttraction(id);
+        return Result.ok();
+    }
+
+    @Operation(summary = "批量删除景点")
+    @DeleteMapping("/batch")
+    @PreAuthorize("hasRole('ADMIN')")
+    @SystemOperation(module = "景点管理", operation = "批量删除景点", description = "批量删除景点")
+    public Result<Void> batchDeleteAttractions(@RequestBody List<Long> ids) {
+        attractionMapper.deleteBatchIds(ids);
+        return Result.ok();
+    }
+
+    @Operation(summary = "批量更新景点状态")
+    @PutMapping("/batch/status")
+    @PreAuthorize("hasRole('ADMIN')")
+    @SystemOperation(module = "景点管理", operation = "批量更新景点状态", description = "批量启用/禁用景点")
+    public Result<Void> batchUpdateAttractionStatus(@RequestBody Map<String, Object> params) {
+        @SuppressWarnings("unchecked")
+        List<Long> ids = (List<Long>) params.get("ids");
+        Integer status = (Integer) params.get("status");
+        LambdaUpdateWrapper<Attraction> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.in(Attraction::getId, ids).set(Attraction::getStatus, status);
+        attractionMapper.update(null, wrapper);
         return Result.ok();
     }
     
@@ -144,5 +175,20 @@ public class AttractionController {
     public Result<Void> deleteAttractionCategory(@PathVariable Long id) {
         attractionService.deleteAttractionCategory(id);
         return Result.ok();
+    }
+
+    @Operation(summary = "从高德地图同步景点数据")
+    @PostMapping("/sync")
+    @PreAuthorize("hasRole('ADMIN')")
+    @SystemOperation(module = "景点管理", operation = "同步景点数据", description = "从高德地图API同步景点数据")
+    public Result<Map<String, Object>> syncFromAmap(@Valid @RequestBody AmapSyncRequest request) {
+        AmapSyncService.SyncResult result = amapSyncService.syncFromAmap(
+                request.getRegion(), request.getKeyword(), request.getMaxPages()
+        );
+        return Result.ok(Map.of(
+                "inserted", result.inserted(),
+                "updated", result.updated(),
+                "skipped", result.skipped()
+        ));
     }
 }

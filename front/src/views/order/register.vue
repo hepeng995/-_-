@@ -2,7 +2,7 @@
   <div class="register-container">
     <div class="register-card">
       <div class="logo-container">
-        <h1>电影院在线购票系统</h1>
+        <h1>智兴乡村，数创未来系统</h1>
       </div>
       <h3>用户注册</h3>
       
@@ -78,7 +78,7 @@
     </div>
     
     <div class="footer">
-      &copy; {{ new Date().getFullYear() }} 电影院在线购票系统
+      &copy; {{ new Date().getFullYear() }} 智兴乡村，数创未来系统
     </div>
   </div>
 </template>
@@ -213,7 +213,7 @@ const handleRegister = () => {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f1 100%);
+  background: linear-gradient(135deg, var(--color-bg-body) 0%, #e4e8f1 100%);
   padding: 40px 0;
   position: relative;
 }
@@ -221,8 +221,8 @@ const handleRegister = () => {
 .register-card {
   width: 450px;
   padding: 40px;
-  background-color: white;
-  border-radius: 12px;
+  background-color: var(--color-bg-surface);
+  border-radius: var(--radius-lg);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease;
 }
@@ -241,7 +241,7 @@ h1 {
   font-size: 24px;
   font-weight: 600;
   margin-bottom: 10px;
-  background: linear-gradient(90deg, #409EFF, #67C23A);
+  background: linear-gradient(90deg, var(--color-info), #67C23A);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -249,7 +249,7 @@ h1 {
 h3 {
   text-align: center;
   margin-bottom: 30px;
-  color: #606266;
+  color: var(--color-text-secondary);
   font-weight: normal;
   font-size: 18px;
 }
@@ -269,7 +269,7 @@ h3 {
 }
 
 .login-link a, .back-link a {
-  color: #409EFF;
+  color: var(--color-info);
   text-decoration: none;
   font-size: 14px;
   transition: all 0.2s;
@@ -282,7 +282,7 @@ h3 {
 .footer {
   position: absolute;
   bottom: 20px;
-  color: #909399;
+  color: var(--color-text-placeholder);
   font-size: 13px;
 }
 
@@ -301,11 +301,11 @@ h3 {
 }
 
 :deep(.el-input__wrapper.is-focus) {
-  box-shadow: 0 0 0 1px #409EFF inset !important;
+  box-shadow: 0 0 0 1px var(--color-info) inset !important;
 }
 
 :deep(.el-form-item__label) {
   padding-bottom: 5px;
   font-weight: 500;
 }
-</style> 
+</style>

@@ -30,24 +30,9 @@
               </div>
               <div class="attraction-location">
                 <el-icon class="location-icon"><MapLocation /></el-icon>
-                <span>{{ attraction.location }}</span>
+                <span>{{ attraction.address }}</span>
               </div>
               <p class="attraction-summary">{{ attraction.description }}</p>
-              
-              <!-- 特色标签 -->
-              <div class="attraction-features" v-if="attraction.features">
-                <h3>景点特色</h3>
-                <div class="features-list">
-                  <el-tag
-                    v-for="feature in attraction.features.split(',')"
-                    :key="feature"
-                    type="info"
-                    class="feature-tag"
-                  >
-                    {{ feature.trim() }}
-                  </el-tag>
-                </div>
-              </div>
 
               <!-- 操作按钮 -->
               <div class="action-buttons">
@@ -98,26 +83,17 @@
                     <span class="info-label">门票价格：</span>
                     <span class="info-value price">￥{{ attraction.ticketPrice || attraction.ticket_price }}</span>
                   </div>
-                  <div class="info-item" v-if="attraction.contactPhone">
-                    <span class="info-label">联系电话：</span>
-                    <span class="info-value">{{ attraction.contactPhone }}</span>
-                  </div>
                 </div>
               </div>
+
+              <!-- 实时天气 -->
+              <WeatherCard v-if="attraction.id" :attraction-id="attraction.id" />
 
               <!-- 交通指南 -->
               <div class="info-card" v-if="attraction.trafficGuide || attraction.traffic_guide">
                 <h3>交通指南</h3>
                 <div class="transportation-info">
                   <p>{{ attraction.trafficGuide || attraction.traffic_guide }}</p>
-                </div>
-              </div>
-
-              <!-- 温馨提示 -->
-              <div class="info-card" v-if="attraction.tips">
-                <h3>温馨提示</h3>
-                <div class="tips-info">
-                  <p>{{ attraction.tips }}</p>
                 </div>
               </div>
             </div>
@@ -195,6 +171,7 @@ import { ElMessage, ElImageViewer } from 'element-plus'
 import { MapLocation, Compass, Share } from '@element-plus/icons-vue'
 import attractionApi from '@/api/attraction'
 import LocationMap from '@/components/LocationMap.vue'
+import WeatherCard from '@/components/WeatherCard.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -340,25 +317,24 @@ onMounted(() => {
 <style scoped>
 .attraction-detail {
   min-height: 100vh;
-  background: #f8fafc;
+  background: var(--color-bg-body);
 }
 
 .container {
-  max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
 }
 
 /* 面包屑导航 */
 .breadcrumb-section {
-  background: white;
+  background: var(--color-bg-surface);
   padding: 20px 0;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--color-border);
 }
 
 /* 景点主要信息 */
 .attraction-hero {
-  background: white;
+  background: var(--color-bg-surface);
   padding: 40px 0;
 }
 
@@ -370,7 +346,7 @@ onMounted(() => {
 }
 
 .hero-image {
-  border-radius: 16px;
+  border-radius: var(--radius-xl);
   overflow: hidden;
   box-shadow: 0 8px 32px rgba(0,0,0,0.1);
 }
@@ -392,7 +368,7 @@ onMounted(() => {
 .attraction-title {
   font-size: 36px;
   font-weight: 700;
-  color: #1e293b;
+  color: var(--color-text-primary);
   margin-bottom: 20px;
   line-height: 1.2;
 }
@@ -405,7 +381,7 @@ onMounted(() => {
 }
 
 .rating-text {
-  color: #64748b;
+  color: var(--color-text-tertiary);
   font-weight: 500;
 }
 
@@ -413,19 +389,19 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #64748b;
+  color: var(--color-text-tertiary);
   margin-bottom: 24px;
   font-size: 16px;
 }
 
 .location-icon {
-  color: #3b82f6;
+  color: var(--color-info);
 }
 
 .attraction-summary {
   font-size: 16px;
   line-height: 1.8;
-  color: #4b5563;
+  color: var(--color-text-secondary);
   margin-bottom: 32px;
 }
 
@@ -435,7 +411,7 @@ onMounted(() => {
 
 .attraction-features h3 {
   font-size: 18px;
-  color: #1e293b;
+  color: var(--color-text-primary);
   margin-bottom: 16px;
   font-weight: 600;
 }
@@ -468,7 +444,7 @@ onMounted(() => {
 
 .detail-section h2 {
   font-size: 28px;
-  color: #1e293b;
+  color: var(--color-text-primary);
   margin-bottom: 24px;
   font-weight: 600;
 }
@@ -476,7 +452,7 @@ onMounted(() => {
 .detail-content {
   font-size: 16px;
   line-height: 1.8;
-  color: #4b5563;
+  color: var(--color-text-secondary);
 }
 
 /* 信息侧边栏 */
@@ -487,18 +463,18 @@ onMounted(() => {
 }
 
 .info-card {
-  background: white;
-  border-radius: 12px;
+  background: var(--color-bg-surface);
+  border-radius: var(--radius-lg);
   padding: 24px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  box-shadow: var(--shadow-card);
 }
 
 .info-card h3 {
   font-size: 20px;
-  color: #1e293b;
+  color: var(--color-text-primary);
   margin-bottom: 20px;
   font-weight: 600;
-  border-bottom: 2px solid #e2e8f0;
+  border-bottom: 2px solid var(--color-border);
   padding-bottom: 12px;
 }
 
@@ -515,17 +491,17 @@ onMounted(() => {
 }
 
 .info-label {
-  color: #64748b;
+  color: var(--color-text-tertiary);
   font-weight: 500;
 }
 
 .info-value {
-  color: #1e293b;
+  color: var(--color-text-primary);
   font-weight: 600;
 }
 
 .info-value.price {
-  color: #e74c3c;
+  color: var(--color-danger);
   font-size: 18px;
 }
 
@@ -533,18 +509,18 @@ onMounted(() => {
 .tips-info {
   font-size: 14px;
   line-height: 1.6;
-  color: #4b5563;
+  color: var(--color-text-secondary);
 }
 
 /* 图片展示 */
 .attraction-gallery {
   padding: 60px 0;
-  background: white;
+  background: var(--color-bg-surface);
 }
 
 .attraction-gallery h2 {
   font-size: 28px;
-  color: #1e293b;
+  color: var(--color-text-primary);
   margin-bottom: 32px;
   text-align: center;
   font-weight: 600;
@@ -557,7 +533,7 @@ onMounted(() => {
 }
 
 .gallery-item {
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   overflow: hidden;
   cursor: pointer;
   transition: transform 0.3s ease;
@@ -580,7 +556,7 @@ onMounted(() => {
 
 .related-attractions h2 {
   font-size: 28px;
-  color: #1e293b;
+  color: var(--color-text-primary);
   margin-bottom: 32px;
   text-align: center;
   font-weight: 600;
@@ -593,10 +569,10 @@ onMounted(() => {
 }
 
 .related-card {
-  background: white;
-  border-radius: 12px;
+  background: var(--color-bg-surface);
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  box-shadow: var(--shadow-card);
   transition: all 0.3s ease;
   cursor: pointer;
 }
@@ -623,7 +599,7 @@ onMounted(() => {
 
 .related-info h4 {
   font-size: 16px;
-  color: #1e293b;
+  color: var(--color-text-primary);
   margin-bottom: 12px;
   font-weight: 600;
 }
@@ -640,7 +616,7 @@ onMounted(() => {
     grid-template-columns: 1fr;
     gap: 40px;
   }
-  
+
   .details-grid {
     grid-template-columns: 1fr;
     gap: 40px;
@@ -651,21 +627,21 @@ onMounted(() => {
   .attraction-title {
     font-size: 28px;
   }
-  
+
   .action-buttons {
     flex-direction: column;
   }
-  
+
   .info-item {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
   }
-  
+
   .gallery-grid {
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   }
-  
+
   .related-grid {
     grid-template-columns: 1fr;
   }

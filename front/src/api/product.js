@@ -24,39 +24,6 @@ export default {
   },
 
   /**
-   * 创建商品
-   */
-  createProduct(data) {
-    return request({
-      url: '/products',
-      method: 'post',
-      data
-    })
-  },
-
-  /**
-   * 更新商品
-   */
-  updateProduct(id, data) {
-    return request({
-      url: `/products/${id}`,
-      method: 'put',
-      data
-    })
-  },
-
-  /**
-   * 删除商品
-   */
-  deleteProduct(id) {
-    return request({
-      url: `/products/${id}`,
-      method: 'delete'
-    })
-  },
-
-
-  /**
    * 获取热门商品列表
    */
   getHotProducts(limit = 8) {
@@ -145,71 +112,6 @@ export default {
   },
 
   /**
-   * 分页查询商品分类列表
-   */
-  getProductCategoriesPage(params) {
-    return request({
-      url: '/products/categories/page',
-      method: 'get',
-      params
-    })
-  },
-
-  /**
-   * 创建商品分类
-   */
-  createProductCategory(data) {
-    return request({
-      url: '/products/categories',
-      method: 'post',
-      data
-    })
-  },
-
-  /**
-   * 更新商品分类
-   */
-  updateProductCategory(id, data) {
-    return request({
-      url: `/products/categories/${id}`,
-      method: 'put',
-      data
-    })
-  },
-
-  /**
-   * 删除商品分类
-   */
-  deleteProductCategory(id) {
-    return request({
-      url: `/products/categories/${id}`,
-      method: 'delete'
-    })
-  },
-
-  /**
-   * 更新商品分类
-   */
-  updateProductCategory(id, data) {
-    return request({
-      url: `/products/categories/${id}`,
-      method: 'put',
-      data
-    })
-  },
-
-  /**
-   * 更新商品分类状态
-   */
-  updateProductCategoryStatus(id, status) {
-    return request({
-      url: `/products/categories/${id}/status`,
-      method: 'put',
-      data: { status }
-    })
-  },
-
-  /**
    * 搜索商品
    */
   searchProducts(keyword, params = {}) {
@@ -217,28 +119,6 @@ export default {
       url: '/products/search',
       method: 'get',
       params: { keyword, ...params }
-    })
-  },
-
-  /**
-   * 更新商品库存
-   */
-  updateProductStock(id, stock) {
-    return request({
-      url: `/products/${id}/stock`,
-      method: 'put',
-      data: { stock }
-    })
-  },
-
-  /**
-   * 批量更新商品状态
-   */
-  batchUpdateProductStatus(ids, status) {
-    return request({
-      url: '/products/batch/status',
-      method: 'put',
-      data: { ids, status }
     })
   }
 }

@@ -1,7 +1,8 @@
 <template>
   <div class="products-page">
     <!-- 页面头部 -->
-    <div class="page-header">
+    <div class="page-header" :style="{ backgroundImage: `url(${headerBg})` }">
+      <div class="header-overlay"></div>
       <div class="container">
         <h1>特产商城</h1>
         <p>品味地道农特产品，感受乡村自然馈赠</p>
@@ -37,7 +38,7 @@
               :value="category.id"
             />
           </el-select> -->
-          
+
           <el-button type="primary" size="large" @click="handleSearch">
             <el-icon><Search /></el-icon>
             搜索
@@ -50,14 +51,14 @@
     <div class="category-tabs">
       <div class="container">
         <div class="tabs-wrapper">
-          <div 
+          <div
             class="category-tab"
             :class="{ active: searchParams.categoryId === null }"
             @click="selectCategory(null)"
           >
             全部商品
           </div>
-          <div 
+          <div
             v-for="category in categories"
             :key="category.id"
             class="category-tab"
@@ -74,7 +75,7 @@
     <div class="products-content">
       <div class="container">
         <div class="products-grid" v-loading="loading">
-          <div 
+          <div
             v-for="product in products"
             :key="product.id"
             class="product-card"
@@ -112,19 +113,19 @@
               </div>
               <div class="product-quantity" v-if="product.stock > 0">
                 <span class="quantity-label">数量:</span>
-                <el-input-number 
-                  v-model="product.buyQuantity" 
-                  :min="1" 
-                  :max="product.stock" 
+                <el-input-number
+                  v-model="product.buyQuantity"
+                  :min="1"
+                  :max="product.stock"
                   size="small"
                   @change="() => updateQuantity(product)"
                   @click.stop
                 />
               </div>
               <div class="product-actions">
-                <el-button 
-                  type="primary" 
-                  size="small" 
+                <el-button
+                  type="primary"
+                  size="small"
                   :disabled="product.stock <= 0"
                   @click.stop="addToCart(product)"
                 >
@@ -180,6 +181,7 @@ import { Search, MapLocation, ShoppingCart } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/user'
 import { useCartStore } from '@/stores/cart'
 import productApi from '@/api/product'
+import headerBg from '@/assets/image/特产商城背景.png'
 
 const router = useRouter()
 const route = useRoute()
@@ -371,7 +373,7 @@ onMounted(() => {
   if (route.query.keyword) {
     searchParams.keyword = route.query.keyword
   }
-  
+
   getCategories()
   getProducts()
   getCartCount()
@@ -381,60 +383,55 @@ onMounted(() => {
 <style scoped>
 .products-page {
   min-height: 100vh;
-  background: #f8fafc;
+  background: var(--color-bg-body);
 }
 
 .container {
-  max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
 }
 
 /* 页面头部 */
 .page-header {
-  background: linear-gradient(135deg, #c7fee4 0%, #dbf9eb 50%, #c0ffd3 100%);
-  color: #e48e58;
-  padding: 50px 0;
+  background-size: cover;
+  background-position: center;
+  color: #ffffff;
+  padding: 70px 0;
   text-align: center;
   position: relative;
   overflow: hidden;
 }
 
-.page-header::before {
-  content: '';
+.header-overlay {
   position: absolute;
-  top: -30%;
-  left: -10%;
-  width: 300px;
-  height: 300px;
-  background: radial-gradient(circle, rgba(251, 191, 36, 0.15) 0%, transparent 70%);
-  border-radius: 50%;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  pointer-events: none;
 }
 
 .page-header h1 {
   font-size: 48px;
   font-weight: 700;
   margin-bottom: 16px;
-  background: linear-gradient(45deg, #ffb07e, #d97706);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #ffffff;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   position: relative;
   z-index: 1;
 }
 
 .page-header p {
   font-size: 18px;
-  color: #d79f51;
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
   position: relative;
   z-index: 1;
 }
 
 /* 搜索区域 */
 .search-section {
-  background: white;
+  background: var(--color-bg-surface);
   padding: 30px 0;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .search-form {
@@ -452,9 +449,9 @@ onMounted(() => {
 
 /* 分类标签 */
 .category-tabs {
-  background: white;
+  background: var(--color-bg-surface);
   padding: 20px 0;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .tabs-wrapper {
@@ -469,21 +466,21 @@ onMounted(() => {
   flex-shrink: 0;
   padding: 8px 20px;
   border-radius: 20px;
-  background: #f1f5f9;
-  color: #64748b;
+  background: var(--color-bg-muted);
+  color: var(--color-text-tertiary);
   cursor: pointer;
   transition: all 0.3s ease;
   font-weight: 500;
 }
 
 .category-tab:hover {
-  background: #e2e8f0;
-  color: #475569;
+  background: var(--color-border);
+  color: var(--color-text-secondary);
 }
 
 .category-tab.active {
-  background: #10b981;
-  color: white;
+  background: var(--color-primary-500);
+  color: var(--color-text-inverse);
 }
 
 /* 商品内容区域 */
@@ -499,17 +496,17 @@ onMounted(() => {
 }
 
 .product-card {
-  background: white;
-  border-radius: 16px;
+  background: var(--color-bg-surface);
+  border-radius: var(--radius-xl);
   overflow: hidden;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  box-shadow: var(--shadow-card);
   transition: all 0.3s ease;
   cursor: pointer;
 }
 
 .product-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+  box-shadow: var(--shadow-card-hover);
 }
 
 .product-image {
@@ -561,19 +558,19 @@ onMounted(() => {
   border-radius: 8px;
   font-size: 11px;
   font-weight: 600;
-  color: white;
+  color: var(--color-text-inverse);
 }
 
 .badge.featured {
-  background: #f59e0b;
+  background: var(--color-warning);
 }
 
 .badge.new {
-  background: #10b981;
+  background: var(--color-primary-500);
 }
 
 .badge.hot {
-  background: #ef4444;
+  background: var(--color-danger);
 }
 
 .product-info {
@@ -582,7 +579,7 @@ onMounted(() => {
 
 .product-category {
   font-size: 12px;
-  color: #64748b;
+  color: var(--color-text-tertiary);
   margin-bottom: 8px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -591,7 +588,7 @@ onMounted(() => {
 .product-name {
   font-size: 16px;
   font-weight: 600;
-  color: #1e293b;
+  color: var(--color-text-primary);
   margin-bottom: 8px;
   display: -webkit-box;
   -webkit-line-clamp: 1;
@@ -602,7 +599,7 @@ onMounted(() => {
 
 .product-desc {
   font-size: 13px;
-  color: #64748b;
+  color: var(--color-text-tertiary);
   line-height: 1.4;
   margin-bottom: 12px;
   display: -webkit-box;
@@ -617,7 +614,7 @@ onMounted(() => {
   align-items: center;
   gap: 4px;
   font-size: 12px;
-  color: #64748b;
+  color: var(--color-text-tertiary);
   margin-bottom: 12px;
 }
 
@@ -628,12 +625,12 @@ onMounted(() => {
 .current-price {
   font-size: 18px;
   font-weight: 700;
-  color: #e74c3c;
+  color: var(--color-danger);
 }
 
 .original-price {
   font-size: 14px;
-  color: #94a3b8;
+  color: var(--color-text-placeholder);
   text-decoration: line-through;
   margin-left: 8px;
 }
@@ -654,7 +651,7 @@ onMounted(() => {
 
 .quantity-label {
   font-size: 14px;
-  color: #64748b;
+  color: var(--color-text-tertiary);
 }
 
 .rating {
@@ -665,12 +662,12 @@ onMounted(() => {
 
 .rating-count {
   font-size: 12px;
-  color: #64748b;
+  color: var(--color-text-tertiary);
 }
 
 .sales {
   font-size: 12px;
-  color: #64748b;
+  color: var(--color-text-tertiary);
 }
 
 .product-actions {
@@ -709,27 +706,27 @@ onMounted(() => {
   .page-header h1 {
     font-size: 32px;
   }
-  
+
   .search-form {
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .search-form .el-input {
     width: 100%;
   }
-  
+
   .products-grid {
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 16px;
   }
-  
+
   .product-meta {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
   }
-  
+
   .cart-float {
     bottom: 20px;
     right: 20px;
@@ -740,15 +737,15 @@ onMounted(() => {
   .products-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .product-info {
     padding: 16px;
   }
-  
+
   .tabs-wrapper {
     gap: 12px;
   }
-  
+
   .category-tab {
     padding: 6px 16px;
     font-size: 14px;

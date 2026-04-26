@@ -1,0 +1,163 @@
+// ============================================================
+// 设计Token系统 - 绿意乡村主题 (Ink & Bloom)
+// 乡村振兴·智兴乡村平台 用户端前端
+// ============================================================
+
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&display=swap');
+
+:root {
+  // === 品牌主色 - 竹翠 (Bamboo Jade) ===
+  --color-primary-50:  #f0fdf4;
+  --color-primary-100: #dcfce7;
+  --color-primary-200: #bbf7d0;
+  --color-primary-300: #86efac;
+  --color-primary-400: #4ade80;
+  --color-primary-500: #22c55e;
+  --color-primary-600: #16a34a;
+  --color-primary-700: #15803d;
+  --color-primary-800: #166534;
+  --color-primary-900: #14532d;
+  --color-primary-950: #052e16;
+
+  // === 桃色点缀 (Blossom Accent) ===
+  --color-blossom-50:  #fdf2f8;
+  --color-blossom-100: #fce7f3;
+  --color-blossom-200: #fbcfe8;
+  --color-blossom-300: #f9a8d4;
+  --color-blossom-400: #f472b6;
+  --color-blossom-500: #ec4899;
+
+  // === 墨色 (Ink) ===
+  --color-ink-50:  #f8fafc;
+  --color-ink-100: #f1f5f9;
+  --color-ink-200: #e2e8f0;
+  --color-ink-300: #cbd5e1;
+  --color-ink-400: #94a3b8;
+  --color-ink-500: #64748b;
+  --color-ink-600: #475569;
+  --color-ink-700: #334155;
+  --color-ink-800: #1e293b;
+  --color-ink-900: #0f172a;
+
+  // === 功能色 ===
+  --color-success: #22c55e;
+  --color-warning: #eab308;
+  --color-danger:  #ef4444;
+  --color-info:    #0ea5e9;
+
+  // === 文字色 (水墨层次) ===
+  --color-text-primary:    #1a2e1a;
+  --color-text-secondary:  #3d5a3d;
+  --color-text-tertiary:   #5f7f5f;
+  --color-text-placeholder:#8fa68f;
+  --color-text-inverse:    #f0fdf4;
+  --color-text-link:       #15803d;
+
+  // === 背景/表面色 (宣纸质感) ===
+  --color-bg-body:     #fafbf7;
+  --color-bg-surface:  #ffffff;
+  --color-bg-muted:    #f3f4ef;
+  --color-bg-sidebar:  #f6faf6;
+  --color-bg-sidebar-hover:  rgba(34, 197, 94, 0.06);
+  --color-bg-sidebar-active: rgba(34, 197, 94, 0.12);
+  --color-bg-overlay:  rgba(15, 23, 42, 0.5);
+
+  // === 边框色 ===
+  --color-border:       #dde5d8;
+  --color-border-light: #eef2ea;
+  --color-border-focus: #15803d;
+
+  // === 渐变色 (水墨晕染) ===
+  --gradient-green:   linear-gradient(135deg, #f0fdf4 0%, #dcfce7 40%, #bbf7d0 100%);
+  --gradient-orange:  linear-gradient(135deg, #fffbeb 0%, #fef3c7 40%, #fde68a 100%);
+  --gradient-blue:    linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 40%, #bae6fd 100%);
+  --gradient-purple:  linear-gradient(135deg, #faf5ff 0%, #f3e8ff 40%, #e9d5ff 100%);
+  --gradient-primary: linear-gradient(135deg, #15803d, #22c55e);
+  --gradient-hero:    linear-gradient(160deg, #052e16 0%, #166534 35%, #15803d 65%, #22c55e 100%);
+  --gradient-sidebar: linear-gradient(180deg, #f8fbf8 0%, #eef4ee 100%);
+  --gradient-ink:     linear-gradient(180deg, rgba(15,23,42,0.03) 0%, transparent 100%);
+  --gradient-paper:   linear-gradient(135deg, #fafbf7 0%, #f5f6f0 50%, #fafbf7 100%);
+
+  // === 间距 (4px基准网格) ===
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+
+  // === 排版 (水墨书体) ===
+  --font-display: 'Noto Serif SC', 'Source Han Serif SC', 'STSong',
+                  'SimSun', serif;
+  --font-sans: 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei',
+               -apple-system, BlinkMacSystemFont, sans-serif;
+  --text-xs:   12px;
+  --text-sm:   13px;
+  --text-base: 14px;
+  --text-md:   16px;
+  --text-lg:   18px;
+  --text-xl:   20px;
+  --text-2xl:  24px;
+  --text-3xl:  30px;
+  --text-4xl:  36px;
+  --text-5xl:  48px;
+  --leading-tight:   1.25;
+  --leading-normal:  1.6;
+  --leading-relaxed: 1.8;
+  --font-normal:   400;
+  --font-medium:   500;
+  --font-semibold: 600;
+  --font-bold:     700;
+
+  // === 圆角 ===
+  --radius-sm:   4px;
+  --radius-md:   8px;
+  --radius-lg:   12px;
+  --radius-xl:   16px;
+  --radius-2xl:  24px;
+  --radius-full: 9999px;
+
+  // === 阴影 (墨迹阴影) ===
+  --shadow-sm:          0 1px 3px rgba(20, 83, 45, 0.06);
+  --shadow-md:          0 4px 8px rgba(20, 83, 45, 0.08);
+  --shadow-lg:          0 8px 20px rgba(20, 83, 45, 0.1);
+  --shadow-xl:          0 16px 32px rgba(20, 83, 45, 0.12);
+  --shadow-card:        0 1px 4px rgba(20, 83, 45, 0.06), 0 4px 12px rgba(20, 83, 45, 0.04);
+  --shadow-card-hover:  0 8px 24px rgba(20, 83, 45, 0.12), 0 2px 8px rgba(20, 83, 45, 0.06);
+  --shadow-sidebar:     2px 0 12px rgba(20, 83, 45, 0.08);
+  --shadow-glow:        0 0 20px rgba(34, 197, 94, 0.15);
+
+  // === 过渡动画 ===
+  --duration-fast:   150ms;
+  --duration-normal: 250ms;
+  --duration-slow:   400ms;
+  --duration-slower: 600ms;
+  --ease-default:    cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-in:         cubic-bezier(0.4, 0, 1, 1);
+  --ease-out:        cubic-bezier(0, 0, 0.2, 1);
+  --ease-bounce:     cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-flow:       cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  // === Z-Index层级 ===
+  --z-sidebar:      100;
+  --z-toolbar:      110;
+  --z-dropdown:     200;
+  --z-overlay:      300;
+  --z-drawer:       400;
+  --z-modal:        500;
+  --z-chat:         600;
+  --z-tooltip:      700;
+  --z-notification: 800;
+
+  // === 布局 ===
+  --sidebar-width:        240px;
+  --sidebar-width-collapsed: 64px;
+  --sidebar-bg:           var(--color-bg-sidebar);
+  --toolbar-height:       56px;
+  --content-padding:      var(--space-6);
+}

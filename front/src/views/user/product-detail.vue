@@ -27,7 +27,7 @@
                 </div>
               </div>
               <div class="image-thumbs" v-if="product.images && product.images.length > 1">
-                <div 
+                <div
                   v-for="(image, index) in product.images"
                   :key="index"
                   class="thumb-item"
@@ -46,7 +46,7 @@
               </div>
               <h1 class="product-title">{{ product.name }}</h1>
               <div class="product-subtitle">{{ product.subtitle }}</div>
-              
+
               <div class="product-rating">
                 <el-rate v-model="product.rating" disabled show-score text-color="#ff9900" />
                 <span class="rating-text">({{ product.rating }}分 · {{ product.reviewCount || 0 }}条评价)</span>
@@ -71,7 +71,7 @@
               <div class="product-specs" v-if="product.specifications">
                 <h3>商品规格</h3>
                 <div class="specs-list">
-                  <div 
+                  <div
                     v-for="spec in getSpecificationsList(product.specifications)"
                     :key="spec"
                     class="spec-item"
@@ -99,17 +99,17 @@
 
               <!-- 操作按钮 -->
               <div class="action-buttons">
-                <el-button 
-                  type="warning" 
-                  size="large" 
+                <el-button
+                  type="warning"
+                  size="large"
                   :disabled="product.stock <= 0"
                   @click="addToCart"
                 >
                   <el-icon><ShoppingCart /></el-icon>
                   {{ product.stock > 0 ? '加入购物车' : '缺货' }}
                 </el-button>
-                <el-button 
-                  type="primary" 
+                <el-button
+                  type="primary"
                   size="large"
                   :disabled="product.stock <= 0"
                   @click="buyNow"
@@ -200,7 +200,7 @@
                       <div class="rating-count">{{ Number(reviewStats.total_count || 0) }}条评价</div>
                     </div>
                   </div>
-                  
+
                   <!-- 评分分布 -->
                   <div class="rating-distribution" v-if="reviewStats && reviewStats.total_count > 0">
                     <div v-for="rating in [5, 4, 3, 2, 1]" :key="rating" class="rating-bar">
@@ -216,15 +216,15 @@
                 <!-- 评价筛选和排序 -->
                 <div class="reviews-filters">
                   <div class="filter-buttons">
-                    <el-button 
+                    <el-button
                       :type="reviewFilter.rating === null ? 'primary' : 'default'"
                       @click="setRatingFilter(null)"
                       size="small"
                     >
                       全部({{ reviewStats?.total_count || 0 }})
                     </el-button>
-                    <el-button 
-                      v-for="rating in [5, 4, 3, 2, 1]" 
+                    <el-button
+                      v-for="rating in [5, 4, 3, 2, 1]"
                       :key="rating"
                       :type="reviewFilter.rating === rating ? 'primary' : 'default'"
                       @click="setRatingFilter(rating)"
@@ -232,7 +232,7 @@
                     >
                       {{ rating }}星({{ getRatingCount(rating) }})
                     </el-button>
-                    <el-button 
+                    <el-button
                       :type="reviewFilter.hasImages ? 'primary' : 'default'"
                       @click="toggleImageFilter"
                       size="small"
@@ -240,7 +240,7 @@
                       有图({{ reviewStats?.has_images_count || 0 }})
                     </el-button>
                   </div>
-                  
+
                   <div class="sort-options">
                     <el-select v-model="reviewFilter.sortBy" @change="loadReviews" size="small" style="width: 120px">
                       <el-option label="按时间" value="time" />
@@ -252,19 +252,19 @@
 
                 <!-- 写评价按钮 -->
                 <div class="write-review-section">
-                  <el-button 
-                    v-if="userInfo" 
-                    type="primary" 
-                    @click="showReviewDialog = true" 
+                  <el-button
+                    v-if="userInfo"
+                    type="primary"
+                    @click="showReviewDialog = true"
                     size="large"
                   >
                     <el-icon><EditPen /></el-icon>
                     写评价
                   </el-button>
-                  <el-button 
-                    v-else 
-                    type="primary" 
-                    @click="$router.push('/login')" 
+                  <el-button
+                    v-else
+                    type="primary"
+                    @click="$router.push('/login')"
                     size="large"
                   >
                     <el-icon><EditPen /></el-icon>
@@ -288,17 +288,17 @@
                         </div>
                         <div class="review-date">{{ formatDate(review.createdAt) }}</div>
                       </div>
-                      
+
                       <div class="review-rating">
                         <el-rate :model-value="review.rating" disabled size="small" />
                       </div>
-                      
+
                       <div class="review-content">{{ review.content }}</div>
-                      
+
                       <!-- 评价图片 -->
                       <div class="review-images" v-if="review.images">
                         <div class="image-grid">
-                          <img 
+                          <img
                             v-for="(image, index) in parseImages(review.images)"
                             :key="index"
                             :src="image"
@@ -307,18 +307,18 @@
                           />
                         </div>
                       </div>
-                      
+
                       <!-- 商家回复 -->
                       <div class="merchant-reply" v-if="review.replyContent">
                         <div class="reply-header">商家回复：</div>
                         <div class="reply-content">{{ review.replyContent }}</div>
                         <div class="reply-time">{{ formatDate(review.replyTime) }}</div>
                       </div>
-                      
+
                       <!-- 评价操作 -->
                       <div class="review-actions">
-                        <el-button 
-                          text 
+                        <el-button
+                          text
                           :type="review.isHelpful ? 'primary' : 'default'"
                           @click="toggleHelpful(review)"
                           size="small"
@@ -329,7 +329,7 @@
                       </div>
                     </div>
                   </div>
-                  
+
                   <!-- 分页 -->
                   <div class="reviews-pagination" v-if="reviewPagination.total > 0">
                     <el-pagination
@@ -345,6 +345,9 @@
                 </div>
               </div>
             </el-tab-pane>
+            <el-tab-pane label="溯源信息" name="trace" v-if="hasTraceData">
+              <ProductTrace :product-id="Number(route.params.id)" />
+            </el-tab-pane>
           </el-tabs>
         </div>
       </div>
@@ -354,7 +357,7 @@
         <div class="container">
           <h2>相关推荐</h2>
           <div class="related-grid">
-            <div 
+            <div
               v-for="item in relatedProducts"
               :key="item.id"
               class="related-card"
@@ -389,18 +392,18 @@
         <el-form-item label="评分" prop="rating" required>
           <el-rate v-model="reviewForm.rating" :texts="['极差', '失望', '一般', '满意', '惊喜']" show-text />
         </el-form-item>
-        
+
         <el-form-item label="评价内容" prop="content">
-          <el-input 
-            v-model="reviewForm.content" 
-            type="textarea" 
-            :rows="4" 
+          <el-input
+            v-model="reviewForm.content"
+            type="textarea"
+            :rows="4"
             placeholder="分享你的使用感受，帮助其他用户更好地了解该商品..."
             maxlength="500"
             show-word-limit
           />
         </el-form-item>
-        
+
         <el-form-item label="上传图片">
           <el-upload
             ref="uploadRef"
@@ -419,12 +422,12 @@
             </template>
           </el-upload>
         </el-form-item>
-        
+
         <el-form-item label="匿名评价">
           <el-checkbox v-model="reviewForm.isAnonymous">匿名发表评价</el-checkbox>
         </el-form-item>
       </el-form>
-      
+
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="showReviewDialog = false">取消</el-button>
@@ -439,12 +442,12 @@
 import { ref, onMounted, nextTick, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElImageViewer } from 'element-plus'
-import { 
-  MapLocation, 
-  ShoppingCart, 
-  Share, 
-  CircleCheckFilled, 
-  MessageBox, 
+import {
+  MapLocation,
+  ShoppingCart,
+  Share,
+  CircleCheckFilled,
+  MessageBox,
   RefreshRight,
   User,
   EditPen,
@@ -456,6 +459,8 @@ import { useCartStore } from '@/stores/cart'
 import productApi from '@/api/product'
 import reviewApi from '@/api/review'
 import fileApi from '@/api/file'
+import traceApi from '@/api/trace'
+import ProductTrace from './product-trace.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -470,6 +475,7 @@ const activeTab = ref('detail')
 const currentImage = ref('')
 const selectedSpec = ref('')
 const quantity = ref(1)
+const hasTraceData = ref(false)
 
 // 评价相关数据
 const reviewStats = ref(null)
@@ -528,7 +534,7 @@ const loadProduct = async () => {
     const res = await productApi.getProductById(id)
     if (res.code === 200) {
       product.value = res.data
-      
+
       // 处理图片数据：将JSON字符串转换为数组
       if (product.value.images && typeof product.value.images === 'string') {
         try {
@@ -541,15 +547,15 @@ const loadProduct = async () => {
       if (!Array.isArray(product.value.images)) {
         product.value.images = []
       }
-      
+
       // 设置当前显示的图片
       currentImage.value = product.value.coverImage || '/images/default-product.jpg'
-      
+
       // 如果有多张图片，将封面图片添加到图片数组的开头
       if (product.value.coverImage && !product.value.images.includes(product.value.coverImage)) {
         product.value.images.unshift(product.value.coverImage)
       }
-      
+
       // 设置页面标题
       document.title = `${res.data.name} - 商品详情`
       // 设置默认规格
@@ -563,6 +569,8 @@ const loadProduct = async () => {
       loadRelatedProducts(res.data.categoryId, id)
       // 获取评价
       loadReviews()
+      // 检查溯源数据
+      checkTraceData(id)
       // 检查评价权限
       checkReviewEligibility()
     } else {
@@ -573,6 +581,19 @@ const loadProduct = async () => {
     ElMessage.error('获取商品详情失败')
   } finally {
     loading.value = false
+  }
+}
+
+// 检查溯源数据
+const checkTraceData = async (id) => {
+  try {
+    const res = await traceApi.hasTraceData(id)
+    if (res.code === 200) {
+      hasTraceData.value = res.data
+    }
+  } catch (error) {
+    console.error('检查溯源数据失败:', error)
+    hasTraceData.value = false
   }
 }
 
@@ -594,7 +615,7 @@ const loadRelatedProducts = async (categoryId, currentId) => {
 // 获取商品评价
 const loadReviews = async () => {
   if (!product.value) return
-  
+
   reviewsLoading.value = true
   try {
     const params = {
@@ -605,7 +626,7 @@ const loadReviews = async () => {
       current: reviewPagination.value.current,
       size: reviewPagination.value.size
     }
-    
+
     const res = await productApi.getProductReviews(product.value.id, params)
     if (res.code === 200) {
       const data = res.data
@@ -782,7 +803,7 @@ const toggleImageFilter = () => {
 
 const getRatingCount = (rating) => {
   if (!reviewStats.value) return 0
-  
+
   const countKey = `${rating === 5 ? 'five' : rating === 4 ? 'four' : rating === 3 ? 'three' : rating === 2 ? 'two' : 'one'}_star_count`
   return Number(reviewStats.value[countKey] || 0)
 }
@@ -790,10 +811,10 @@ const getRatingCount = (rating) => {
 // 获取评分百分比
 const getRatingPercentage = (rating) => {
   if (!reviewStats.value || !reviewStats.value.total_count) return 0
-  
+
   const count = getRatingCount(rating)
   const totalCount = Number(reviewStats.value.total_count)
-  
+
   return totalCount > 0 ? (count / totalCount) * 100 : 0
 }
 
@@ -866,13 +887,13 @@ const beforeImageUpload = (file) => {
 // 提交评价
 const submitReview = async () => {
   if (!reviewFormRef.value) return
-  
+
   try {
     const valid = await reviewFormRef.value.validate()
     if (!valid) return
-    
+
     submittingReview.value = true
-    
+
     // 处理图片上传
     let imageUrls = []
     if (reviewForm.value.imageList.length > 0) {
@@ -883,7 +904,7 @@ const submitReview = async () => {
             // 使用文件上传API
             const uploadRes = await fileApi.uploadFile(fileItem.raw)
             console.log('上传响应完整数据:', uploadRes)
-            
+
             // 处理不同的响应格式
             if (uploadRes.data) {
               if (uploadRes.data.code === 200 && uploadRes.data.data) {
@@ -903,7 +924,7 @@ const submitReview = async () => {
         return
       }
     }
-    
+
     const reviewData = {
       productId: product.value.id,
       rating: reviewForm.value.rating,
@@ -911,7 +932,7 @@ const submitReview = async () => {
       images: imageUrls.length > 0 ? JSON.stringify(imageUrls) : null,
       isAnonymous: reviewForm.value.isAnonymous
     }
-    
+
     const res = await reviewApi.createReview(reviewData)
     if (res.code === 200) {
       ElMessage.success('评价提交成功')
@@ -985,25 +1006,24 @@ watch(
 <style scoped>
 .product-detail {
   min-height: 100vh;
-  background: #f8fafc;
+  background: var(--color-bg-body);
 }
 
 .container {
-  max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
 }
 
 /* 面包屑导航 */
 .breadcrumb-section {
-  background: white;
+  background: var(--color-bg-surface);
   padding: 20px 0;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--color-border);
 }
 
 /* 商品主要信息 */
 .product-hero {
-  background: white;
+  background: var(--color-bg-surface);
   padding: 40px 0;
 }
 
@@ -1023,7 +1043,7 @@ watch(
 .main-image {
   position: relative;
   margin-bottom: 16px;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   overflow: hidden;
   box-shadow: 0 8px 32px rgba(0,0,0,0.1);
 }
@@ -1046,22 +1066,22 @@ watch(
 
 .badge {
   padding: 6px 12px;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   font-size: 12px;
   font-weight: 600;
-  color: white;
+  color: var(--color-text-inverse);
 }
 
 .badge.featured {
-  background: #f59e0b;
+  background: var(--color-warning);
 }
 
 .badge.new {
-  background: #10b981;
+  background: var(--color-primary-500);
 }
 
 .badge.hot {
-  background: #ef4444;
+  background: var(--color-danger);
 }
 
 .image-thumbs {
@@ -1082,7 +1102,7 @@ watch(
 }
 
 .thumb-item.active {
-  border-color: #10b981;
+  border-color: var(--color-primary-500);
 }
 
 .thumb-item img {
@@ -1103,14 +1123,14 @@ watch(
 .product-title {
   font-size: 32px;
   font-weight: 700;
-  color: #1e293b;
+  color: var(--color-text-primary);
   margin-bottom: 12px;
   line-height: 1.2;
 }
 
 .product-subtitle {
   font-size: 16px;
-  color: #64748b;
+  color: var(--color-text-tertiary);
   margin-bottom: 20px;
 }
 
@@ -1122,7 +1142,7 @@ watch(
 }
 
 .rating-text {
-  color: #64748b;
+  color: var(--color-text-tertiary);
   font-size: 14px;
 }
 
@@ -1130,20 +1150,20 @@ watch(
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #64748b;
+  color: var(--color-text-tertiary);
   margin-bottom: 24px;
   font-size: 16px;
 }
 
 .origin-icon {
-  color: #10b981;
+  color: var(--color-primary-500);
 }
 
 .product-price {
   margin-bottom: 32px;
   padding: 20px;
-  background: #f1f5f9;
-  border-radius: 12px;
+  background: var(--color-bg-muted);
+  border-radius: var(--radius-lg);
 }
 
 .price-row {
@@ -1156,12 +1176,12 @@ watch(
 .current-price {
   font-size: 28px;
   font-weight: 700;
-  color: #e74c3c;
+  color: var(--color-danger);
 }
 
 .original-price {
   font-size: 18px;
-  color: #94a3b8;
+  color: var(--color-text-placeholder);
   text-decoration: line-through;
 }
 
@@ -1170,7 +1190,7 @@ watch(
 }
 
 .discount {
-  color: #10b981;
+  color: var(--color-primary-500);
   font-weight: 600;
 }
 
@@ -1181,7 +1201,7 @@ watch(
 
 .product-specs h3 {
   font-size: 18px;
-  color: #1e293b;
+  color: var(--color-text-primary);
   margin-bottom: 16px;
   font-weight: 600;
 }
@@ -1201,13 +1221,13 @@ watch(
 }
 
 .spec-item:hover {
-  border-color: #10b981;
+  border-color: var(--color-primary-500);
 }
 
 .spec-item.active {
-  border-color: #10b981;
-  background: #10b981;
-  color: white;
+  border-color: var(--color-primary-500);
+  background: var(--color-primary-500);
+  color: var(--color-text-inverse);
 }
 
 /* 购买数量 */
@@ -1217,7 +1237,7 @@ watch(
 
 .quantity-section h3 {
   font-size: 18px;
-  color: #1e293b;
+  color: var(--color-text-primary);
   margin-bottom: 16px;
   font-weight: 600;
 }
@@ -1229,7 +1249,7 @@ watch(
 }
 
 .stock-info {
-  color: #64748b;
+  color: var(--color-text-tertiary);
   font-size: 14px;
 }
 
@@ -1249,15 +1269,15 @@ watch(
   display: flex;
   gap: 24px;
   padding: 20px;
-  background: #f8fafc;
-  border-radius: 12px;
+  background: var(--color-bg-body);
+  border-radius: var(--radius-lg);
 }
 
 .guarantee-item {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #64748b;
+  color: var(--color-text-tertiary);
   font-size: 14px;
 }
 
@@ -1267,21 +1287,21 @@ watch(
 }
 
 .detail-tabs {
-  background: white;
-  border-radius: 12px;
+  background: var(--color-bg-surface);
+  border-radius: var(--radius-lg);
   padding: 32px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  box-shadow: var(--shadow-card);
 }
 
 .detail-content {
   font-size: 16px;
   line-height: 1.8;
-  color: #4b5563;
+  color: var(--color-text-secondary);
 }
 
 .default-content h3 {
   font-size: 20px;
-  color: #1e293b;
+  color: var(--color-text-primary);
   margin: 24px 0 16px;
   font-weight: 600;
 }
@@ -1302,11 +1322,11 @@ watch(
 
 .specs-table td {
   padding: 12px 16px;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .specs-table td:first-child {
-  background: #f8fafc;
+  background: var(--color-bg-body);
   font-weight: 600;
   width: 120px;
 }
@@ -1315,8 +1335,8 @@ watch(
 .reviews-summary {
   margin-bottom: 32px;
   padding: 24px;
-  background: #f8fafc;
-  border-radius: 12px;
+  background: var(--color-bg-body);
+  border-radius: var(--radius-lg);
 }
 
 .rating-overview {
@@ -1329,12 +1349,12 @@ watch(
 .rating-score {
   font-size: 48px;
   font-weight: 700;
-  color: #f59e0b;
+  color: var(--color-warning);
 }
 
 .rating-count {
   font-size: 14px;
-  color: #64748b;
+  color: var(--color-text-tertiary);
   margin-top: 8px;
 }
 
@@ -1354,27 +1374,27 @@ watch(
 
 .rating-label {
   width: 40px;
-  color: #64748b;
+  color: var(--color-text-tertiary);
 }
 
 .progress-bar {
   flex: 1;
   height: 6px;
-  background: #e2e8f0;
+  background: var(--color-border);
   border-radius: 3px;
   overflow: hidden;
 }
 
 .progress-fill {
   height: 100%;
-  background: #f59e0b;
+  background: var(--color-warning);
   transition: width 0.3s ease;
 }
 
 .rating-percent {
   width: 40px;
   text-align: right;
-  color: #64748b;
+  color: var(--color-text-tertiary);
 }
 
 /* 评价筛选 */
@@ -1384,7 +1404,7 @@ watch(
   align-items: center;
   margin-bottom: 24px;
   padding: 16px;
-  background: white;
+  background: var(--color-bg-surface);
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
@@ -1409,9 +1429,9 @@ watch(
 
 .review-tip {
   padding: 12px 20px;
-  background: #f8fafc;
+  background: var(--color-bg-body);
   border-radius: 8px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--color-border);
   margin: 0 auto;
   display: inline-block;
 }
@@ -1424,8 +1444,8 @@ watch(
 
 .review-item {
   padding: 20px;
-  background: white;
-  border-radius: 12px;
+  background: var(--color-bg-surface);
+  border-radius: var(--radius-lg);
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
@@ -1444,12 +1464,12 @@ watch(
 
 .reviewer-name {
   font-weight: 600;
-  color: #1e293b;
+  color: var(--color-text-primary);
 }
 
 .review-date {
   font-size: 14px;
-  color: #64748b;
+  color: var(--color-text-tertiary);
 }
 
 .review-rating {
@@ -1458,7 +1478,7 @@ watch(
 
 .review-content {
   line-height: 1.6;
-  color: #4b5563;
+  color: var(--color-text-secondary);
   margin-bottom: 16px;
 }
 
@@ -1490,27 +1510,27 @@ watch(
 .merchant-reply {
   margin-top: 16px;
   padding: 16px;
-  background: #f8fafc;
+  background: var(--color-bg-body);
   border-radius: 8px;
-  border-left: 4px solid #10b981;
+  border-left: 4px solid var(--color-primary-500);
 }
 
 .reply-header {
   font-weight: 600;
-  color: #10b981;
+  color: var(--color-primary-500);
   margin-bottom: 8px;
   font-size: 14px;
 }
 
 .reply-content {
-  color: #4b5563;
+  color: var(--color-text-secondary);
   line-height: 1.6;
   margin-bottom: 8px;
 }
 
 .reply-time {
   font-size: 12px;
-  color: #64748b;
+  color: var(--color-text-tertiary);
 }
 
 /* 评价操作 */
@@ -1530,12 +1550,12 @@ watch(
 /* 推荐商品 */
 .related-products {
   padding: 60px 0;
-  background: white;
+  background: var(--color-bg-surface);
 }
 
 .related-products h2 {
   font-size: 28px;
-  color: #1e293b;
+  color: var(--color-text-primary);
   margin-bottom: 32px;
   text-align: center;
   font-weight: 600;
@@ -1548,10 +1568,10 @@ watch(
 }
 
 .related-card {
-  background: white;
-  border-radius: 12px;
+  background: var(--color-bg-surface);
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  box-shadow: var(--shadow-card);
   transition: all 0.3s ease;
   cursor: pointer;
 }
@@ -1578,7 +1598,7 @@ watch(
 
 .related-info h4 {
   font-size: 14px;
-  color: #1e293b;
+  color: var(--color-text-primary);
   margin-bottom: 8px;
   font-weight: 600;
   display: -webkit-box;
@@ -1590,7 +1610,7 @@ watch(
 .related-price {
   font-size: 16px;
   font-weight: 600;
-  color: #e74c3c;
+  color: var(--color-danger);
 }
 
 /* 错误状态 */
@@ -1605,7 +1625,7 @@ watch(
     grid-template-columns: 1fr;
     gap: 40px;
   }
-  
+
   .product-images {
     position: static;
   }
@@ -1615,22 +1635,22 @@ watch(
   .product-title {
     font-size: 24px;
   }
-  
+
   .action-buttons {
     flex-direction: column;
   }
-  
+
   .service-guarantee {
     flex-direction: column;
     gap: 16px;
   }
-  
+
   .rating-overview {
     flex-direction: column;
     align-items: flex-start;
     gap: 16px;
   }
-  
+
   .related-grid {
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   }

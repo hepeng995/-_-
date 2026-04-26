@@ -22,12 +22,12 @@
 
     <!-- 主要内容区域 - 紧凑布局 -->
     <div class="main-content">
-      <!-- 桃源概览 - 简化布局 -->
+      <!-- 乡村概览 - 简化布局 -->
       <section class="overview-section">
         <div class="container">
           <div class="section-header compact">
-            <h2>桃源概览</h2>
-            <p>走进新桃源智界，感受乡村振兴的美好愿景</p>
+            <h2>乡村概览</h2>
+            <p>走进智兴乡村平台，感受乡村振兴的美好愿景</p>
           </div>
           <div class="overview-content">
             <div class="overview-text">
@@ -45,7 +45,7 @@
               </div>
             </div>
             <div class="overview-image">
-              <img :src="overviewData.image || 桃源概览" alt="桃源概览" />
+              <img :src="overviewData.image || 乡村概览" alt="乡村概览" />
             </div>
           </div>
         </div>
@@ -62,8 +62,8 @@
                 <el-button type="text" @click="goTo('/attractions')">查看更多 →</el-button>
               </div>
               <div class="attractions-grid compact" v-loading="attractionsLoading">
-                <div 
-                  v-for="attraction in featuredAttractions.slice(0, 4)" 
+                <div
+                  v-for="attraction in featuredAttractions.slice(0, 4)"
                   :key="attraction.id"
                   class="attraction-card compact"
                   @click="goToAttractionDetail(attraction.id)"
@@ -90,8 +90,8 @@
                 <el-button type="text" @click="goTo('/products')">进入商城 →</el-button>
               </div>
               <div class="products-grid compact" v-loading="productsLoading">
-                <div 
-                  v-for="product in hotProducts.slice(0, 4)" 
+                <div
+                  v-for="product in hotProducts.slice(0, 4)"
                   :key="product.id"
                   class="product-card compact"
                   @click="goToProductDetail(product.id)"
@@ -127,8 +127,8 @@
             <p>了解乡村发展动态</p>
           </div>
           <div class="news-list compact" v-loading="newsLoading">
-            <div 
-              v-for="news in latestNews.slice(0, 6)" 
+            <div
+              v-for="news in latestNews.slice(0, 6)"
               :key="news.id"
               class="news-item compact"
               @click="goToNewsDetail(news.id)"
@@ -167,36 +167,36 @@ import homeApi from '@/api/home'
 const router = useRouter()
 
 // 轮播图数据
-import 美丽乡村 from '@/assets/image/美丽乡村.png'
-import 特产商城 from '@/assets/image/特产商城.png'
-import 动态资讯 from '@/assets/image/动态资讯.png'
-import 桃源概览 from '@/assets/image/桃源概览.jpg'
-import 建言献策 from '@/assets/image/建言献策.png'
+import 景点导览背景 from '@/assets/image/景点导览背景.png'
+import 景点活动背景 from '@/assets/image/景点活动背景.png'
+import 建言献策背景 from '@/assets/image/建言献策背景.png'
+import 旅游路线规划背景 from '@/assets/image/旅游路线规划背景.png'
+import 乡村概览 from '@/assets/image/乡村概览新.jpg'
 
 const bannerImages = ref([
   {
-    image: 美丽乡村,
-    title: '美丽乡村 生态桃源',
+    image: 景点导览背景,
+    title: '美丽乡村 绿水青山',
     subtitle: '走进新时代的乡村振兴示范区',
     path: '/attractions',
     buttonText: '探索景点'
   },
   {
-    image: 特产商城,
+    image: 景点活动背景,
     title: '特产商城 品质生活',
     subtitle: '购买正宗的乡村特产',
     path: '/products',
     buttonText: '进入商城'
   },
   {
-    image: 动态资讯,
+    image: 旅游路线规划背景,
     title: '动态资讯 时事热点',
     subtitle: '获取最新动态，了解乡村发展',
     path: '/news',
     buttonText: '查看资讯'
   },
   {
-    image: 建言献策,
+    image: 建言献策背景,
     title: '建言献策 乡村发展',
     subtitle: '建言献策，助力乡村发展',
     path: '/forum',
@@ -230,7 +230,7 @@ const getHomeData = async () => {
     attractionsLoading.value = true
     productsLoading.value = true
     newsLoading.value = true
-    
+
     const res = await homeApi.getHomeData()
     if (res.code === 200) {
       const data = res.data
@@ -309,11 +309,10 @@ onMounted(() => {
 <style scoped>
 .home-page {
   min-height: 100vh;
-  background: #f8fafc;
+  background: var(--color-bg-body);
 }
 
 .container {
-  max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
 }
@@ -368,7 +367,6 @@ onMounted(() => {
 
 /* 主要内容区域 */
 .main-content {
-  max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
 }
@@ -380,26 +378,26 @@ section {
 }
 
 section.overview-section {
-  background: white;
-  border-radius: 16px;
+  background: var(--color-bg-surface);
+  border-radius: var(--radius-lg);
   padding: 25px 0;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+  box-shadow: var(--shadow-card);
   margin-bottom: 20px;
 }
 
 section.featured-section {
-  background: white;
-  border-radius: 16px;
+  background: var(--color-bg-surface);
+  border-radius: var(--radius-lg);
   padding: 25px 0;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+  box-shadow: var(--shadow-card);
   margin-bottom: 20px;
 }
 
 section.latest-news {
-  background: white;
-  border-radius: 16px;
+  background: var(--color-bg-surface);
+  border-radius: var(--radius-lg);
   padding: 25px 0;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+  box-shadow: var(--shadow-card);
 }
 
 /* Section Header 样式 */
@@ -421,20 +419,20 @@ section.latest-news {
   transform: translateX(-50%);
   width: 40px;
   height: 3px;
-  background: linear-gradient(135deg, #1976d2, #26a69a);
+  background: linear-gradient(135deg, var(--color-primary-600), var(--color-primary-500));
   border-radius: 2px;
 }
 
 .section-header h2 {
   font-size: 24px;
-  color: #0d47a1;
+  color: var(--color-primary-800);
   margin-bottom: 8px;
   font-weight: 600;
 }
 
 .section-header p {
   font-size: 14px;
-  color: #546e7a;
+  color: var(--color-text-secondary);
   font-weight: 400;
 }
 
@@ -455,10 +453,12 @@ section.latest-news {
 }
 
 .featured-block {
-  background: #fafbfc;
+  background: var(--color-bg-muted);
   border-radius: 12px;
   padding: 20px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
 }
 
 .block-header {
@@ -467,12 +467,12 @@ section.latest-news {
   align-items: center;
   margin-bottom: 15px;
   padding-bottom: 10px;
-  border-bottom: 2px solid #e2e8f0;
+  border-bottom: 2px solid var(--color-border);
 }
 
 .block-header h3 {
   font-size: 18px;
-  color: #0d47a1;
+  color: var(--color-primary-800);
   font-weight: 600;
   margin: 0;
 }
@@ -489,9 +489,9 @@ section.latest-news {
 .overview-item {
   margin-bottom: 15px;
   padding: 12px 16px;
-  background: #f8fafc;
+  background: var(--color-bg-body);
   border-radius: 8px;
-  border-left: 3px solid #1976d2;
+  border-left: 3px solid var(--color-primary-600);
   transition: all 0.3s ease;
 }
 
@@ -506,7 +506,7 @@ section.latest-news {
 
 .overview-item h3 {
   font-size: 16px;
-  color: #0d47a1;
+  color: var(--color-primary-800);
   margin-bottom: 8px;
   font-weight: 600;
   display: flex;
@@ -517,7 +517,7 @@ section.latest-news {
   content: '';
   width: 6px;
   height: 6px;
-  background: #1976d2;
+  background: var(--color-primary-600);
   border-radius: 50%;
   margin-right: 8px;
 }
@@ -525,7 +525,7 @@ section.latest-news {
 .overview-item p {
   font-size: 13px;
   line-height: 1.5;
-  color: #475569;
+  color: var(--color-text-secondary);
   font-weight: 400;
 }
 
@@ -549,27 +549,31 @@ section.latest-news {
 
 .attractions-grid.compact {
   grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: 1fr 1fr;
   gap: 10px;
+  flex: 1;
 }
 
 .attraction-card {
-  background: white;
+  background: var(--color-bg-surface);
   border-radius: 10px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0,0,0,0.06);
   transition: all 0.3s ease;
   cursor: pointer;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--color-border);
 }
 
 .attraction-card.compact {
   border-radius: 8px;
+  display: flex;
+  flex-direction: column;
 }
 
 .attraction-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(25, 118, 210, 0.15);
-  border-color: #1976d2;
+  box-shadow: var(--shadow-card-hover);
+  border-color: var(--color-primary-600);
 }
 
 .attraction-image {
@@ -609,14 +613,17 @@ section.latest-news {
 
 .attraction-info {
   padding: 12px;
-  background: white;
+  background: var(--color-bg-surface);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .attraction-info h3,
 .attraction-info h4 {
   font-size: 14px;
-  margin-bottom: 6px;
-  color: #0d47a1;
+  margin-bottom: 4px;
+  color: var(--color-primary-800);
   font-weight: 600;
   display: -webkit-box;
   -webkit-line-clamp: 1;
@@ -626,7 +633,7 @@ section.latest-news {
 }
 
 .attraction-info p {
-  color: #64748b;
+  color: var(--color-text-tertiary);
   margin-bottom: 8px;
   line-height: 1.4;
   font-size: 12px;
@@ -635,6 +642,10 @@ section.latest-news {
   line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+.attraction-info :deep(.el-rate) {
+  margin-top: auto;
 }
 
 /* 商品网格 - 紧凑设计 */
@@ -646,34 +657,38 @@ section.latest-news {
 
 .products-grid.compact {
   grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: 1fr 1fr;
   gap: 10px;
+  flex: 1;
 }
 
 .product-card {
-  background: white;
+  background: var(--color-bg-surface);
   border-radius: 10px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0,0,0,0.06);
   transition: all 0.3s ease;
   cursor: pointer;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--color-border);
 }
 
 .product-card.compact {
   border-radius: 8px;
+  display: flex;
+  flex-direction: column;
 }
 
 .product-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(38, 166, 154, 0.15);
-  border-color: #26a69a;
+  box-shadow: var(--shadow-card-hover);
+  border-color: var(--color-primary-500);
 }
 
 .product-image {
   position: relative;
   height: 120px;
   overflow: hidden;
-  background: #f8fafc;
+  background: var(--color-bg-body);
 }
 
 .product-image img {
@@ -691,7 +706,7 @@ section.latest-news {
   position: absolute;
   top: 8px;
   right: 8px;
-  background: #ef4444;
+  background: var(--color-danger);
   color: white;
   padding: 2px 6px;
   border-radius: 12px;
@@ -701,14 +716,17 @@ section.latest-news {
 
 .product-info {
   padding: 12px;
-  background: white;
+  background: var(--color-bg-surface);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .product-info h3,
 .product-info h4 {
   font-size: 14px;
   margin-bottom: 4px;
-  color: #0d47a1;
+  color: var(--color-primary-800);
   font-weight: 600;
   display: -webkit-box;
   -webkit-line-clamp: 1;
@@ -719,7 +737,7 @@ section.latest-news {
 
 .product-origin {
   font-size: 11px;
-  color: #26a69a;
+  color: var(--color-primary-500);
   margin-bottom: 6px;
   font-weight: 500;
 }
@@ -731,12 +749,12 @@ section.latest-news {
 .current-price {
   font-size: 16px;
   font-weight: 600;
-  color: #26a69a;
+  color: var(--color-primary-500);
 }
 
 .original-price {
   font-size: 11px;
-  color: #94a3b8;
+  color: var(--color-text-placeholder);
   text-decoration: line-through;
   margin-left: 4px;
 }
@@ -749,8 +767,8 @@ section.latest-news {
 
 .sales {
   font-size: 10px;
-  color: #64748b;
-  background: rgba(38, 166, 154, 0.1);
+  color: var(--color-text-tertiary);
+  background: var(--color-primary-50);
   padding: 2px 6px;
   border-radius: 8px;
   font-weight: 500;
@@ -770,13 +788,13 @@ section.latest-news {
 
 .news-item {
   display: flex;
-  background: white;
+  background: var(--color-bg-surface);
   border-radius: 10px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0,0,0,0.06);
   transition: all 0.3s ease;
   cursor: pointer;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--color-border);
 }
 
 .news-item.compact {
@@ -785,8 +803,8 @@ section.latest-news {
 
 .news-item:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(13, 71, 161, 0.15);
-  border-color: #0d47a1;
+  box-shadow: var(--shadow-card-hover);
+  border-color: var(--color-primary-800);
 }
 
 .news-image {
@@ -811,7 +829,7 @@ section.latest-news {
 .news-content {
   padding: 12px;
   flex: 1;
-  background: white;
+  background: var(--color-bg-surface);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -821,7 +839,7 @@ section.latest-news {
 .news-content h4 {
   font-size: 14px;
   margin-bottom: 6px;
-  color: #0d47a1;
+  color: var(--color-primary-800);
   font-weight: 600;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -832,7 +850,7 @@ section.latest-news {
 }
 
 .news-content p {
-  color: #64748b;
+  color: var(--color-text-tertiary);
   margin-bottom: 8px;
   line-height: 1.4;
   font-size: 12px;
@@ -849,20 +867,20 @@ section.latest-news {
   justify-content: space-between;
   align-items: center;
   font-size: 10px;
-  color: #94a3b8;
+  color: var(--color-text-placeholder);
   margin-top: auto;
 }
 
 .news-date {
-  background: rgba(25, 118, 210, 0.1);
+  background: var(--color-primary-50);
   padding: 2px 6px;
   border-radius: 8px;
   font-weight: 500;
 }
 
 .news-category {
-  background: rgba(38, 166, 154, 0.1);
-  color: #26a69a;
+  background: var(--color-primary-50);
+  color: var(--color-primary-500);
   padding: 2px 6px;
   border-radius: 8px;
   font-weight: 500;
@@ -885,37 +903,37 @@ section.latest-news {
 }
 
 :deep(.el-button--primary) {
-  background: linear-gradient(135deg, #1976d2, #26a69a);
+  background: linear-gradient(135deg, var(--color-primary-600), var(--color-primary-500));
   border: none;
   border-radius: 20px;
   padding: 10px 20px;
   font-weight: 600;
   font-size: 14px;
-  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   transition: all 0.3s ease;
 }
 
 :deep(.el-button--primary:hover) {
-  background: linear-gradient(135deg, #0d47a1, #00695c);
+  background: linear-gradient(135deg, var(--color-primary-800), var(--color-primary-700));
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(25, 118, 210, 0.4);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 :deep(.el-button--text) {
-  color: #1976d2;
+  color: var(--color-primary-600);
   font-weight: 500;
   font-size: 14px;
   padding: 4px 8px;
 }
 
 :deep(.el-button--text:hover) {
-  color: #0d47a1;
-  background: rgba(25, 118, 210, 0.1);
+  color: var(--color-primary-800);
+  background: var(--color-primary-50);
 }
 
 /* 评分组件样式 */
 :deep(.el-rate) {
-  --el-rate-fill-color: #ffa726;
+  --el-rate-fill-color: var(--color-warning);
   --el-rate-void-color: #e0e7ff;
 }
 
@@ -929,9 +947,8 @@ section.latest-news {
     grid-template-columns: 1fr;
     gap: 20px;
   }
-  
+
   .container {
-    max-width: 100%;
     padding: 0 16px;
   }
 }
@@ -940,69 +957,69 @@ section.latest-news {
   .main-content {
     padding: 0 16px;
   }
-  
+
   .carousel-item {
     height: 300px;
   }
-  
+
   .carousel-title {
     font-size: 24px;
   }
-  
+
   .carousel-subtitle {
     font-size: 14px;
   }
-  
+
   section {
     padding: 15px 0;
     margin-bottom: 12px;
   }
-  
+
   .section-header h2 {
     font-size: 20px;
   }
-  
+
   .section-header p {
     font-size: 13px;
   }
-  
+
   .overview-content {
     grid-template-columns: 1fr;
     gap: 20px;
     padding: 15px;
   }
-  
+
   .featured-grid {
     grid-template-columns: 1fr;
     gap: 15px;
   }
-  
+
   .featured-block {
     padding: 15px;
   }
-  
+
   .attractions-grid,
   .attractions-grid.compact {
     grid-template-columns: 1fr;
     gap: 10px;
   }
-  
+
   .products-grid,
   .products-grid.compact {
     grid-template-columns: 1fr;
     gap: 10px;
   }
-  
+
   .news-list,
   .news-list.compact {
     grid-template-columns: 1fr;
     gap: 10px;
   }
-  
+
   .news-item {
     flex-direction: column;
   }
-  
+
   .news-image {
     width: 100%;
     height: 120px;
@@ -1013,23 +1030,23 @@ section.latest-news {
   .container {
     padding: 0 12px;
   }
-  
+
   .main-content {
     padding: 0 12px;
   }
-  
+
   .carousel-item {
     height: 250px;
   }
-  
+
   .carousel-title {
     font-size: 20px;
   }
-  
+
   .overview-content {
     padding: 12px;
   }
-  
+
   .featured-block {
     padding: 12px;
   }

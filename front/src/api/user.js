@@ -6,7 +6,6 @@ import request from './request'
  * @returns {Promise}
  */
 export function login(data) {
-  console.log('调用登录API，参数:', data)
   return request({
     url: '/auth/login',
     method: 'post',
@@ -19,7 +18,6 @@ export function login(data) {
  * @returns {Promise}
  */
 export function getUserInfo() {
-  console.log('获取用户信息API')
   return request({
     url: '/user/info',
     method: 'get'
@@ -31,98 +29,9 @@ export function getUserInfo() {
  * @returns {Promise}
  */
 export function logout() {
-  console.log('调用登出API')
   return request({
     url: '/auth/logout',
     method: 'post'
-  })
-}
-
-/**
- * 分页获取用户列表
- * @param {Object} query - 查询参数
- * @returns {Promise}
- */
-export function getUserList(query) {
-  return request({
-    url: '/user/page',
-    method: 'get',
-    params: query
-  })
-}
-
-/**
- * 获取用户详情
- */
-export function getUserDetail(id) {
-  return request({
-    url: `/user/${id}`,
-    method: 'get'
-  })
-}
-
-/**
- * 添加用户
- * @param {Object} data - 用户信息
- * @returns {Promise}
- */
-export function addUser(data) {
-  return request({
-    url: '/user',
-    method: 'post',
-    data
-  })
-}
-
-/**
- * 更新用户信息
- * @param {number} id - 用户ID
- * @param {Object} data - 用户信息
- * @returns {Promise}
- */
-export function updateUser(id, data) {
-  return request({
-    url: `/user/${id}`,
-    method: 'put',
-    data
-  })
-}
-
-/**
- * 删除用户
- * @param {number} id - 用户ID
- * @returns {Promise}
- */
-export function deleteUser(id) {
-  return request({
-    url: `/user/${id}`,
-    method: 'delete'
-  })
-}
-
-/**
- * 更新用户状态（启用/禁用）
- * @param {number} id - 用户ID
- * @param {boolean} enabled - 是否启用
- * @returns {Promise}
- */
-export function updateUserStatus(id, enabled) {
-  return request({
-    url: `/user/${id}/status`,
-    method: 'put',
-    params: { enabled }
-  })
-}
-
-/**
- * 重置用户密码
- * @param {number} id - 用户ID
- * @returns {Promise}
- */
-export function resetUserPassword(id) {
-  return request({
-    url: `/user/${id}/reset-password`,
-    method: 'put'
   })
 }
 
@@ -149,17 +58,6 @@ export function checkEmail(email) {
     url: '/user/check-email',
     method: 'get',
     params: { email }
-  })
-}
-
-/**
- * 获取用户统计信息
- * @returns {Promise}
- */
-export function getUserStats() {
-  return request({
-    url: '/user/stats',
-    method: 'get'
   })
 }
 
@@ -215,34 +113,15 @@ export function updateAvatar(data) {
   })
 }
 
-/**
- * 获取用户数量统计（按角色）
- */
-export function getUserCount() {
-  return request({
-    url: '/user/stats',
-    method: 'get'
-  })
-}
-
 // 默认导出所有API
 export default {
   login,
   getUserInfo,
   logout,
-  getUserList,
-  getUserDetail,
-  addUser,
-  updateUser,
-  deleteUser,
-  updateUserStatus,
-  resetUserPassword,
   checkUsername,
   checkEmail,
-  getUserStats,
   register,
   changePassword,
   updateProfile,
-  updateAvatar,
-  getUserCount
-} 
+  updateAvatar
+}

@@ -1,10 +1,13 @@
 package com.cinema.booking.controller;
 
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.cinema.booking.annotation.SystemOperation;
 import com.cinema.booking.dto.OrderDTO;
 import com.cinema.booking.dto.OrderItemDTO;
 import com.cinema.booking.dto.PageRequest;
+import com.cinema.booking.entity.Order;
+import com.cinema.booking.mapper.OrderMapper;
 import com.cinema.booking.security.SecurityService;
 import com.cinema.booking.service.OrderService;
 import com.cinema.booking.utils.Result;
@@ -39,6 +42,7 @@ public class OrderController {
     
     private final OrderService orderService;
     private final SecurityService securityService;
+    private final OrderMapper orderMapper;
     
     @Operation(summary = "分页查询订单列表")
     @GetMapping("/page")
@@ -141,6 +145,36 @@ public class OrderController {
     public Result<OrderDTO> updateOrderStatus(@PathVariable Long id, @RequestParam Integer orderStatus) {
         OrderDTO updated = orderService.updateOrderStatus(id, orderStatus);
         return Result.ok(updated);
+    }
+
+    @Operation(summary = "批量更新订单状态")
+    @PutMapping("/batch/status")
+    @PreAuthorize("hasRole('ADMIN')")
+    @SystemOperation(module = "订单管理", operation = "批量更新订单状态", description = "管理员批量更新订单状态")
+    public Result<Void> batchUpdateOrderStatus(@RequestBody Map<String, Object> params) {
+        @SuppressWarnings("unchecked")
+        List<Long> ids = (List<Long>) params.get("ids");
+        Integer orderStatus = (Integer) params.get("orderStatus");
+        LambdaUpdateWrapper<Order> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.in(Order::getId, ids).set(Order::getOrderStatus, orderStatus);
+        orderMapper.update(null, wrapper);
+        return Result.ok();
+    }
+
+    @Operation(summary = "批量取消订单")
+    @PutMapping("/batch/cancel")
+    @PreAuthorize("hasRole('ADMIN')")
+    @SystemOperation(module = "订单管理", operation = "批量取消订单", description = "管理员批量取消订单")
+    public Result<Void> batchCancelOrders(@RequestBody Map<String, Object> params) {
+        @SuppressWarnings("unchecked")
+        List<Long> ids = (List<Long>) params.get("ids");
+        String cancelReason = (String) params.getOrDefault("cancelReason", "管理员批量取消");
+        LambdaUpdateWrapper<Order> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.in(Order::getId, ids)
+                .set(Order::getOrderStatus, 5)
+                .set(Order::getCancelReason, cancelReason);
+        orderMapper.update(null, wrapper);
+        return Result.ok();
     }
     
     @Operation(summary = "取消订单")

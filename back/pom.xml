@@ -14,7 +14,7 @@
     <artifactId>village-revival-system</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>village-revival-system</name>
-    <description>乡村振兴·新桃源智界系统后端</description>
+    <description>乡村振兴·智兴乡村平台系统后端</description>
 
     <properties>
         <java.version>17</java.version>
@@ -100,6 +100,13 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!-- Jsoup 网页正文抓取 -->
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>1.17.2</version>
         </dependency>
 
         <!-- Spring AOP -->

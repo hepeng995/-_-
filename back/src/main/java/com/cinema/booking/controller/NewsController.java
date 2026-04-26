@@ -1,10 +1,14 @@
 package com.cinema.booking.controller;
 
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.cinema.booking.annotation.SystemOperation;
 import com.cinema.booking.dto.NewsDTO;
 import com.cinema.booking.dto.PageRequest;
+import com.cinema.booking.entity.News;
+import com.cinema.booking.mapper.NewsMapper;
 import com.cinema.booking.service.NewsService;
+import com.cinema.booking.service.TianApiNewsService;
 import com.cinema.booking.utils.Result;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -16,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 资讯控制器
@@ -28,6 +33,8 @@ import java.util.List;
 public class NewsController {
     
     private final NewsService newsService;
+    private final TianApiNewsService tianApiNewsService;
+    private final NewsMapper newsMapper;
     
     @Operation(summary = "分页查询资讯列表")
     @GetMapping("/page")
@@ -78,6 +85,29 @@ public class NewsController {
     @SystemOperation(module = "资讯管理", operation = "删除资讯", description = "删除资讯信息")
     public Result<Void> deleteNews(@PathVariable Long id) {
         newsService.deleteNews(id);
+        return Result.ok();
+    }
+
+    @Operation(summary = "批量删除资讯")
+    @DeleteMapping("/batch")
+    @PreAuthorize("hasRole('ADMIN')")
+    @SystemOperation(module = "资讯管理", operation = "批量删除资讯", description = "批量删除资讯")
+    public Result<Void> batchDeleteNews(@RequestBody List<Long> ids) {
+        newsMapper.deleteBatchIds(ids);
+        return Result.ok();
+    }
+
+    @Operation(summary = "批量更新资讯状态")
+    @PutMapping("/batch/status")
+    @PreAuthorize("hasRole('ADMIN')")
+    @SystemOperation(module = "资讯管理", operation = "批量更新资讯状态", description = "批量发布/下线资讯")
+    public Result<Void> batchUpdateNewsStatus(@RequestBody Map<String, Object> params) {
+        @SuppressWarnings("unchecked")
+        List<Long> ids = (List<Long>) params.get("ids");
+        Integer status = (Integer) params.get("status");
+        LambdaUpdateWrapper<News> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.in(News::getId, ids).set(News::getStatus, status);
+        newsMapper.update(null, wrapper);
         return Result.ok();
     }
     
@@ -136,8 +166,7 @@ public class NewsController {
     @GetMapping("/latest")
     public Result<List<NewsDTO>> getLatestNews(
             @Parameter(description = "限制数量") @RequestParam(defaultValue = "4") Integer limit) {
-        // 使用推荐资讯作为最新资讯
-        List<NewsDTO> newsList = newsService.getFeaturedNews(limit);
+        List<NewsDTO> newsList = newsService.getLatestNews(limit);
         return Result.ok(newsList);
     }
     
@@ -166,5 +195,36 @@ public class NewsController {
         stats.put("todayNews", newsService.getTodayCount());
         stats.put("totalViews", newsService.getTotalViews());
         return Result.ok(stats);
+    }
+
+    @Operation(summary = "从TianAPI同步农业新闻")
+    @PostMapping("/sync")
+    @PreAuthorize("hasRole('ADMIN')")
+    @SystemOperation(module = "资讯管理", operation = "同步TianAPI新闻", description = "从天聚数行同步农业新闻到本地")
+    public Result<Map<String, Object>> syncTianApiNews(
+            @Parameter(description = "分类 (news/policy/activity)") @RequestParam(defaultValue = "news") String category,
+            @Parameter(description = "搜索关键词") @RequestParam(required = false) String keyword,
+            @Parameter(description = "获取数量 (1-50)") @RequestParam(defaultValue = "20") Integer num,
+            @Parameter(description = "强制刷新缓存") @RequestParam(defaultValue = "false") Boolean force) {
+        Map<String, Object> result = tianApiNewsService.syncNews(category, keyword, num, force);
+        return Result.ok(result);
+    }
+
+    @Operation(summary = "回填已有文章正文内容")
+    @PostMapping("/backfill")
+    @PreAuthorize("hasRole('ADMIN')")
+    @SystemOperation(module = "资讯管理", operation = "回填文章正文", description = "从原文URL抓取完整正文并更新数据库")
+    public Result<Map<String, Object>> backfillContent() {
+        Map<String, Object> result = tianApiNewsService.backfillContent();
+        return Result.ok(result);
+    }
+
+    @Operation(summary = "回填缺少的封面图")
+    @PostMapping("/backfill-covers")
+    @PreAuthorize("hasRole('ADMIN')")
+    @SystemOperation(module = "资讯管理", operation = "回填封面图", description = "从TianAPI重新匹配并下载缺失的封面图")
+    public Result<Map<String, Object>> backfillCoverImages() {
+        Map<String, Object> result = tianApiNewsService.backfillCoverImages();
+        return Result.ok(result);
     }
 }

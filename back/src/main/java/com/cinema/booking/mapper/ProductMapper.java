@@ -69,7 +69,7 @@ public interface ProductMapper extends BaseMapper<Product> {
     void incrementSalesCount(@Param("productId") Long productId, @Param("quantity") Integer quantity);
 
     @Select("""
-        SELECT 
+        SELECT
             p.id,
             p.name,
             p.description,
@@ -77,16 +77,17 @@ public interface ProductMapper extends BaseMapper<Product> {
             p.origin,
             p.avg_rating AS avgRating,
             p.review_count AS reviewCount,
+            p.cover_image AS coverImage,
             COUNT(CASE WHEN pr.rating >= 4 THEN 1 END) AS goodReviewCount,
             SUBSTRING(MAX(pr.content), 1, 100) AS topReview
         FROM products p
-        LEFT JOIN product_reviews pr ON p.id = pr.product_id 
-            AND pr.rating >= 4 
-            AND pr.status = 1 
+        LEFT JOIN product_reviews pr ON p.id = pr.product_id
+            AND pr.rating >= 4
+            AND pr.status = 1
             AND pr.deleted = 0
-        WHERE p.deleted = 0 
+        WHERE p.deleted = 0
           AND p.status = 1
-          AND (p.name LIKE CONCAT('%', #{keyword}, '%') 
+          AND (p.name LIKE CONCAT('%', #{keyword}, '%')
                OR p.description LIKE CONCAT('%', #{keyword}, '%'))
         GROUP BY p.id
         HAVING goodReviewCount > 0

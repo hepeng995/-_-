@@ -67,43 +67,6 @@ export const forumPostAPI = {
   },
 
   /**
-   * 审核帖子
-   */
-  auditPost(id, status, rejectReason, adminReply) {
-    return request({
-      url: `/forum/posts/${id}/audit`,
-      method: 'post',
-      params: {
-        status,
-        rejectReason,
-        adminReply
-      }
-    })
-  },
-
-  /**
-   * 设置帖子置顶
-   */
-  setPostTop(id, isTop) {
-    return request({
-      url: `/forum/posts/${id}/top`,
-      method: 'post',
-      params: { isTop }
-    })
-  },
-
-  /**
-   * 设置帖子推荐
-   */
-  setPostFeatured(id, isFeatured) {
-    return request({
-      url: `/forum/posts/${id}/featured`,
-      method: 'post',
-      params: { isFeatured }
-    })
-  },
-
-  /**
    * 点赞帖子
    */
   likePost(id) {
@@ -210,17 +173,6 @@ export const forumCommentAPI = {
   },
 
   /**
-   * 审核评论
-   */
-  auditComment(id, status) {
-    return request({
-      url: `/forum/comments/${id}/audit`,
-      method: 'post',
-      params: { status }
-    })
-  },
-
-  /**
    * 点赞评论
    */
   likeComment(id) {
@@ -258,69 +210,6 @@ export const forumCommentAPI = {
       url: '/forum/comments/page',
       method: 'get',
       params
-    })
-  }
-}
-
-// 论坛统计相关API
-export const forumStatisticsAPI = {
-  /**
-   * 获取论坛综合统计数据
-   */
-  getForumOverview() {
-    return request({
-      url: '/forum/statistics/overview',
-      method: 'get'
-    })
-  },
-
-  /**
-   * 获取建议类型分布统计
-   */
-  getCategoryDistribution() {
-    return request({
-      url: '/forum/statistics/category-distribution',
-      method: 'get'
-    })
-  },
-
-  /**
-   * 获取热度排序数据
-   */
-  getHotRanking() {
-    return request({
-      url: '/forum/statistics/hot-ranking',
-      method: 'get'
-    })
-  },
-
-  /**
-   * 获取月度趋势数据
-   */
-  getMonthlyTrend() {
-    return request({
-      url: '/forum/statistics/monthly-trend',
-      method: 'get'
-    })
-  },
-
-  /**
-   * 获取审核状态统计
-   */
-  getAuditStatus() {
-    return request({
-      url: '/forum/statistics/audit-status',
-      method: 'get'
-    })
-  },
-
-  /**
-   * 获取用户公开的统计数据
-   */
-  getPublicStatistics() {
-    return request({
-      url: '/forum/statistics/public',
-      method: 'get'
     })
   }
 }
@@ -384,6 +273,5 @@ export const forumUtils = {
 export default {
   ...forumPostAPI,
   ...forumCommentAPI,
-  ...forumStatisticsAPI,
   ...forumUtils
 }

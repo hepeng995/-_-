@@ -55,13 +55,16 @@ public class AiChatController {
             }
             log.info("【AI返回原始JSON】：{}", aiJson);
 
-            // 2. 解析AI返回的JSON（提取文本 + 卡片列表）
+            // 2. 预清理 LLM 可能包裹的 Markdown 代码块标记
+            aiJson = stripMarkdownCodeBlock(aiJson);
+
+            // 3. 解析AI返回的JSON（提取文本 + 卡片列表）
             Map<String, Object> aiResult = objectMapper.readValue(aiJson, new TypeReference<>() {});
-            String recommendText = (String) aiResult.get("recommendText");
+            String recommendText = stripMarkdownCodeBlock((String) aiResult.get("recommendText"));
             // 读取 AI 返回的 productList（日志里的真实字段）
             // ===================== 核心修复：自动识别所有列表类型 =====================
             List<CommonCardDTO> commonCardDTOS = parseAiResult(aiResult);
-            // 3. 组装【你原有项目标准返回体】AiChatResponse
+            // 4. 组装【你原有项目标准返回体】AiChatResponse
             AiChatResponse response = AiChatResponse.builder()
                     .sessionId(String.valueOf(userId))   // 会话ID = 用户ID（多轮对话唯一标识）
                     .userId(userId)                     // 用户ID
@@ -70,12 +73,12 @@ public class AiChatController {
                     .cardList(commonCardDTOS)                 // 结构化卡片
                     .build();
 
-            // 4. 返回项目统一成功格式
+            // 5. 返回项目统一成功格式
             return Result.success(response);
 
         } catch (Exception e) {
             log.error("【AI对话异常】", e);
-            // 5. 异常兜底（完全兼容前端格式）
+            // 6. 异常兜底（完全兼容前端格式）
             AiChatResponse errorResponse = AiChatResponse.builder()
                     .sessionId(String.valueOf(userId))
                     .userId(userId)
@@ -122,6 +125,9 @@ public class AiChatController {
             return null;
         }
 
+        if (containsAny(message, "路线", "行程", "规划", "旅游攻略", "出行")) {
+            return ruralDigitalTools.retrieveRoutes(message);
+        }
         if (containsAny(message, "景点", "旅游", "景区", "游玩", "一日游", "好玩的")) {
             return ruralDigitalTools.retrieveScenics(message);
         }
@@ -185,7 +191,7 @@ public class AiChatController {
             // 适配描述：description / content
             String desc = (String) (item.get("description") != null ? item.get("description") :
                     item.get("content") != null ? item.get("content") : "暂无描述");
-            card.setContent(desc);
+            card.setContent(truncateAndClean(desc));
 
             // 适配价格/额外信息：price / extra
             String price = (String) (item.get("price") != null ? item.get("price") :
@@ -200,5 +206,36 @@ public class AiChatController {
             cardList.add(card);
         }
         return cardList;
+    }
+
+    private String stripMarkdownCodeBlock(String text) {
+        if (text == null || text.isBlank()) {
+            return text;
+        }
+        String cleaned = text.trim();
+        if (cleaned.startsWith("```")) {
+            cleaned = cleaned.replaceFirst("^```[a-zA-Z]*\\s*", "");
+            if (cleaned.endsWith("```")) {
+                cleaned = cleaned.substring(0, cleaned.length() - 3);
+            }
+            cleaned = cleaned.trim();
+        }
+        return cleaned;
+    }
+
+    private String truncateAndClean(String text) {
+        if (text == null || text.isBlank()) {
+            return "暂无描述";
+        }
+        String clean = text.replaceAll("<[^>]+>", "")
+                .replaceAll("```[a-zA-Z]*\\s*", "")
+                .replaceAll("```", "")
+                .replaceAll("\\*\\*", "")
+                .replaceAll("\\s+", " ")
+                .trim();
+        if (clean.length() > 80) {
+            clean = clean.substring(0, 80) + "...";
+        }
+        return clean;
     }
 }

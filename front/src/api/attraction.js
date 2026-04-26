@@ -24,38 +24,6 @@ export default {
   },
 
   /**
-   * 创建景点
-   */
-  createAttraction(data) {
-    return request({
-      url: '/attractions',
-      method: 'post',
-      data
-    })
-  },
-
-  /**
-   * 更新景点
-   */
-  updateAttraction(id, data) {
-    return request({
-      url: `/attractions/${id}`,
-      method: 'put',
-      data
-    })
-  },
-
-  /**
-   * 删除景点
-   */
-  deleteAttraction(id) {
-    return request({
-      url: `/attractions/${id}`,
-      method: 'delete'
-    })
-  },
-
-  /**
    * 获取推荐景点列表
    */
   getRecommendAttractions(limit = 6) {
@@ -105,38 +73,6 @@ export default {
     return request({
       url: '/attractions/categories',
       method: 'get'
-    })
-  },
-
-  /**
-   * 创建景点分类
-   */
-  createAttractionCategory(data) {
-    return request({
-      url: '/attractions/categories',
-      method: 'post',
-      data
-    })
-  },
-
-  /**
-   * 更新景点分类
-   */
-  updateAttractionCategory(id, data) {
-    return request({
-      url: `/attractions/categories/${id}`,
-      method: 'put',
-      data
-    })
-  },
-
-  /**
-   * 删除景点分类
-   */
-  deleteAttractionCategory(id) {
-    return request({
-      url: `/attractions/categories/${id}`,
-      method: 'delete'
     })
   }
 }

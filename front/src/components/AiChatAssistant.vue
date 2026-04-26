@@ -8,7 +8,7 @@
           <div class="chat-header-left">
             <img :src="ipMascot" alt="AI助手" class="header-avatar" />
             <div class="header-info">
-              <h3>桃源智界AI助手</h3>
+              <h3>智兴乡村AI助手</h3>
               <div class="status-line">
                 <span class="status-dot"></span>
                 <span class="status-text">在线</span>
@@ -34,7 +34,7 @@
           <!-- 欢迎消息（无历史消息时显示） -->
           <div v-if="chatStore.messages.length === 0" class="welcome-message">
             <img :src="ipMascot" alt="AI助手" class="welcome-avatar" />
-            <h3>你好，我是桃源智界AI助手</h3>
+            <h3>你好，我是智兴乡村，数创未来AI助手</h3>
             <p>我可以帮你推荐景点、特产、资讯，为你规划乡村之旅。</p>
             <div class="quick-questions">
               <div
@@ -67,7 +67,7 @@
                   <span></span>
                 </div>
                 <template v-else>
-                  {{ msg.content }}
+                  {{ stripHtml(msg.content) }}
                 </template>
               </div>
 
@@ -114,7 +114,7 @@
                         />
                       </div>
                     </div>
-                    <p class="card-desc">{{ card.content }}</p>
+                    <p class="card-desc">{{ stripHtml(card.content) }}</p>
                     <!-- 解析后的extra信息行 -->
                     <div class="card-meta-row" v-if="getParsedExtra(card.extra)">
                       <span class="card-price" v-if="getParsedExtra(card.extra).price">
@@ -194,6 +194,24 @@ const inputMessage = ref('')
 
 // 消息列表容器 ref
 const messagesContainer = ref(null)
+
+/**
+ * 去除文本中的HTML标签和Markdown代码块标记
+ */
+const stripHtml = (text) => {
+  if (!text) return ''
+  return text
+    .replace(/<[^>]+>/g, '')
+    .replace(/```[a-zA-Z]*\s*/g, '')
+    .replace(/```/g, '')
+    .replace(/\*\*/g, '')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
 
 // 快捷问题列表
 const quickQuestions = [
@@ -337,8 +355,8 @@ const getModuleTypeClass = (type) => {
 
 /**
  * 解析extra字段为结构化数据
- * 输入: "价格：12.00元，产地：桃源县，评分：4.2分"
- * 输出: { price: '12.00', origin: '桃源县', rating: 4.2 }
+ * 输入: "价格：12.00元，产地：乡村振兴示范县，评分：4.2分"
+ * 输出: { price: '12.00', origin: '乡村振兴示范县', rating: 4.2 }
  */
 const parseExtraField = (extra) => {
   if (!extra) return null

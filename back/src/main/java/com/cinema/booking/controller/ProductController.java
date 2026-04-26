@@ -1,10 +1,15 @@
 package com.cinema.booking.controller;
 
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.cinema.booking.annotation.SystemOperation;
 import com.cinema.booking.dto.CategoryDTO;
 import com.cinema.booking.dto.PageRequest;
 import com.cinema.booking.dto.ProductDTO;
+import com.cinema.booking.entity.Product;
+import com.cinema.booking.entity.ProductCategory;
+import com.cinema.booking.mapper.ProductCategoryMapper;
+import com.cinema.booking.mapper.ProductMapper;
 import com.cinema.booking.security.SecurityService;
 import com.cinema.booking.service.ProductService;
 import com.cinema.booking.service.ProductReviewService;
@@ -35,6 +40,8 @@ public class ProductController {
     private final ProductService productService;
     private final ProductReviewService productReviewService;
     private final SecurityService securityService;
+    private final ProductMapper productMapper;
+    private final ProductCategoryMapper productCategoryMapper;
     
     @Operation(summary = "分页查询商品列表")
     @GetMapping("/page")
@@ -82,6 +89,29 @@ public class ProductController {
     @SystemOperation(module = "商品管理", operation = "删除商品", description = "删除商品信息")
     public Result<Void> deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);
+        return Result.ok();
+    }
+
+    @Operation(summary = "批量删除商品")
+    @DeleteMapping("/batch")
+    @PreAuthorize("hasRole('ADMIN')")
+    @SystemOperation(module = "商品管理", operation = "批量删除商品", description = "批量删除商品")
+    public Result<Void> batchDeleteProducts(@RequestBody List<Long> ids) {
+        productMapper.deleteBatchIds(ids);
+        return Result.ok();
+    }
+
+    @Operation(summary = "批量更新商品状态")
+    @PutMapping("/batch/status")
+    @PreAuthorize("hasRole('ADMIN')")
+    @SystemOperation(module = "商品管理", operation = "批量更新商品状态", description = "批量上架/下架商品")
+    public Result<Void> batchUpdateProductStatus(@RequestBody Map<String, Object> params) {
+        @SuppressWarnings("unchecked")
+        List<Long> ids = (List<Long>) params.get("ids");
+        Integer status = (Integer) params.get("status");
+        LambdaUpdateWrapper<Product> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.in(Product::getId, ids).set(Product::getStatus, status);
+        productMapper.update(null, wrapper);
         return Result.ok();
     }
     
@@ -139,6 +169,29 @@ public class ProductController {
     @SystemOperation(module = "商品管理", operation = "删除分类", description = "删除商品分类")
     public Result<Void> deleteProductCategory(@PathVariable Long id) {
         productService.deleteProductCategory(id);
+        return Result.ok();
+    }
+
+    @Operation(summary = "批量删除商品分类")
+    @DeleteMapping("/categories/batch")
+    @PreAuthorize("hasRole('ADMIN')")
+    @SystemOperation(module = "商品管理", operation = "批量删除分类", description = "批量删除商品分类")
+    public Result<Void> batchDeleteProductCategories(@RequestBody List<Long> ids) {
+        productCategoryMapper.deleteBatchIds(ids);
+        return Result.ok();
+    }
+
+    @Operation(summary = "批量更新商品分类状态")
+    @PutMapping("/categories/batch/status")
+    @PreAuthorize("hasRole('ADMIN')")
+    @SystemOperation(module = "商品管理", operation = "批量更新分类状态", description = "批量启用/禁用商品分类")
+    public Result<Void> batchUpdateProductCategoryStatus(@RequestBody Map<String, Object> params) {
+        @SuppressWarnings("unchecked")
+        List<Long> ids = (List<Long>) params.get("ids");
+        Integer status = (Integer) params.get("status");
+        LambdaUpdateWrapper<ProductCategory> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.in(ProductCategory::getId, ids).set(ProductCategory::getStatus, status);
+        productCategoryMapper.update(null, wrapper);
         return Result.ok();
     }
     

@@ -330,7 +330,7 @@ onMounted(() => {
 <style scoped>
 .user-profile {
   min-height: 100vh;
-  background: #f8fafc;
+  background: var(--color-bg-body);
   padding: 40px 0;
 }
 
@@ -348,7 +348,7 @@ onMounted(() => {
 
 .page-header h1 {
   font-size: 32px;
-  color: #1e293b;
+  color: var(--color-text-primary);
   margin-bottom: 8px;
   font-weight: 700;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -359,7 +359,7 @@ onMounted(() => {
 
 .page-header p {
   font-size: 16px;
-  color: #64748b;
+  color: var(--color-text-tertiary);
 }
 
 /* 个人资料内容 */
@@ -370,10 +370,10 @@ onMounted(() => {
 }
 
 .profile-card {
-  background: white;
-  border-radius: 16px;
+  background: var(--color-bg-surface);
+  border-radius: var(--radius-xl);
   padding: 32px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  box-shadow: var(--shadow-card);
 }
 
 /* 个人资料头部 */
@@ -396,7 +396,7 @@ onMounted(() => {
 
 .user-basic h2 {
   font-size: 24px;
-  color: #1e293b;
+  color: var(--color-text-primary);
   margin-bottom: 12px;
   font-weight: 600;
 }
@@ -408,16 +408,16 @@ onMounted(() => {
 }
 
 .join-date {
-  color: #64748b;
+  color: var(--color-text-tertiary);
   font-size: 14px;
 }
 
 /* 最近订单 */
 .recent-orders-card {
-  background: white;
-  border-radius: 16px;
+  background: var(--color-bg-surface);
+  border-radius: var(--radius-xl);
   padding: 24px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  box-shadow: var(--shadow-card);
 }
 
 .card-header {
@@ -429,7 +429,7 @@ onMounted(() => {
 
 .card-header h3 {
   font-size: 18px;
-  color: #1e293b;
+  color: var(--color-text-primary);
   font-weight: 600;
   margin: 0;
 }
@@ -445,13 +445,13 @@ onMounted(() => {
   justify-content: space-between;
   align-items: center;
   padding: 16px;
-  background: #f8fafc;
-  border-radius: 12px;
+  background: var(--color-bg-body);
+  border-radius: var(--radius-lg);
   transition: all 0.3s ease;
 }
 
 .order-item:hover {
-  background: #f1f5f9;
+  background: var(--color-bg-muted);
 }
 
 .order-info {
@@ -462,12 +462,12 @@ onMounted(() => {
 
 .order-number {
   font-weight: 500;
-  color: #1e293b;
+  color: var(--color-text-primary);
 }
 
 .order-date {
   font-size: 12px;
-  color: #64748b;
+  color: var(--color-text-tertiary);
 }
 
 .order-status {
@@ -479,7 +479,7 @@ onMounted(() => {
 
 .order-amount {
   font-weight: 600;
-  color: #ef4444;
+  color: var(--color-danger);
 }
 
 /* 头像上传 */
@@ -502,7 +502,7 @@ onMounted(() => {
 }
 
 .avatar-uploader :deep(.el-upload:hover) {
-  border-color: #409eff;
+  border-color: var(--color-info);
 }
 
 .avatar-uploader-icon {
@@ -523,7 +523,7 @@ onMounted(() => {
 
 .upload-tips p {
   font-size: 14px;
-  color: #64748b;
+  color: var(--color-text-tertiary);
   margin: 0;
 }
 
@@ -532,18 +532,18 @@ onMounted(() => {
   .page-header h1 {
     font-size: 24px;
   }
-  
+
   .profile-header {
     flex-direction: column;
     text-align: center;
   }
-  
+
   .order-item {
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
   }
-  
+
   .order-status {
     align-items: flex-start;
     width: 100%;

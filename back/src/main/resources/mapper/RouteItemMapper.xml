@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cinema.booking.mapper.RouteItemMapper">
+
+    <select id="selectItemsByRouteId" resultType="com.cinema.booking.dto.RouteItemDTO">
+        SELECT
+            ri.id, ri.route_id, ri.day_number, ri.sort_order,
+            ri.attraction_id, ri.suggested_duration, ri.transport_method, ri.note,
+            a.name AS attraction_name,
+            a.cover_image AS attraction_cover,
+            a.description AS attraction_description,
+            a.longitude AS attraction_longitude,
+            a.latitude AS attraction_latitude,
+            a.address AS attraction_address
+        FROM route_items ri
+        LEFT JOIN attractions a ON ri.attraction_id = a.id AND a.deleted = 0
+        WHERE ri.route_id = #{routeId}
+        ORDER BY ri.day_number ASC, ri.sort_order ASC
+    </select>
+
+    <select id="selectItemsByRouteIds" resultType="com.cinema.booking.dto.RouteItemDTO">
+        SELECT
+            ri.id, ri.route_id, ri.day_number, ri.sort_order,
+            ri.attraction_id, ri.suggested_duration, ri.transport_method, ri.note,
+            a.name AS attraction_name,
+            a.cover_image AS attraction_cover,
+            a.description AS attraction_description,
+            a.longitude AS attraction_longitude,
+            a.latitude AS attraction_latitude,
+            a.address AS attraction_address
+        FROM route_items ri
+        LEFT JOIN attractions a ON ri.attraction_id = a.id AND a.deleted = 0
+        WHERE ri.route_id IN
+        <foreach collection="routeIds" item="rid" open="(" separator="," close=")">
+            #{rid}
+        </foreach>
+        ORDER BY ri.route_id ASC, ri.day_number ASC, ri.sort_order ASC
+    </select>
+
+</mapper>

@@ -1,15 +1,16 @@
 <template>
   <div class="forum-container">
     <!-- 论坛头部 -->
-    <div class="forum-header">
+    <div class="forum-header" :style="{ backgroundImage: `url(${headerBg})` }">
+      <div class="header-overlay"></div>
       <div class="header-content">
         <div class="header-left">
           <h1 class="forum-title">建言献策</h1>
           <p class="forum-subtitle">为家乡发展建言献策，共同打造美丽乡村</p>
         </div>
         <div class="header-right">
-          <el-button 
-            type="primary" 
+          <el-button
+            type="primary"
             size="large"
             :icon="Plus"
             @click="showPublishDialog"
@@ -17,9 +18,9 @@
           >
             发布建议
           </el-button>
-          <el-button 
+          <el-button
             v-else
-            type="primary" 
+            type="primary"
             size="large"
             @click="goToLogin"
           >
@@ -41,7 +42,7 @@
           <el-radio-button label="education">教育文化</el-radio-button>
           <el-radio-button label="other">其他</el-radio-button>
         </el-radio-group>
-        
+
         <div class="filter-right">
           <el-select v-model="sortBy" @change="handleSortChange" class="sort-select">
             <el-option label="最新发布" value="latest" />
@@ -78,8 +79,8 @@
             <h3 class="post-title">{{ post.title }}</h3>
             <div class="post-content" v-html="post.content.substring(0, 200) + (post.content.length > 200 ? '...' : '')"></div>
             <div class="post-images" v-if="post.images && post.images.length > 0">
-              <img 
-                v-for="(image, index) in post.images.slice(0, 3)" 
+              <img
+                v-for="(image, index) in post.images.slice(0, 3)"
                 :key="index"
                 :src="getImageUrl(image)"
                 class="post-image"
@@ -118,13 +119,13 @@
             <el-icon><List /></el-icon>
             最新建议
           </h3>
-          
+
           <!-- 空状态 -->
           <el-empty v-if="posts.length === 0 && !loading" description="暂无建议帖子">
             <el-button type="primary" @click="showPublishDialog" v-if="userStore.isLoggedIn">发布第一个建议</el-button>
             <el-button type="primary" @click="goToLogin" v-else>登录后发布</el-button>
           </el-empty>
-          
+
           <!-- 帖子列表 -->
           <div class="post-item" v-for="post in posts" :key="post.id" @click="goToDetail(post.id)">
             <div class="post-header">
@@ -141,8 +142,8 @@
             <h3 class="post-title">{{ post.title }}</h3>
             <div class="post-content" v-html="post.content.substring(0, 200) + (post.content.length > 200 ? '...' : '')"></div>
             <div class="post-images" v-if="post.images && post.images.length > 0">
-              <img 
-                v-for="(image, index) in post.images.slice(0, 3)" 
+              <img
+                v-for="(image, index) in post.images.slice(0, 3)"
                 :key="index"
                 :src="getImageUrl(image)"
                 class="post-image"
@@ -202,14 +203,14 @@
     >
       <el-form :model="publishForm" :rules="publishRules" ref="publishFormRef" label-width="100px">
         <el-form-item label="建议标题" prop="title">
-          <el-input 
-            v-model="publishForm.title" 
+          <el-input
+            v-model="publishForm.title"
             placeholder="请输入建议标题，简明扼要地概括您的建议"
             maxlength="100"
             show-word-limit
           />
         </el-form-item>
-        
+
         <el-form-item label="建议类型" prop="category">
           <el-select v-model="publishForm.category" placeholder="请选择建议类型">
             <el-option label="环境问题" value="environment" />
@@ -220,18 +221,18 @@
             <el-option label="其他" value="other" />
           </el-select>
         </el-form-item>
-        
+
         <el-form-item label="建议内容" prop="content">
-          <el-input 
-            v-model="publishForm.content" 
-            type="textarea" 
+          <el-input
+            v-model="publishForm.content"
+            type="textarea"
             :rows="8"
             placeholder="请详细描述您的建议内容..."
             maxlength="2000"
             show-word-limit
           />
         </el-form-item>
-        
+
         <el-form-item label="相关图片">
           <el-upload
             :file-list="publishForm.imageFiles"
@@ -251,7 +252,7 @@
           </el-upload>
         </el-form-item>
       </el-form>
-      
+
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="publishDialogVisible = false">取消</el-button>
@@ -275,17 +276,18 @@ import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { 
-  Plus, 
-  Top, 
-  List, 
-  User, 
-  View, 
-  Star, 
-  StarFilled, 
-  ChatRound 
+import {
+  Plus,
+  Top,
+  List,
+  User,
+  View,
+  Star,
+  StarFilled,
+  ChatRound
 } from '@element-plus/icons-vue'
 import { forumPostAPI, forumUtils } from '@/api/forum'
+import headerBg from '@/assets/image/建言献策背景.png'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -350,7 +352,7 @@ const getPosts = async () => {
   try {
     const response = await forumPostAPI.getPostList(queryParams)
     const data = response.data
-    
+
     // 处理图片数据
     const processedPosts = (data.records || []).map(post => {
       // 确保images是数组格式
@@ -366,14 +368,14 @@ const getPosts = async () => {
       }
       return post
     })
-    
+
     posts.value = processedPosts
     total.value = data.total || 0
-    
+
     // 分离置顶帖子
     topPosts.value = posts.value.filter(post => post.isTop)
     posts.value = posts.value.filter(post => !post.isTop)
-    
+
   } catch (error) {
     console.error('获取帖子列表失败:', error)
     ElMessage.error('获取帖子列表失败')
@@ -437,26 +439,26 @@ const showPublishDialog = () => {
 // 提交帖子
 const submitPost = async () => {
   if (!publishFormRef.value) return
-  
+
   try {
     await publishFormRef.value.validate()
-    
+
     submitting.value = true
-    
+
     const postData = {
       title: publishForm.title,
       content: publishForm.content,
       category: publishForm.category,
       images: publishForm.images
     }
-    
+
     await forumPostAPI.createPost(postData)
-    
+
     ElMessage.success('建议发布成功，请等待管理员审核')
     publishDialogVisible.value = false
     resetPublishForm()
     getPosts()
-    
+
   } catch (error) {
     console.error('发布建议失败:', error)
     ElMessage.error('发布建议失败，请重试')
@@ -514,7 +516,7 @@ const toggleLike = async (post) => {
     goToLogin()
     return
   }
-  
+
   try {
     if (post.isLiked) {
       await forumPostAPI.unlikePost(post.id)
@@ -578,12 +580,12 @@ const formatTime = (time) => {
   const date = new Date(time)
   const now = new Date()
   const diff = now - date
-  
+
   if (diff < 60000) return '刚刚'
   if (diff < 3600000) return `${Math.floor(diff / 60000)}分钟前`
   if (diff < 86400000) return `${Math.floor(diff / 3600000)}小时前`
   if (diff < 604800000) return `${Math.floor(diff / 86400000)}天前`
-  
+
   return date.toLocaleDateString('zh-CN')
 }
 
@@ -603,69 +605,61 @@ watch(() => userStore.isLoggedIn, (newVal) => {
 <style scoped>
 .forum-container {
   min-height: 100vh;
-  background: #f5f7fa;
+  background: var(--color-bg-body);
 }
 
 /* 论坛头部 */
 .forum-header {
-  background: linear-gradient(135deg, #fef7ff 0%, #e8fff7 50%, #d5fff7 100%);
-  color: #581c87;
+  background-size: cover;
+  background-position: center;
+  color: #ffffff;
   padding: 50px 0;
   margin-bottom: 30px;
   position: relative;
   overflow: hidden;
 }
 
-.forum-header::before {
-  content: '';
+.header-overlay {
   position: absolute;
-  top: -35%;
-  left: -12%;
-  width: 320px;
-  height: 320px;
-  background: radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%);
-  border-radius: 50%;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  pointer-events: none;
 }
 
 .header-content {
-  max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  position: relative;
+  z-index: 1;
 }
 
 .forum-title {
   font-size: 42px;
   margin: 0 0 10px 0;
   font-weight: 700;
-  background: linear-gradient(45deg, #6699ff, #859eff);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  position: relative;
-  z-index: 1;
+  color: #ffffff;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .forum-subtitle {
   font-size: 18px;
   margin: 0;
-  color: #859eff;
-  position: relative;
-  z-index: 1;
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
 }
 
 /* 分类筛选 */
 .category-filter {
-  background: white;
+  background: var(--color-bg-surface);
   padding: 20px 0;
   margin-bottom: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-card);
 }
 
 .filter-container {
-  max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
   display: flex;
@@ -685,7 +679,6 @@ watch(() => userStore.isLoggedIn, (newVal) => {
 
 /* 帖子列表 */
 .posts-list {
-  max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
   min-height: 400px;
@@ -696,29 +689,29 @@ watch(() => userStore.isLoggedIn, (newVal) => {
   align-items: center;
   gap: 8px;
   font-size: 18px;
-  color: #333;
+  color: var(--color-text-primary);
   margin: 0 0 20px 0;
   padding-bottom: 10px;
-  border-bottom: 2px solid #10b981;
+  border-bottom: 2px solid var(--color-primary-500);
 }
 
 .post-item {
-  background: white;
-  border-radius: 12px;
+  background: var(--color-bg-surface);
+  border-radius: var(--radius-lg);
   padding: 24px;
   margin-bottom: 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-card);
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .post-item:hover {
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-card-hover);
   transform: translateY(-2px);
 }
 
 .top-post {
-  border-left: 4px solid #10b981;
+  border-left: 4px solid var(--color-primary-500);
 }
 
 .post-header {
@@ -735,26 +728,26 @@ watch(() => userStore.isLoggedIn, (newVal) => {
 }
 
 .post-time {
-  color: #666;
+  color: var(--color-text-tertiary);
   font-size: 14px;
 }
 
 .top-tag {
-  background: #10b981 !important;
-  border-color: #10b981 !important;
-  color: white !important;
+  background: var(--color-primary-500) !important;
+  border-color: var(--color-primary-500) !important;
+  color: var(--color-text-inverse) !important;
 }
 
 .post-title {
   font-size: 20px;
   font-weight: 600;
-  color: #333;
+  color: var(--color-text-primary);
   margin: 0 0 12px 0;
   line-height: 1.4;
 }
 
 .post-content {
-  color: #666;
+  color: var(--color-text-tertiary);
   font-size: 14px;
   line-height: 1.6;
   margin-bottom: 16px;
@@ -782,12 +775,12 @@ watch(() => userStore.isLoggedIn, (newVal) => {
 .more-images {
   width: 80px;
   height: 80px;
-  background: #f5f7fa;
+  background: var(--color-bg-body);
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #666;
+  color: var(--color-text-tertiary);
   font-size: 14px;
 }
 
@@ -805,7 +798,7 @@ watch(() => userStore.isLoggedIn, (newVal) => {
 
 .author-name {
   font-size: 14px;
-  color: #666;
+  color: var(--color-text-tertiary);
 }
 
 .post-stats {
@@ -818,23 +811,22 @@ watch(() => userStore.isLoggedIn, (newVal) => {
   display: flex;
   align-items: center;
   gap: 4px;
-  color: #666;
+  color: var(--color-text-tertiary);
   font-size: 14px;
   cursor: pointer;
   transition: color 0.3s ease;
 }
 
 .stat-item:hover {
-  color: #10b981;
+  color: var(--color-primary-500);
 }
 
 .like-btn.active {
-  color: #10b981;
+  color: var(--color-primary-500);
 }
 
 /* 分页 */
 .pagination-container {
-  max-width: 1200px;
   margin: 40px auto;
   padding: 0 20px;
   display: flex;
@@ -853,30 +845,30 @@ watch(() => userStore.isLoggedIn, (newVal) => {
     text-align: center;
     gap: 20px;
   }
-  
+
   .forum-title {
     font-size: 28px;
   }
-  
+
   .filter-container {
     flex-direction: column;
     gap: 15px;
   }
-  
+
   .posts-list {
     padding: 0 15px;
   }
-  
+
   .post-item {
     padding: 16px;
   }
-  
+
   .post-footer {
     flex-direction: column;
     gap: 12px;
     align-items: flex-start;
   }
-  
+
   .pagination-container {
     padding: 0 15px;
   }
@@ -887,11 +879,11 @@ watch(() => userStore.isLoggedIn, (newVal) => {
     flex-wrap: wrap;
     gap: 8px;
   }
-  
+
   .post-images {
     flex-wrap: wrap;
   }
-  
+
   .post-image,
   .more-images {
     width: 60px;

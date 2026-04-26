@@ -95,7 +95,32 @@ cinema:
     legacy-collections:
       - village_knowledge_base
 
+# 和风天气 API 配置
+qweather:
+  api-key: a2801b72f2e542b996d08fab62b1eade
+  base-url: https://devapi.qweather.com
+  cache-minutes: 30
+
+# 天聚数行 TianAPI 配置
+tianapi:
+  api-key: dca880bbcd19bf1e4a26035e524b81b6
+  base-url: https://apis.tianapi.com
+  nongye-path: /nongye/index
+  default-num: 20
+  cache-minutes: 60
+
+# 高德地图 API 配置
+amap:
+  web-key: ${AMAP_WEB_KEY:77e1c564894c0b47491fbe4316f018bf}
+  text-search-url: https://restapi.amap.com/v5/place/text
+  detail-url: https://restapi.amap.com/v5/place/detail
+  connect-timeout: 5000
+  read-timeout: 10000
+  sync:
+    default-region: 全国
+    default-page-size: 25
+
 # 文件上传配置
 file:
   upload:
-    path: F:\乡村振兴·新桃源智界平台\作品附件\源码\files  # 文件上传保存路径（与back同级的files目录）
+    path: ..\files  # 文件上传保存路径（与back同级的files目录）

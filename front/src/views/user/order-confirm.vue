@@ -398,12 +398,11 @@ onMounted(() => {
 <style scoped>
 .order-confirm {
   min-height: 100vh;
-  background: #f8fafc;
+  background: var(--color-bg-body);
   padding: 40px 0;
 }
 
 .container {
-  max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
   display: grid;
@@ -421,14 +420,14 @@ onMounted(() => {
 
 .page-header h1 {
   font-size: 32px;
-  color: #1e293b;
+  color: var(--color-text-primary);
   margin-bottom: 8px;
   font-weight: 700;
 }
 
 .page-header p {
   font-size: 16px;
-  color: #64748b;
+  color: var(--color-text-tertiary);
 }
 
 /* 确认内容 */
@@ -444,10 +443,10 @@ onMounted(() => {
 .delivery-section,
 .payment-section,
 .remark-section {
-  background: white;
-  border-radius: 12px;
+  background: var(--color-bg-surface);
+  border-radius: var(--radius-lg);
   padding: 24px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  box-shadow: var(--shadow-card);
 }
 
 .address-section h2,
@@ -456,7 +455,7 @@ onMounted(() => {
 .payment-section h2,
 .remark-section h2 {
   font-size: 18px;
-  color: #1e293b;
+  color: var(--color-text-primary);
   margin-bottom: 20px;
   font-weight: 600;
 }
@@ -467,13 +466,13 @@ onMounted(() => {
   justify-content: space-between;
   align-items: center;
   padding: 20px;
-  border: 2px solid #e2e8f0;
+  border: 2px solid var(--color-border);
   border-radius: 8px;
   transition: all 0.3s ease;
 }
 
 .address-card.selected {
-  border-color: #3b82f6;
+  border-color: var(--color-info);
   background: #eff6ff;
 }
 
@@ -486,15 +485,15 @@ onMounted(() => {
 
 .receiver-name {
   font-weight: 600;
-  color: #1e293b;
+  color: var(--color-text-primary);
 }
 
 .receiver-phone {
-  color: #64748b;
+  color: var(--color-text-tertiary);
 }
 
 .address-detail {
-  color: #4b5563;
+  color: var(--color-text-secondary);
   line-height: 1.5;
 }
 
@@ -516,7 +515,7 @@ onMounted(() => {
   gap: 16px;
   align-items: center;
   padding: 16px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
 }
 
@@ -535,7 +534,7 @@ onMounted(() => {
 
 .product-info h3 {
   font-size: 16px;
-  color: #1e293b;
+  color: var(--color-text-primary);
   margin-bottom: 8px;
   font-weight: 600;
 }
@@ -543,7 +542,7 @@ onMounted(() => {
 .product-spec,
 .product-origin {
   font-size: 14px;
-  color: #64748b;
+  color: var(--color-text-tertiary);
   margin-bottom: 4px;
 }
 
@@ -553,19 +552,19 @@ onMounted(() => {
 
 .price {
   font-size: 16px;
-  color: #e74c3c;
+  color: var(--color-danger);
   font-weight: 600;
   display: block;
 }
 
 .quantity {
   font-size: 14px;
-  color: #64748b;
+  color: var(--color-text-tertiary);
 }
 
 .product-subtotal {
   font-size: 18px;
-  color: #e74c3c;
+  color: var(--color-danger);
   font-weight: 600;
 }
 
@@ -583,9 +582,9 @@ onMounted(() => {
   width: 100%;
   padding: 40px;
   margin-bottom: 12px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
-  
+
 }
 
 .el-radio-group {
@@ -599,19 +598,19 @@ onMounted(() => {
 
 .delivery-name {
   font-weight: 600;
-  color: #1e293b;
+  color: var(--color-text-primary);
   margin-bottom: 4px;
 }
 
 .delivery-desc {
   font-size: 14px;
-  color: #64748b;
+  color: var(--color-text-tertiary);
   margin:5px 0;
 }
 
 .delivery-fee {
   font-weight: 600;
-  color: #e74c3c;
+  color: var(--color-danger);
   margin-left:12px;
 }
 
@@ -627,7 +626,7 @@ onMounted(() => {
   align-items: center;
   padding: 16px;
   margin-bottom: 12px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   width: 100%;
 }
@@ -641,7 +640,7 @@ onMounted(() => {
 
 .payment-icon {
   font-size: 20px;
-  color: #3b82f6;
+  color: var(--color-info);
 }
 
 /* 订单结算 */
@@ -651,10 +650,10 @@ onMounted(() => {
 }
 
 .summary-card {
-  background: white;
-  border-radius: 12px;
+  background: var(--color-bg-surface);
+  border-radius: var(--radius-lg);
   padding: 24px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  box-shadow: var(--shadow-card);
 }
 
 .summary-items {
@@ -668,11 +667,11 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  color: #4b5563;
+  color: var(--color-text-secondary);
 }
 
 .summary-item.discount {
-  color: #10b981;
+  color: var(--color-primary-500);
 }
 
 .summary-total {
@@ -681,13 +680,13 @@ onMounted(() => {
   align-items: center;
   padding-top: 20px;
   margin-bottom: 24px;
-  border-top: 2px solid #e2e8f0;
+  border-top: 2px solid var(--color-border);
   font-size: 18px;
   font-weight: 600;
 }
 
 .total-amount {
-  color: #e74c3c;
+  color: var(--color-danger);
   font-size: 24px;
 }
 
@@ -710,18 +709,18 @@ onMounted(() => {
   align-items: center;
   padding: 16px;
   margin-bottom: 12px;
-  border: 2px solid #e2e8f0;
+  border: 2px solid var(--color-border);
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .address-item:hover {
-  border-color: #3b82f6;
+  border-color: var(--color-info);
 }
 
 .address-item.selected {
-  border-color: #3b82f6;
+  border-color: var(--color-info);
   background: #eff6ff;
 }
 
@@ -731,7 +730,7 @@ onMounted(() => {
     grid-template-columns: 1fr;
     gap: 20px;
   }
-  
+
   .order-summary {
     position: static;
   }
@@ -741,26 +740,26 @@ onMounted(() => {
   .page-header h1 {
     font-size: 24px;
   }
-  
+
   .product-item {
     grid-template-columns: 60px 1fr;
     gap: 12px;
   }
-  
+
   .product-price,
   .product-subtotal {
     grid-column: 1 / -1;
     text-align: left;
     margin-top: 8px;
   }
-  
+
   .delivery-option,
   .payment-option {
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
   }
-  
+
   .address-item {
     flex-direction: column;
     align-items: flex-start;

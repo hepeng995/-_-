@@ -74,7 +74,7 @@ class QdrantVectorSearchAdapterTest {
         assertEquals(1, results.size());
         Content content = results.get(0);
         TextSegment segment = content.textSegment();
-        assertEquals("【特产商城】商品名称：桃源茶叶。", segment.text());
+        assertEquals("【特产商城】商品名称：高山云雾茶。", segment.text());
         assertEquals("2", segment.metadata().getString("id"));
         assertEquals("PRODUCT", segment.metadata().getString("type"));
         assertNotNull(content.metadata().get(ContentMetadata.SCORE));
@@ -94,10 +94,10 @@ class QdrantVectorSearchAdapterTest {
                                 .build())
                         .build())
                 .putAllPayload(Map.of(
-                        "text_segment", ValueFactory.value("【特产商城】商品名称：桃源茶叶。"),
+                        "text_segment", ValueFactory.value("【特产商城】商品名称：高山云雾茶。"),
                         "type", ValueFactory.value("PRODUCT"),
                         "id", ValueFactory.value("2"),
-                        "name", ValueFactory.value("桃源茶叶")
+                        "name", ValueFactory.value("高山云雾茶")
                 ))
                 .build();
     }

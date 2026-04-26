@@ -1,0 +1,112 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  /* 翠竹绿 / Bamboo Green — 主色 */
+  --color-bamboo-50: #F0F8F4;
+  --color-bamboo-100: #DCF0E6;
+  --color-bamboo-200: #B8E0CC;
+  --color-bamboo-300: #88C8A6;
+  --color-bamboo-400: #4EA87A;
+  --color-bamboo-500: #1E7A52;
+  --color-bamboo-600: #196847;
+  --color-bamboo-700: #145339;
+  --color-bamboo-800: #0F3D2B;
+  --color-bamboo-900: #0A2A1E;
+  --color-bamboo-950: #061A12;
+
+  /* 丰收金 / Harvest Gold — 警告 */
+  --color-harvest-50: #FBF6ED;
+  --color-harvest-100: #F5E8CE;
+  --color-harvest-200: #EDCFA0;
+  --color-harvest-300: #E0B46D;
+  --color-harvest-400: #D49E42;
+  --color-harvest-500: #C8922A;
+  --color-harvest-600: #A87820;
+  --color-harvest-700: #875E18;
+  --color-harvest-800: #684812;
+  --color-harvest-900: #4A320C;
+  --color-harvest-950: #2E1F07;
+
+  /* 暮霞橘 / Twilight Terracotta — 危险 */
+  --color-terracotta-50: #FDF1ED;
+  --color-terracotta-100: #F9DAD0;
+  --color-terracotta-200: #F0B4A0;
+  --color-terracotta-300: #E28870;
+  --color-terracotta-400: #D46A4E;
+  --color-terracotta-500: #C05638;
+  --color-terracotta-600: #A44430;
+  --color-terracotta-700: #863626;
+  --color-terracotta-800: #6B2B1E;
+  --color-terracotta-900: #4E1F15;
+  --color-terracotta-950: #33140E;
+
+  /* 春芽绿 / Spring Sprout — 成功 */
+  --color-sprout-50: #EEF8F1;
+  --color-sprout-100: #D4EEDE;
+  --color-sprout-200: #ABDCC0;
+  --color-sprout-300: #7DC49E;
+  --color-sprout-400: #52AB7A;
+  --color-sprout-500: #3A9B5B;
+  --color-sprout-600: #2E8349;
+  --color-sprout-700: #246A3A;
+  --color-sprout-800: #1B522C;
+  --color-sprout-900: #123A1F;
+  --color-sprout-950: #0A2413;
+
+  /* 天青蓝 / Sky Teal — 信息 */
+  --color-sky-50: #EDF5F8;
+  --color-sky-100: #D0E6EE;
+  --color-sky-200: #A6CCDA;
+  --color-sky-300: #7FB0C2;
+  --color-sky-400: #5E9AAF;
+  --color-sky-500: #4A8FA8;
+  --color-sky-600: #3C7690;
+  --color-sky-700: #305F77;
+  --color-sky-800: #264960;
+  --color-sky-900: #1C3447;
+  --color-sky-950: #122130;
+
+  /* 墨夜青 / Ink Slate — 标题/深色 */
+  --color-ink-50: #EEF2F5;
+  --color-ink-100: #D5DDE3;
+  --color-ink-200: #ADC0CD;
+  --color-ink-300: #82A0B2;
+  --color-ink-400: #50788E;
+  --color-ink-500: #325A6E;
+  --color-ink-600: #1B3A4B;
+  --color-ink-700: #16303F;
+  --color-ink-800: #112530;
+  --color-ink-900: #0C1B24;
+  --color-ink-950: #070F15;
+
+  /* 荷塘碧 / Lotus Pond — 装饰点缀 */
+  --color-lotus-50: #ECF9F5;
+  --color-lotus-100: #C8F0E4;
+  --color-lotus-200: #96E0CC;
+  --color-lotus-300: #5CC8B0;
+  --color-lotus-400: #38B49C;
+  --color-lotus-500: #2AAA8A;
+  --color-lotus-600: #229076;
+  --color-lotus-700: #1C7561;
+  --color-lotus-800: #155A4C;
+  --color-lotus-900: #0F4038;
+  --color-lotus-950: #092822;
+
+  /* 字体 */
+  --font-sans: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
+
+  /* 阴影层级 */
+  --shadow-elevation-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-elevation-md: 0 4px 20px rgba(0, 0, 0, 0.06);
+  --shadow-elevation-lg: 0 12px 40px rgba(0, 0, 0, 0.1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

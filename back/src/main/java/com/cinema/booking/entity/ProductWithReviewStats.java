@@ -24,4 +24,5 @@ public class ProductWithReviewStats {
     private Integer reviewCount;
     private Integer goodReviewCount;
     private String topReview;
+    private String coverImage;
 }

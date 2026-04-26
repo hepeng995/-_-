@@ -4,6 +4,8 @@ import com.cinema.booking.mapper.AttractionMapper;
 import com.cinema.booking.mapper.NewsMapper;
 import com.cinema.booking.mapper.ProductMapper;
 import com.cinema.booking.mapper.ProductReviewMapper;
+import com.cinema.booking.mapper.TourRouteMapper;
+import com.cinema.booking.mapper.RouteItemMapper;
 import com.cinema.booking.service.ai.RuralDigitalAgent;
 import com.cinema.booking.service.ai.impl.HybridRetrievalService;
 import com.cinema.booking.service.ai.impl.RuralDigitalTools;
@@ -131,6 +133,8 @@ public class AIConfig {
             NewsMapper newsMapper,
             ProductMapper productMapper,
             ProductReviewMapper productReviewMapper,
+            TourRouteMapper tourRouteMapper,
+            RouteItemMapper routeItemMapper,
             ObjectMapper objectMapper) {
         return new RuralDigitalTools(
                 hybridRetrievalService,
@@ -138,6 +142,8 @@ public class AIConfig {
                 newsMapper,
                 productMapper,
                 productReviewMapper,
+                tourRouteMapper,
+                routeItemMapper,
                 objectMapper
         );
     }

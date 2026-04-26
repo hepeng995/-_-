@@ -125,7 +125,7 @@ const initMap = async () => {
     // 创建地图实例
     map.value = await createMap('location-picker-map', {
       zoom: 13,
-      center: [112.345678, 28.123456] // 桃源县中心坐标
+      center: [106.551557, 29.563009] // 全国中心坐标
     })
     
     // 添加地图控件
@@ -136,7 +136,7 @@ const initMap = async () => {
     
     // 创建地理编码服务
     geocoder.value = new window.AMap.Geocoder({
-      city: '桃源县'
+      city: ''
     })
     
     // 地图点击事件
@@ -256,7 +256,7 @@ const searchAddress = async () => {
       await loadAmapScript()
     }
     
-    const results = await searchPlace(addressInput.value, '桃源县')
+    const results = await searchPlace(addressInput.value, '')
     searchResults.value = results.map(result => ({
       id: result.id,
       name: result.name,
@@ -322,7 +322,7 @@ const performSearch = async (keyword) => {
       await loadAmapScript()
     }
     
-    const results = await searchPlace(keyword, '桃源县')
+    const results = await searchPlace(keyword, '')
     searchResults.value = results.map(result => ({
       id: result.id,
       name: result.name,

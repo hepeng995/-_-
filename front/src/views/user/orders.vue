@@ -514,12 +514,11 @@ onMounted(() => {
 <style scoped>
 .user-orders {
   min-height: 100vh;
-  background: #f8fafc;
+  background: var(--color-bg-body);
   padding: 40px 0;
 }
 
 .container {
-  max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
 }
@@ -532,23 +531,23 @@ onMounted(() => {
 
 .page-header h1 {
   font-size: 32px;
-  color: #1e293b;
+  color: var(--color-text-primary);
   margin-bottom: 12px;
   font-weight: 700;
 }
 
 .page-header p {
   font-size: 16px;
-  color: #64748b;
+  color: var(--color-text-tertiary);
 }
 
 /* 订单标签 */
 .order-tabs {
-  background: white;
-  border-radius: 12px;
+  background: var(--color-bg-surface);
+  border-radius: var(--radius-lg);
   padding: 20px;
   margin-bottom: 24px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  box-shadow: var(--shadow-card);
 }
 
 .tabs-wrapper {
@@ -561,21 +560,21 @@ onMounted(() => {
 .tab-item {
   padding: 10px 20px;
   border-radius: 20px;
-  background: #f1f5f9;
-  color: #64748b;
+  background: var(--color-bg-muted);
+  color: var(--color-text-tertiary);
   cursor: pointer;
   transition: all 0.3s ease;
   font-weight: 500;
 }
 
 .tab-item:hover {
-  background: #e2e8f0;
-  color: #475569;
+  background: var(--color-border);
+  color: var(--color-text-secondary);
 }
 
 .tab-item.active {
-  background: #3b82f6;
-  color: white;
+  background: var(--color-info);
+  color: var(--color-text-inverse);
 }
 
 /* 订单内容 */
@@ -590,10 +589,10 @@ onMounted(() => {
 }
 
 .order-card {
-  background: white;
-  border-radius: 12px;
+  background: var(--color-bg-surface);
+  border-radius: var(--radius-lg);
   padding: 24px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  box-shadow: var(--shadow-card);
   transition: all 0.3s ease;
 }
 
@@ -608,7 +607,7 @@ onMounted(() => {
   align-items: center;
   margin-bottom: 20px;
   padding-bottom: 16px;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .order-info {
@@ -619,11 +618,11 @@ onMounted(() => {
 
 .order-number {
   font-weight: 600;
-  color: #1e293b;
+  color: var(--color-text-primary);
 }
 
 .order-date {
-  color: #64748b;
+  color: var(--color-text-tertiary);
   font-size: 14px;
 }
 
@@ -636,7 +635,7 @@ onMounted(() => {
   display: flex;
   gap: 16px;
   padding: 16px 0;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid var(--color-bg-muted);
 }
 
 .order-item:last-child {
@@ -663,14 +662,14 @@ onMounted(() => {
 
 .item-name {
   font-size: 16px;
-  color: #1e293b;
+  color: var(--color-text-primary);
   margin-bottom: 8px;
   font-weight: 600;
 }
 
 .item-spec {
   font-size: 14px;
-  color: #64748b;
+  color: var(--color-text-tertiary);
   margin-bottom: 8px;
 }
 
@@ -682,19 +681,19 @@ onMounted(() => {
 
 .item-price {
   font-size: 16px;
-  color: #e74c3c;
+  color: var(--color-danger);
   font-weight: 600;
 }
 
 .item-quantity {
-  color: #64748b;
+  color: var(--color-text-tertiary);
 }
 
 /* 订单总计 */
 .order-total {
   margin-bottom: 20px;
   padding: 16px;
-  background: #f8fafc;
+  background: var(--color-bg-body);
   border-radius: 8px;
 }
 
@@ -706,7 +705,7 @@ onMounted(() => {
 
 .total-amount {
   font-size: 18px;
-  color: #e74c3c;
+  color: var(--color-danger);
   font-weight: 600;
 }
 
@@ -752,7 +751,7 @@ onMounted(() => {
 
 .amount-info .total {
   font-size: 16px;
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--color-border);
   padding-top: 10px;
 }
 
@@ -769,44 +768,44 @@ onMounted(() => {
   .page-header h1 {
     font-size: 24px;
   }
-  
+
   .tabs-wrapper {
     gap: 12px;
   }
-  
+
   .tab-item {
     padding: 8px 16px;
     font-size: 14px;
   }
-  
+
   .order-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
   }
-  
+
   .order-info {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
   }
-  
+
   .item-meta {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
   }
-  
+
   .total-info {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
   }
-  
+
   .order-actions {
     justify-content: flex-start;
   }
-  
+
   .dialog-actions {
     justify-content: center;
   }
@@ -816,7 +815,7 @@ onMounted(() => {
   .order-item {
     flex-direction: column;
   }
-  
+
   .item-image {
     width: 100%;
     height: 200px;

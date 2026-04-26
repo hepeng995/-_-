@@ -81,9 +81,9 @@ public class HomeController {
         VillageOverviewVO overview = new VillageOverviewVO();
         
         // 这里可以设置一些静态的乡村介绍数据
-        overview.setTitle("乡村振兴·新桃源智界");
-        overview.setSubtitle("陶渊明笔下的世外桃源，现代科技赋能的智慧乡村");
-        overview.setDescription("这里有桃花烂漫的春天，绿荫如盖的夏日，硕果累累的秋季，雪梅傲骨的冬时。" +
+        overview.setTitle("乡村振兴·智兴乡村平台");
+        overview.setSubtitle("绿水青山就是金山银山，现代科技赋能的智慧乡村");
+        overview.setDescription("这里有繁花似锦的春天，绿荫如盖的夏日，硕果累累的秋季，雪梅傲骨的冬时。" +
                 "我们致力于打造集自然风光、人文历史、现代农业、智慧旅游于一体的美丽乡村。");
         
         overview.setHonors(List.of(

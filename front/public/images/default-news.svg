@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="280" viewBox="0 0 400 280">
+  <rect width="400" height="280" fill="#f0f4f8"/>
+  <rect x="140" y="70" width="120" height="90" rx="8" fill="#d1d9e6"/>
+  <circle cx="180" cy="105" r="15" fill="#b0bec5"/>
+  <polygon points="150,145 200,100 250,145" fill="#90a4ae"/>
+  <polygon points="170,145 210,115 260,150 260,145 250,145 200,100 150,145" fill="#78909c"/>
+  <text x="200" y="200" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#90a4ae">暂无封面图</text>
+</svg>

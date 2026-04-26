@@ -439,12 +439,11 @@ onMounted(() => {
 <style scoped>
 .shopping-cart {
   min-height: 100vh;
-  background: #f8fafc;
+  background: var(--color-bg-body);
   padding: 40px 0;
 }
 
 .container {
-  max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
 }
@@ -457,14 +456,14 @@ onMounted(() => {
 
 .page-header h1 {
   font-size: 32px;
-  color: #1e293b;
+  color: var(--color-text-primary);
   margin-bottom: 8px;
   font-weight: 700;
 }
 
 .page-header p {
   font-size: 16px;
-  color: #64748b;
+  color: var(--color-text-tertiary);
 }
 
 /* 购物车主要内容 */
@@ -477,10 +476,10 @@ onMounted(() => {
 
 /* 购物车列表 */
 .cart-list {
-  background: white;
-  border-radius: 12px;
+  background: var(--color-bg-surface);
+  border-radius: var(--radius-lg);
   padding: 24px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  box-shadow: var(--shadow-card);
 }
 
 .select-all {
@@ -489,11 +488,11 @@ onMounted(() => {
   gap: 20px;
   padding-bottom: 20px;
   margin-bottom: 20px;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .selected-count {
-  color: #64748b;
+  color: var(--color-text-tertiary);
   font-size: 14px;
 }
 
@@ -510,16 +509,16 @@ onMounted(() => {
   align-items: center;
   padding: 20px;
   border: 2px solid transparent;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   transition: all 0.3s ease;
 }
 
 .cart-item:hover {
-  background: #f8fafc;
+  background: var(--color-bg-body);
 }
 
 .cart-item.selected {
-  border-color: #3b82f6;
+  border-color: var(--color-info);
   background: #eff6ff;
 }
 
@@ -542,7 +541,7 @@ onMounted(() => {
 
 .item-name {
   font-size: 16px;
-  color: #1e293b;
+  color: var(--color-text-primary);
   margin-bottom: 8px;
   font-weight: 600;
   display: -webkit-box;
@@ -554,7 +553,7 @@ onMounted(() => {
 .item-spec,
 .item-origin {
   font-size: 14px;
-  color: #64748b;
+  color: var(--color-text-tertiary);
   margin-bottom: 4px;
 }
 
@@ -564,14 +563,14 @@ onMounted(() => {
 
 .current-price {
   font-size: 16px;
-  color: #e74c3c;
+  color: var(--color-danger);
   font-weight: 600;
   display: block;
 }
 
 .original-price {
   font-size: 14px;
-  color: #94a3b8;
+  color: var(--color-text-placeholder);
   text-decoration: line-through;
 }
 
@@ -581,13 +580,13 @@ onMounted(() => {
 
 .stock-info {
   font-size: 12px;
-  color: #64748b;
+  color: var(--color-text-tertiary);
   margin-top: 4px;
 }
 
 .item-subtotal {
   font-size: 18px;
-  color: #e74c3c;
+  color: var(--color-danger);
   font-weight: 600;
   text-align: right;
 }
@@ -603,15 +602,15 @@ onMounted(() => {
 }
 
 .summary-card {
-  background: white;
-  border-radius: 12px;
+  background: var(--color-bg-surface);
+  border-radius: var(--radius-lg);
   padding: 24px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  box-shadow: var(--shadow-card);
 }
 
 .summary-card h3 {
   font-size: 20px;
-  color: #1e293b;
+  color: var(--color-text-primary);
   margin-bottom: 20px;
   font-weight: 600;
 }
@@ -627,15 +626,15 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  color: #4b5563;
+  color: var(--color-text-secondary);
 }
 
 .summary-item.discount {
-  color: #10b981;
+  color: var(--color-primary-500);
 }
 
 .summary-item.shipping {
-  color: #64748b;
+  color: var(--color-text-tertiary);
 }
 
 .summary-total {
@@ -644,13 +643,13 @@ onMounted(() => {
   align-items: center;
   padding-top: 20px;
   margin-bottom: 24px;
-  border-top: 2px solid #e2e8f0;
+  border-top: 2px solid var(--color-border);
   font-size: 18px;
   font-weight: 600;
 }
 
 .total-amount {
-  color: #e74c3c;
+  color: var(--color-danger);
   font-size: 24px;
 }
 
@@ -674,7 +673,7 @@ onMounted(() => {
 
 .recommended-products h2 {
   font-size: 24px;
-  color: #1e293b;
+  color: var(--color-text-primary);
   margin-bottom: 24px;
   font-weight: 600;
   text-align: center;
@@ -687,10 +686,10 @@ onMounted(() => {
 }
 
 .product-card {
-  background: white;
-  border-radius: 12px;
+  background: var(--color-bg-surface);
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  box-shadow: var(--shadow-card);
   transition: all 0.3s ease;
   cursor: pointer;
 }
@@ -717,7 +716,7 @@ onMounted(() => {
 
 .product-info h4 {
   font-size: 14px;
-  color: #1e293b;
+  color: var(--color-text-primary);
   margin-bottom: 8px;
   font-weight: 600;
   display: -webkit-box;
@@ -728,7 +727,7 @@ onMounted(() => {
 
 .product-price {
   font-size: 16px;
-  color: #e74c3c;
+  color: var(--color-danger);
   font-weight: 600;
 }
 
@@ -738,7 +737,7 @@ onMounted(() => {
     grid-template-columns: 1fr;
     gap: 20px;
   }
-  
+
   .cart-summary {
     position: static;
   }
@@ -748,12 +747,12 @@ onMounted(() => {
   .page-header h1 {
     font-size: 24px;
   }
-  
+
   .cart-item {
     grid-template-columns: auto 60px 1fr;
     gap: 12px;
   }
-  
+
   .item-price,
   .item-quantity,
   .item-subtotal,
@@ -762,7 +761,7 @@ onMounted(() => {
     text-align: left;
     margin-top: 12px;
   }
-  
+
   .select-all {
     flex-wrap: wrap;
     gap: 12px;

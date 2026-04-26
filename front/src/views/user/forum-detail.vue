@@ -88,7 +88,6 @@
           </div>
         </div>
 
-        <!-- 管理员回复功能已移除 -->
       </el-card>
     </div>
 
@@ -632,14 +631,14 @@ onMounted(() => {
 }
 
 .post-time {
-  color: #666;
+  color: var(--color-text-tertiary);
   font-size: 14px;
 }
 
 .post-title {
   font-size: 28px;
   font-weight: 600;
-  color: #333;
+  color: var(--color-text-primary);
   margin: 0;
   line-height: 1.3;
 }
@@ -650,18 +649,18 @@ onMounted(() => {
   align-items: center;
   gap: 12px;
   padding: 16px 0;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--color-border);
   margin-bottom: 24px;
 }
 
 .author-name {
   font-weight: 600;
-  color: #333;
+  color: var(--color-text-primary);
   font-size: 16px;
 }
 
 .author-meta {
-  color: #666;
+  color: var(--color-text-tertiary);
   font-size: 14px;
 }
 
@@ -673,7 +672,7 @@ onMounted(() => {
 .content-text {
   font-size: 16px;
   line-height: 1.8;
-  color: #333;
+  color: var(--color-text-primary);
   margin-bottom: 20px;
   white-space: pre-wrap;
 }
@@ -702,8 +701,8 @@ onMounted(() => {
   justify-content: space-between;
   align-items: center;
   padding: 16px 0;
-  border-top: 1px solid #eee;
-  border-bottom: 1px solid #eee;
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .post-stats {
@@ -715,43 +714,13 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 6px;
-  color: #666;
+  color: var(--color-text-tertiary);
   font-size: 14px;
 }
 
 .action-buttons {
   display: flex;
   gap: 12px;
-}
-
-/* 管理员回复 */
-.admin-reply {
-  background: #f8f9fa;
-  border: 1px solid #e9ecef;
-  border-radius: 8px;
-  padding: 16px;
-  margin-top: 20px;
-}
-
-.reply-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 12px;
-  color: #007bff;
-  font-weight: 600;
-}
-
-.reply-time {
-  margin-left: auto;
-  color: #666;
-  font-size: 14px;
-  font-weight: normal;
-}
-
-.reply-content {
-  color: #333;
-  line-height: 1.6;
 }
 
 /* 评论区域 */
@@ -767,14 +736,14 @@ onMounted(() => {
 
 .comments-header h3 {
   margin: 0;
-  color: #333;
+  color: var(--color-text-primary);
 }
 
 /* 评论表单 */
 .comment-form {
   margin-bottom: 24px;
   padding: 20px;
-  background: #f8f9fa;
+  background: var(--color-bg-muted);
   border-radius: 8px;
 }
 
@@ -787,7 +756,7 @@ onMounted(() => {
 
 .current-user {
   font-weight: 600;
-  color: #333;
+  color: var(--color-text-primary);
 }
 
 .form-actions {
@@ -796,7 +765,7 @@ onMounted(() => {
 
 /* 评论列表 */
 .comment-item {
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--color-border);
   padding: 20px 0;
 }
 
@@ -822,16 +791,16 @@ onMounted(() => {
 
 .comment-author {
   font-weight: 600;
-  color: #333;
+  color: var(--color-text-primary);
 }
 
 .comment-time {
-  color: #666;
+  color: var(--color-text-tertiary);
   font-size: 14px;
 }
 
 .comment-text {
-  color: #333;
+  color: var(--color-text-primary);
   line-height: 1.6;
   margin-bottom: 12px;
 }
@@ -845,14 +814,14 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 4px;
-  color: #666;
+  color: var(--color-text-tertiary);
   font-size: 14px;
   cursor: pointer;
   transition: color 0.3s ease;
 }
 
 .action-btn:hover {
-  color: #409EFF;
+  color: var(--color-info);
 }
 
 .like-btn.active {
@@ -863,7 +832,7 @@ onMounted(() => {
 .reply-form {
   margin-top: 16px;
   padding: 16px;
-  background: #f8f9fa;
+  background: var(--color-bg-muted);
   border-radius: 6px;
 }
 
@@ -875,7 +844,7 @@ onMounted(() => {
 .replies-list {
   margin-top: 16px;
   margin-left: 52px;
-  border-left: 2px solid #eee;
+  border-left: 2px solid var(--color-border);
   padding-left: 16px;
 }
 
@@ -883,7 +852,7 @@ onMounted(() => {
   display: flex;
   gap: 8px;
   padding: 12px 0;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--color-bg-muted);
 }
 
 .reply-item:last-child {
@@ -903,24 +872,24 @@ onMounted(() => {
 
 .reply-author {
   font-weight: 600;
-  color: #333;
+  color: var(--color-text-primary);
   font-size: 14px;
 }
 
 .reply-time {
-  color: #666;
+  color: var(--color-text-tertiary);
   font-size: 12px;
 }
 
 .reply-text {
-  color: #333;
+  color: var(--color-text-primary);
   line-height: 1.5;
   margin-bottom: 8px;
   font-size: 14px;
 }
 
 .reply-target {
-  color: #409EFF;
+  color: var(--color-info);
 }
 
 .reply-actions {
@@ -939,33 +908,33 @@ onMounted(() => {
   .forum-detail-container {
     padding: 15px;
   }
-  
+
   .post-header {
     flex-direction: column;
     gap: 15px;
   }
-  
+
   .post-title {
     font-size: 24px;
   }
-  
+
   .post-actions {
     flex-direction: column;
     gap: 15px;
     align-items: flex-start;
   }
-  
+
   .author-info {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
   }
-  
+
   .comment-main {
     flex-direction: column;
     gap: 8px;
   }
-  
+
   .replies-list {
     margin-left: 20px;
     padding-left: 12px;

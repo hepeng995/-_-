@@ -2,7 +2,7 @@
   <div class="login-container">
     <div class="login-card">
       <div class="logo-container">
-        <h1>新桃源智界</h1>
+        <h1>智兴乡村平台</h1>
       </div>
       <h3>用户登录</h3>
       
@@ -47,7 +47,7 @@
     </div>
     
     <div class="footer">
-      &copy; {{ new Date().getFullYear() }} 乡村振兴·新桃源智界
+      &copy; {{ new Date().getFullYear() }} 智兴乡村，数创未来
     </div>
   </div>
 </template>
@@ -78,17 +78,6 @@ const rules = {
   password: [{ required: true, message: '请输入密码', trigger: 'blur' }]
 }
 
-// 调试登录方法
-const debugLogin = () => {
-  console.log('调试：强制跳转到管理后台')
-  router.push('/admin').then(() => {
-    console.log('调试：跳转成功')
-  }).catch(err => {
-    console.error('调试：跳转失败', err)
-    window.location.href = '/admin'
-  })
-}
-
 // 登录方法
 const handleLogin = () => {
   if (loginFormRef.value) {
@@ -114,16 +103,9 @@ const handleLogin = () => {
           
           console.log('登录成功，准备跳转到:', redirectPath)
           console.log('当前用户角色:', userData.role)
-          
+
           // 使用nextTick确保DOM更新后再跳转
           await router.push(redirectPath)
-          console.log('跳转完成')
-          
-          // 如果是管理员但没有成功跳转到admin页面，强制跳转
-          if (userData.role === 'ADMIN' && window.location.pathname !== '/admin') {
-            console.log('强制跳转到管理后台')
-            window.location.href = '/admin'
-          }
         } catch (error) {
           ElMessage.error(error.message || '登录失败，请检查网络连接')
         } finally {
@@ -145,15 +127,15 @@ const handleLogin = () => {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f1 100%);
+  background: linear-gradient(135deg, var(--color-bg-body) 0%, #e4e8f1 100%);
   position: relative;
 }
 
 .login-card {
   width: 400px;
   padding: 40px;
-  background-color: white;
-  border-radius: 12px;
+  background-color: var(--color-bg-surface);
+  border-radius: var(--radius-lg);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease;
 }
@@ -172,7 +154,7 @@ h1 {
   font-size: 24px;
   font-weight: 600;
   margin-bottom: 10px;
-  background: linear-gradient(90deg, #409EFF, #67C23A);
+  background: linear-gradient(90deg, var(--color-info), #67C23A);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -180,7 +162,7 @@ h1 {
 h3 {
   text-align: center;
   margin-bottom: 30px;
-  color: #606266;
+  color: var(--color-text-secondary);
   font-weight: normal;
   font-size: 18px;
 }
@@ -201,7 +183,7 @@ h3 {
 }
 
 .register-link {
-  color: #409EFF;
+  color: var(--color-info);
   text-decoration: none;
   font-size: 14px;
   transition: all 0.2s;
@@ -214,7 +196,7 @@ h3 {
 .footer {
   position: absolute;
   bottom: 20px;
-  color: #909399;
+  color: var(--color-text-placeholder);
   font-size: 13px;
 }
 
@@ -229,6 +211,6 @@ h3 {
 }
 
 :deep(.el-input__wrapper.is-focus) {
-  box-shadow: 0 0 0 1px #409EFF inset !important;
+  box-shadow: 0 0 0 1px var(--color-info) inset !important;
 }
-</style> 
+</style>

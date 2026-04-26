@@ -67,6 +67,13 @@ public interface NewsService {
     List<NewsDTO> getFeaturedNews(Integer limit);
 
     /**
+     * 获取最新资讯列表
+     * @param limit 限制数量
+     * @return 最新资讯列表
+     */
+    List<NewsDTO> getLatestNews(Integer limit);
+
+    /**
      * 获取热门资讯列表
      * @param limit 限制数量
      * @return 热门资讯列表
