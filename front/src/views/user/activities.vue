@@ -725,13 +725,6 @@ onMounted(() => {
 }
 
 @media (max-width: 968px) {
-  .activity-grid {
-    grid-template-columns: 1fr;
-    max-width: 560px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-
   .date-activity-card {
     flex-direction: column;
     align-items: flex-start;
@@ -746,24 +739,29 @@ onMounted(() => {
 
 @media (max-width: 768px) {
   .page-header {
-    padding: 48px 0 0;
+    padding: 40px 0 0;
   }
 
   .page-header h1 {
-    font-size: 32px;
+    font-size: 24px;
   }
 
   .header-subtitle {
-    font-size: 15px;
+    font-size: 14px;
   }
 
   .header-icon {
     font-size: 32px;
   }
 
+  .toolbar-section {
+    padding: 20px 0;
+  }
+
   .toolbar {
     flex-direction: column;
     align-items: stretch;
+    gap: 8px;
   }
 
   .toolbar-right {
@@ -774,15 +772,58 @@ onMounted(() => {
     flex: 1;
     min-width: 0;
   }
+
+  .activity-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .card-image {
+    height: 130px;
+  }
+
+  .card-image-overlay {
+    display: none;
+  }
+
+  .card-body {
+    padding: 12px;
+  }
+
+  .card-title {
+    font-size: 14px;
+    -webkit-line-clamp: 2;
+  }
+
+  .activity-card:hover {
+    transform: none;
+  }
+
+  .activity-card:hover .card-image img {
+    transform: none;
+  }
+
+  .pagination-wrapper :deep(.el-pagination) {
+    --el-pagination-button-width: 28px;
+    --el-pagination-button-height: 28px;
+  }
 }
 
 @media (max-width: 480px) {
-  .page-header {
-    padding: 36px 0 0;
+  .page-header h1 {
+    font-size: 13px;
   }
 
-  .page-header h1 {
-    font-size: 28px;
+  .card-image {
+    height: 110px;
+  }
+
+  .card-body {
+    padding: 10px;
+  }
+
+  .card-title {
+    font-size: 13px;
   }
 
   .list-tabs {
@@ -792,18 +833,6 @@ onMounted(() => {
   .list-tab {
     padding: 8px 14px;
     font-size: 13px;
-  }
-
-  .activity-grid {
-    gap: 16px;
-  }
-
-  .card-image {
-    height: 170px;
-  }
-
-  .card-body {
-    padding: 16px;
   }
 }
 </style>

@@ -251,9 +251,14 @@ async function handleUserCommand(command) {
   }
 }
 
+.collapsed .sidebar-logo {
+  padding: 0;
+  justify-content: center;
+}
+
 .collapsed .sidebar-logo__img {
-  width: 34px;
-  margin: 0 auto;
+  width: 32px;
+  height: 32px;
 }
 
 .sidebar-logo__text {
@@ -349,6 +354,11 @@ async function handleUserCommand(command) {
 .nav-item__icon {
   font-size: 19px;
   flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   color: var(--color-text-placeholder);
   transition: all var(--duration-normal) var(--ease-flow);
 }
@@ -368,11 +378,24 @@ async function handleUserCommand(command) {
 .collapsed .nav-item {
   justify-content: center;
   padding: 0;
-  margin: 2px 10px;
+  margin: 2px 8px;
 }
 
 .collapsed .nav-item:hover {
   padding: 0;
+}
+
+.collapsed .sidebar-user__avatar {
+  justify-content: center;
+  padding: 0;
+}
+
+.collapsed .sidebar-user {
+  padding: 12px 0;
+}
+
+.collapsed .sidebar-user__auth {
+  margin: 0 8px;
 }
 
 /* 快捷操作 */
@@ -463,6 +486,10 @@ async function handleUserCommand(command) {
 .sidebar-toggle:hover {
   color: var(--color-primary-600);
   background: rgba(34, 197, 94, 0.05);
+}
+
+.collapsed .sidebar-toggle {
+  padding: 0;
 }
 
 /* 过渡动画 */

@@ -24,7 +24,7 @@
     <el-drawer
       v-model="drawerVisible"
       direction="ltr"
-      :size="280"
+      :size="isMobile ? '72vw' : 280"
       :show-close="false"
       :with-header="false"
       class="mobile-drawer"
@@ -78,11 +78,13 @@
     <div class="app-main" :class="{ 'no-sidebar': !showSidebar, 'ml-collapsed': collapsed && showSidebar }">
       <!-- 移动端顶栏 (仅汉堡菜单+Logo) -->
       <div v-if="isMobile" class="mobile-header">
-        <el-icon class="mobile-header__menu" :size="22" @click="toggleDrawer" role="button" tabindex="0" aria-label="打开导航菜单"><Operation /></el-icon>
+        <button class="mobile-header__menu-btn" @click="toggleDrawer" aria-label="打开导航菜单">
+          <el-icon :size="24"><Operation /></el-icon>
+        </button>
         <span class="mobile-header__title">{{ systemName }}</span>
         <div class="mobile-header__actions">
           <el-badge :value="cartCount" :hidden="cartCount === 0" :offset="[4, -4]">
-            <el-icon :size="20" class="mobile-header__icon" @click="goToCart" role="button" tabindex="0" aria-label="购物车"><ShoppingCart /></el-icon>
+            <el-icon :size="22" class="mobile-header__icon" @click="goToCart" role="button" tabindex="0" aria-label="购物车"><ShoppingCart /></el-icon>
           </el-badge>
         </div>
       </div>
@@ -114,11 +116,11 @@
             <router-link to="/routes" class="footer-link">旅游路线</router-link>
             <router-link to="/activities" class="footer-link">景点活动</router-link>
           </div>
-          <div class="footer-section">
+          <div class="footer-section footer-section--contact">
             <h4 class="footer-section-title">联系我们</h4>
             <p style="color: #bdc3c7; line-height: 2;">电话：400-123-4567<br>邮箱：info@zhixing-rural.com<br>地址：智兴乡村平台示范区</p>
           </div>
-          <div class="footer-section">
+          <div class="footer-section footer-section--social">
             <h4 class="footer-section-title">关注我们</h4>
             <div style="display: flex; gap: 8px; margin-top: 4px;">
               <el-button circle size="small"><el-icon><Message /></el-icon></el-button>
@@ -128,7 +130,7 @@
           </div>
         </div>
         <div class="footer-bottom">
-          <p>&copy; 2024 {{ systemName }}. 保留所有权利.</p>
+          <p>&copy; 2026 {{ systemName }}. 保留所有权利.</p>
         </div>
       </footer>
       </div>
@@ -340,26 +342,38 @@ watch(() => userInfo.value, (val) => {
 
 /* 移动端顶栏 */
 .mobile-header {
-  height: 52px;
+  height: var(--mobile-header-height, 48px);
   background-color: var(--color-primary-800);
   display: flex;
   align-items: center;
   padding: 0 var(--space-4);
   gap: var(--space-3);
   flex-shrink: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.mobile-header__menu {
-  color: rgba(255, 255, 255, 0.8);
-  cursor: pointer;
-  padding: 6px;
+.mobile-header__menu-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: transparent;
+  border: none;
   border-radius: var(--radius-md);
-  transition: background 0.2s;
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.mobile-header__menu:hover {
+.mobile-header__menu-btn:hover {
   background: rgba(255, 255, 255, 0.1);
-  color: #fff;
+}
+
+.mobile-header__menu-btn:active {
+  background: rgba(255, 255, 255, 0.18);
+  transform: scale(0.93);
 }
 
 .mobile-header__title {
@@ -376,13 +390,19 @@ watch(() => userInfo.value, (val) => {
 }
 
 .mobile-header__icon {
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.9);
   cursor: pointer;
-  transition: color 0.2s;
+  padding: 8px;
+  border-radius: var(--radius-md);
+  transition: color 0.2s, transform 0.15s;
 }
 
 .mobile-header__icon:hover {
   color: #fff;
+}
+
+.mobile-header__icon:active {
+  transform: scale(0.92);
 }
 
 /* 主内容区 */
@@ -531,6 +551,10 @@ watch(() => userInfo.value, (val) => {
 .mobile-nav-item.active {
   color: var(--color-primary-700);
   background: rgba(34, 197, 94, 0.08);
+}
+
+.mobile-nav-item:active {
+  background: rgba(34, 197, 94, 0.15);
 }
 
 .mobile-nav-item.active {

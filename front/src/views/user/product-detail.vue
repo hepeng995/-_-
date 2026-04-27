@@ -1632,27 +1632,194 @@ watch(
 }
 
 @media (max-width: 768px) {
+  .container {
+    padding: 0 12px;
+  }
+
+  .breadcrumb-section {
+    padding: 12px 0;
+  }
+
+  .breadcrumb-section :deep(.el-breadcrumb) {
+    font-size: 12px;
+  }
+
+  .product-hero {
+    padding: 20px 0;
+  }
+
+  .hero-content {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .product-images {
+    position: static;
+  }
+
+  .main-image img {
+    height: 200px;
+  }
+
+  .product-info {
+    padding: 12px 0;
+  }
+
   .product-title {
+    font-size: 20px;
+  }
+
+  .product-subtitle {
+    font-size: 14px;
+    margin-bottom: 12px;
+  }
+
+  .product-rating {
+    margin-bottom: 12px;
+  }
+
+  .product-origin {
+    margin-bottom: 16px;
+    font-size: 14px;
+  }
+
+  .product-price {
+    margin-bottom: 20px;
+    padding: 12px;
+  }
+
+  .current-price {
     font-size: 24px;
+  }
+
+  .original-price {
+    font-size: 14px;
+  }
+
+  .product-specs {
+    margin-bottom: 20px;
+  }
+
+  .product-specs h3 {
+    font-size: 16px;
+    margin-bottom: 12px;
+  }
+
+  .quantity-section {
+    margin-bottom: 20px;
+  }
+
+  .quantity-section h3 {
+    font-size: 16px;
+    margin-bottom: 12px;
   }
 
   .action-buttons {
     flex-direction: column;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .action-buttons .el-button {
+    width: 100%;
+    flex: none;
   }
 
   .service-guarantee {
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .product-details {
+    padding: 24px 0;
+  }
+
+  .detail-tabs {
+    padding: 16px;
+  }
+
+  .reviews-summary {
+    padding: 16px;
   }
 
   .rating-overview {
     flex-direction: column;
     align-items: flex-start;
-    gap: 16px;
+    gap: 12px;
+  }
+
+  .rating-score {
+    font-size: 36px;
+  }
+
+  .reviews-filters {
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .review-item {
+    padding: 12px;
+  }
+
+  .reviewer-info {
+    gap: 8px;
+  }
+
+  .related-products {
+    padding: 24px 0;
+  }
+
+  .related-products h2 {
+    font-size: 20px;
+    margin-bottom: 20px;
   }
 
   .related-grid {
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+
+  .related-info {
+    padding: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .breadcrumb-section {
+    padding: 8px 0;
+  }
+
+  .product-hero {
+    padding: 12px 0;
+  }
+
+  .product-title {
+    font-size: 18px;
+  }
+
+  .main-image img {
+    height: 180px;
+  }
+
+  .product-price {
+    padding: 8px;
+  }
+
+  .current-price {
+    font-size: 20px;
+  }
+
+  .detail-tabs {
+    padding: 12px;
+  }
+
+  .review-item {
+    padding: 8px;
+  }
+
+  .related-products {
+    padding: 16px 0;
   }
 }
 </style>

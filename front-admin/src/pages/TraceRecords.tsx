@@ -304,12 +304,14 @@ export default function TraceRecords() {
           </button>
         </div>
 
-        <button onClick={handleOpenAdd} className="bg-bamboo-500 hover:bg-bamboo-400 text-white px-4 py-1.5 rounded text-sm flex items-center gap-1">
-          <Plus size={14} />新增溯源记录
-        </button>
-        <button onClick={handleBatchDelete} disabled={selectedIds.length === 0} className="bg-terracotta-500 hover:bg-terracotta-400 text-white px-4 py-1.5 rounded text-sm ml-3 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1">
-          <Trash2 size={14} />批量删除
-        </button>
+        <div className="flex items-center gap-3">
+          <button onClick={handleOpenAdd} className="bg-bamboo-500 hover:bg-bamboo-400 text-white px-4 py-1.5 rounded text-sm flex items-center gap-1">
+            <Plus size={14} />新增溯源记录
+          </button>
+          <button onClick={handleBatchDelete} disabled={selectedIds.length === 0} className="bg-terracotta-500 hover:bg-terracotta-400 text-white px-4 py-1.5 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1">
+            <Trash2 size={14} />批量删除
+          </button>
+        </div>
       </Card>
 
       {/* 表格区域 */}

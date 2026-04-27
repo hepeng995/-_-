@@ -677,26 +677,165 @@ watch(() => route.params.id, (newId) => {
 }
 
 @media (max-width: 768px) {
+  .container {
+    padding: 0 12px;
+  }
+
+  .breadcrumb-section {
+    padding: 12px 0;
+  }
+
+  .breadcrumb-section :deep(.el-breadcrumb) {
+    font-size: 12px;
+  }
+
+  .article-header {
+    padding: 20px 0;
+  }
+
+  .article-category {
+    margin-bottom: 12px;
+  }
+
   .article-title {
-    font-size: 24px;
+    font-size: 20px;
+    margin-bottom: 16px;
+    line-height: 1.4;
   }
 
   .article-meta {
     flex-direction: column;
-    gap: 12px;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .meta-item {
+    font-size: 12px;
+  }
+
+  .article-summary {
+    font-size: 14px;
+    padding: 12px;
+    line-height: 1.5;
+  }
+
+  .article-content {
+    padding: 24px 0 40px;
+  }
+
+  .content-layout {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .main-content {
+    gap: 24px;
+  }
+
+  .article-body {
+    padding: 16px;
+  }
+
+  .cover-image {
+    margin-bottom: 20px;
+  }
+
+  .cover-image img {
+    border-radius: var(--radius-md);
+  }
+
+  .content-text {
+    font-size: 14px;
+    line-height: 1.7;
   }
 
   .article-actions {
     flex-direction: column;
+    gap: 8px;
+    padding: 16px;
+  }
+
+  .article-actions .el-button {
+    width: 100%;
+  }
+
+  .related-news {
+    padding: 20px;
+  }
+
+  .related-news h3 {
+    font-size: 18px;
+    margin-bottom: 16px;
   }
 
   .related-item {
     flex-direction: column;
+    padding: 8px;
   }
 
   .related-image {
     width: 100%;
     height: 120px;
+  }
+
+  .related-content h4 {
+    font-size: 13px;
+  }
+
+  .sidebar-card {
+    padding: 16px;
+  }
+
+  .sidebar-card h3 {
+    font-size: 16px;
+    margin-bottom: 16px;
+  }
+
+  .latest-item {
+    padding: 8px;
+  }
+
+  .latest-title {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .breadcrumb-section {
+    padding: 8px 0;
+  }
+
+  .article-header {
+    padding: 12px 0;
+  }
+
+  .article-title {
+    font-size: 18px;
+  }
+
+  .article-summary {
+    padding: 8px;
+    font-size: 13px;
+  }
+
+  .article-body {
+    padding: 12px;
+  }
+
+  .content-text {
+    font-size: 13px;
+  }
+
+  .related-news {
+    padding: 12px;
+  }
+
+  .sidebar-card {
+    padding: 12px;
+  }
+
+  .article-content {
+    padding: 16px 0 24px;
   }
 }
 </style>

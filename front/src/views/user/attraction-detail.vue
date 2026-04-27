@@ -624,12 +624,85 @@ onMounted(() => {
 }
 
 @media (max-width: 768px) {
+  .container {
+    padding: 0 12px;
+  }
+
+  .breadcrumb-section {
+    padding: 12px 0;
+  }
+
+  .breadcrumb-section :deep(.el-breadcrumb) {
+    font-size: 12px;
+  }
+
+  .attraction-hero {
+    padding: 20px 0;
+  }
+
+  .hero-content {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .hero-image img {
+    height: 200px;
+    border-radius: 0;
+  }
+
+  .hero-info {
+    padding: 12px 0;
+  }
+
   .attraction-title {
-    font-size: 28px;
+    font-size: 20px;
+    margin-bottom: 12px;
+  }
+
+  .attraction-category {
+    margin-bottom: 12px;
+  }
+
+  .attraction-rating {
+    margin-bottom: 12px;
+  }
+
+  .attraction-location {
+    margin-bottom: 16px;
+    font-size: 14px;
+  }
+
+  .attraction-summary {
+    font-size: 14px;
+    margin-bottom: 20px;
+    line-height: 1.6;
   }
 
   .action-buttons {
     flex-direction: column;
+    gap: 8px;
+  }
+
+  .action-buttons .el-button {
+    width: 100%;
+  }
+
+  .attraction-details {
+    padding: 24px 0;
+  }
+
+  .detail-section h2 {
+    font-size: 20px;
+    margin-bottom: 16px;
+  }
+
+  .detail-content {
+    padding: 0;
+    font-size: 14px;
+  }
+
+  .info-card {
+    padding: 16px;
   }
 
   .info-item {
@@ -642,8 +715,51 @@ onMounted(() => {
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   }
 
+  .related-attractions {
+    padding: 24px 0;
+  }
+
+  .related-attractions h2 {
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+
   .related-grid {
     grid-template-columns: 1fr;
+  }
+
+  .related-info {
+    padding: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .breadcrumb-section {
+    padding: 8px 0;
+  }
+
+  .attraction-title {
+    font-size: 18px;
+  }
+
+  .hero-image img {
+    height: 180px;
+  }
+
+  .attraction-hero {
+    padding: 12px 0;
+  }
+
+  .attraction-details {
+    padding: 16px 0;
+  }
+
+  .info-card {
+    padding: 12px;
+  }
+
+  .related-attractions {
+    padding: 16px 0;
   }
 }
 </style>

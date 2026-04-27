@@ -47,6 +47,14 @@ img {
   display: block;
 }
 
+// --- 移动端触摸优化 ---
+@media screen and (max-width: 767px) {
+  * {
+    -webkit-tap-highlight-color: rgba(34, 197, 94, 0.1);
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
 // --- 选中文字样式 ---
 ::selection {
   background-color: var(--color-primary-200);
@@ -303,7 +311,7 @@ img {
 // 移动端
 @media screen and (max-width: 767px) {
   :root {
-    --content-padding: var(--space-4);
+    --content-padding: var(--space-3);
   }
 
   .app-sidebar {
@@ -316,7 +324,28 @@ img {
 
   .app-footer .footer-grid {
     grid-template-columns: 1fr 1fr;
-    gap: var(--space-6);
+    gap: var(--space-5);
+  }
+
+  .app-footer .footer-section--contact,
+  .app-footer .footer-section--social {
+    display: none;
+  }
+
+  .app-footer .footer-section-title {
+    font-size: var(--text-sm);
+    margin-bottom: var(--space-2);
+  }
+
+  .app-footer .footer-link {
+    font-size: var(--text-xs);
+    line-height: 2;
+  }
+
+  .app-footer .footer-bottom {
+    font-size: 11px;
+    margin-top: var(--space-5);
+    padding-top: var(--space-3);
   }
 }
 

@@ -168,9 +168,9 @@ const router = useRouter()
 
 // 轮播图数据
 import 景点导览背景 from '@/assets/image/景点导览背景.png'
-import 景点活动背景 from '@/assets/image/景点活动背景.png'
+import 特产商城背景 from '@/assets/image/特产商城背景.png'
+import 动态资讯背景 from '@/assets/image/动态资讯背景.png'
 import 建言献策背景 from '@/assets/image/建言献策背景.png'
-import 旅游路线规划背景 from '@/assets/image/旅游路线规划背景.png'
 import 乡村概览 from '@/assets/image/乡村概览新.jpg'
 
 const bannerImages = ref([
@@ -182,14 +182,14 @@ const bannerImages = ref([
     buttonText: '探索景点'
   },
   {
-    image: 景点活动背景,
+    image: 特产商城背景,
     title: '特产商城 品质生活',
     subtitle: '购买正宗的乡村特产',
     path: '/products',
     buttonText: '进入商城'
   },
   {
-    image: 旅游路线规划背景,
+    image: 动态资讯背景,
     title: '动态资讯 时事热点',
     subtitle: '获取最新动态，了解乡村发展',
     path: '/news',
@@ -955,100 +955,228 @@ section.latest-news {
 
 @media (max-width: 768px) {
   .main-content {
-    padding: 0 16px;
+    padding: 0 var(--mobile-page-padding);
   }
 
+  .container {
+    padding: 0 var(--mobile-page-padding);
+  }
+
+  /* 轮播图高度：45vw 自适应，限高 250px */
   .carousel-item {
-    height: 300px;
+    height: clamp(150px, 45vw, 250px);
   }
 
   .carousel-title {
-    font-size: 24px;
+    font-size: clamp(18px, 5vw, 24px);
   }
 
   .carousel-subtitle {
-    font-size: 14px;
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+
+  .carousel-content :deep(.el-button) {
+    padding: 8px 16px;
+    font-size: 13px;
   }
 
   section {
-    padding: 15px 0;
+    padding: 12px 0;
+    margin-bottom: 10px;
+  }
+
+  section.overview-section,
+  section.featured-section,
+  section.latest-news {
+    padding: 16px 0;
+    border-radius: var(--mobile-radius);
     margin-bottom: 12px;
   }
 
   .section-header h2 {
-    font-size: 20px;
+    font-size: 18px;
   }
 
   .section-header p {
-    font-size: 13px;
+    font-size: 12px;
   }
 
+  /* 概览区：移动端文字优先，图片在下方 */
   .overview-content {
     grid-template-columns: 1fr;
-    gap: 20px;
-    padding: 15px;
+    gap: 16px;
+    padding: 12px;
   }
 
+  .overview-item {
+    padding: 10px 12px;
+  }
+
+  .overview-item h3 {
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+
+  .overview-item p {
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  /* 精选推荐：保持双列 */
   .featured-grid {
     grid-template-columns: 1fr;
-    gap: 15px;
+    gap: 12px;
   }
 
   .featured-block {
-    padding: 15px;
+    padding: 12px;
   }
 
+  .block-header h3 {
+    font-size: 16px;
+  }
+
+  /* 景点/商品卡片：移动端双列 */
   .attractions-grid,
   .attractions-grid.compact {
-    grid-template-columns: 1fr;
-    gap: 10px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .attraction-image {
+    height: 90px;
+  }
+
+  .attraction-info {
+    padding: 8px;
+  }
+
+  .attraction-info h3,
+  .attraction-info h4 {
+    font-size: 13px;
+    margin-bottom: 3px;
+  }
+
+  .attraction-info p {
+    font-size: 11px;
+    margin-bottom: 4px;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+  }
+
+  .attraction-overlay {
+    display: none;
   }
 
   .products-grid,
   .products-grid.compact {
-    grid-template-columns: 1fr;
-    gap: 10px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
   }
 
+  .product-image {
+    height: 90px;
+  }
+
+  .product-info {
+    padding: 8px;
+  }
+
+  .product-info h3,
+  .product-info h4 {
+    font-size: 13px;
+    margin-bottom: 3px;
+  }
+
+  .current-price {
+    font-size: 14px;
+  }
+
+  .product-meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+
+  /* 资讯列表：移动端保持横向（左图右文） */
   .news-list,
   .news-list.compact {
     grid-template-columns: 1fr;
-    gap: 10px;
+    gap: 8px;
   }
 
   .news-item {
-    flex-direction: column;
+    flex-direction: row;
   }
 
   .news-image {
-    width: 100%;
-    height: 120px;
+    width: 80px;
+    height: 64px;
+    flex-shrink: 0;
+  }
+
+  .news-content {
+    padding: 8px 10px;
+  }
+
+  .news-content h3,
+  .news-content h4 {
+    font-size: 13px;
+    margin-bottom: 4px;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+  }
+
+  .news-content p {
+    display: none;
+  }
+
+  .news-meta {
+    font-size: 10px;
   }
 }
 
 @media (max-width: 480px) {
   .container {
-    padding: 0 12px;
+    padding: 0 10px;
   }
 
   .main-content {
-    padding: 0 12px;
+    padding: 0 10px;
   }
 
   .carousel-item {
-    height: 250px;
+    height: clamp(140px, 42vw, 200px);
   }
 
   .carousel-title {
-    font-size: 20px;
+    font-size: 18px;
+  }
+
+  .carousel-subtitle {
+    font-size: 12px;
+    margin-bottom: 12px;
   }
 
   .overview-content {
-    padding: 12px;
+    padding: 10px;
   }
 
   .featured-block {
-    padding: 12px;
+    padding: 10px;
+  }
+
+  .attraction-image,
+  .product-image {
+    height: 80px;
+  }
+
+  .attraction-info h3,
+  .attraction-info h4,
+  .product-info h3,
+  .product-info h4 {
+    font-size: 12px;
   }
 }
 </style>

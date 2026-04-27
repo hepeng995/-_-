@@ -395,14 +395,14 @@ onMounted(() => {
 /* ========== 面包屑 ========== */
 .breadcrumb-section {
   background: var(--color-bg-surface);
-  padding: 20px 0;
+  padding: 16px 0;
   border-bottom: 1px solid var(--color-border);
 }
 
 /* ========== Hero 区域 ========== */
 .detail-hero {
   background: var(--color-bg-surface);
-  padding: 40px 0;
+  padding: 32px 0;
 }
 
 .hero-layout {
@@ -773,7 +773,7 @@ onMounted(() => {
 @media (max-width: 968px) {
   .hero-layout {
     grid-template-columns: 1fr;
-    gap: 28px;
+    gap: 24px;
   }
 
   .hero-cover img {
@@ -782,30 +782,120 @@ onMounted(() => {
 }
 
 @media (max-width: 768px) {
+  .container {
+    padding: 0 12px;
+  }
+
+  .breadcrumb-section {
+    padding: 12px 0;
+  }
+
+  .detail-hero {
+    padding: 20px 0;
+  }
+
+  .hero-layout {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .hero-cover img {
+    max-height: 200px;
+  }
+
+  .hero-info {
+    padding: 12px 0;
+  }
+
   .route-title {
-    font-size: 22px;
+    font-size: 20px;
+    margin-bottom: 12px;
+  }
+
+  .route-rating {
+    margin-bottom: 16px;
+  }
+
+  .rating-count {
+    font-size: 12px;
   }
 
   .meta-badges {
     gap: 8px;
+    margin-bottom: 16px;
   }
 
   .meta-badge {
-    padding: 5px 12px;
+    padding: 4px 10px;
     font-size: 12px;
+  }
+
+  .route-tags {
+    margin-bottom: 20px;
   }
 
   .action-buttons {
     flex-direction: column;
+    gap: 10px;
   }
 
   .action-buttons .el-button {
     width: 100%;
   }
 
+  .description-section {
+    padding: 24px 0 16px;
+  }
+
+  .section-card {
+    padding: 16px;
+  }
+
+  .section-title {
+    font-size: 18px;
+    margin-bottom: 14px;
+  }
+
+  .description-text {
+    font-size: 14px;
+    line-height: 1.8;
+  }
+
+  .timeline-section {
+    padding: 16px 0 60px;
+  }
+
+  .section-heading {
+    font-size: 20px;
+    margin-bottom: 24px;
+  }
+
+  .section-heading::after {
+    width: 48px;
+    margin-top: 8px;
+  }
+
+  .day-header {
+    padding: 14px 16px;
+  }
+
+  .day-label {
+    font-size: 16px;
+  }
+
+  .day-content {
+    padding: 16px 0 4px 0;
+  }
+
+  .timeline-right {
+    padding-left: 16px;
+    padding-bottom: 20px;
+  }
+
   .spot-card {
     flex-direction: column;
     gap: 12px;
+    padding: 14px;
   }
 
   .spot-cover {
@@ -813,47 +903,91 @@ onMounted(() => {
     height: 160px;
   }
 
-  .section-card {
-    padding: 20px;
+  .spot-cover img {
+    max-width: 100%;
   }
 
-  .section-heading {
-    font-size: 22px;
+  .weather-section,
+  .map-section {
+    padding: 0 0 16px;
+  }
+
+  .tips-section {
+    padding: 0 0 60px;
+  }
+
+  .tips-content {
+    font-size: 14px;
+    line-height: 1.8;
   }
 }
 
 @media (max-width: 480px) {
-  .detail-hero {
-    padding: 24px 0;
+  .container {
+    padding: 0 10px;
   }
 
-  .container {
-    padding: 0 16px;
+  .breadcrumb-section {
+    padding: 10px 0;
+  }
+
+  .detail-hero {
+    padding: 16px 0;
+  }
+
+  .hero-cover img {
+    max-height: 180px;
   }
 
   .route-title {
-    font-size: 20px;
+    font-size: 18px;
   }
 
-  .day-header {
-    padding: 12px 16px;
+  .meta-badge {
+    padding: 3px 8px;
+    font-size: 11px;
   }
 
-  .day-label {
+  .section-card {
+    padding: 12px;
+  }
+
+  .section-title {
     font-size: 16px;
   }
 
+  .section-heading {
+    font-size: 18px;
+  }
+
+  .day-header {
+    padding: 10px 12px;
+  }
+
+  .day-label {
+    font-size: 15px;
+  }
+
   .timeline-right {
-    padding-left: 14px;
-    padding-bottom: 20px;
+    padding-left: 12px;
+    padding-bottom: 16px;
   }
 
   .spot-card {
-    padding: 14px;
+    padding: 10px;
   }
 
   .spot-name {
     font-size: 14px;
+  }
+
+  .spot-note {
+    font-size: 12px;
+  }
+
+  .transport-indicator {
+    padding: 3px 10px;
+    font-size: 12px;
   }
 }
 

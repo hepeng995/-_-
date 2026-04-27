@@ -6,6 +6,7 @@ import com.cinema.booking.dto.NewsDTO;
 import com.cinema.booking.dto.ProductDTO;
 import com.cinema.booking.service.AttractionService;
 import com.cinema.booking.service.NewsService;
+import com.cinema.booking.service.OrderService;
 import com.cinema.booking.service.ProductService;
 import com.cinema.booking.utils.Result;
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,6 +38,7 @@ public class HomeController {
     private final AttractionService attractionService;
     private final ProductService productService;
     private final NewsService newsService;
+    private final OrderService orderService;
     
     @Operation(summary = "获取首页数据")
     @GetMapping("/data")
@@ -105,10 +107,21 @@ public class HomeController {
         overview.setAttractionCount(attractionService.getRecommendAttractions(999).size());
         overview.setProductCount(productService.getFeaturedProducts(999).size());
         overview.setNewsCount(newsService.getFeaturedNews(999).size());
-        
+
         return Result.ok(overview);
     }
-    
+
+    @Operation(summary = "获取首页统计数据")
+    @GetMapping("/stats")
+    public Result<Map<String, Object>> getHomeStats() {
+        Map<String, Object> stats = new HashMap<>();
+        stats.put("attractionCount", attractionService.getRecommendAttractions(9999).size());
+        stats.put("productCount", productService.getFeaturedProducts(9999).size());
+        stats.put("newsCount", newsService.getFeaturedNews(9999).size());
+        stats.put("orderCount", orderService.getOrderStats().getTotalOrders());
+        return Result.ok(stats);
+    }
+
     @Operation(summary = "获取数据趋势统计")
     @GetMapping("/trend-data")
     @PreAuthorize("hasRole('ADMIN')")

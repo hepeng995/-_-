@@ -31,10 +31,23 @@ export default function ForumStatistics() {
       ]);
 
       if (overviewRes.status === 'fulfilled' && overviewRes.value.code === 200 && overviewRes.value.data) setOverview(overviewRes.value.data);
-      if (catRes.status === 'fulfilled' && catRes.value.code === 200 && catRes.value.data) setCategoryData(catRes.value.data);
+      if (catRes.status === 'fulfilled' && catRes.value.code === 200 && catRes.value.data) {
+        const d = catRes.value.data as any;
+        setCategoryData(
+          Array.isArray(d) ? d :
+          (d.categories || []).map((c: any) => ({ name: c.categoryDesc || c.category, value: c.count }))
+        );
+      }
       if (auditRes.status === 'fulfilled' && auditRes.value.code === 200 && auditRes.value.data) setAuditData(auditRes.value.data);
-      if (hotRes.status === 'fulfilled' && hotRes.value.code === 200 && hotRes.value.data) setHotPosts(hotRes.value.data);
-      if (monthRes.status === 'fulfilled' && monthRes.value.code === 200 && monthRes.value.data) setMonthlyData(monthRes.value.data);
+      if (hotRes.status === 'fulfilled' && hotRes.value.code === 200 && hotRes.value.data) {
+        const d = hotRes.value.data as any;
+        setHotPosts(Array.isArray(d) ? d : (d.hotPosts || []));
+      }
+      if (monthRes.status === 'fulfilled' && monthRes.value.code === 200 && monthRes.value.data) {
+        const d = monthRes.value.data as any;
+        const raw = Array.isArray(d) ? d : (d.monthlyData || []);
+        setMonthlyData(raw.map((m: any) => ({ month: m.month, posts: m.postCount ?? m.posts, comments: m.commentCount ?? m.comments })));
+      }
     } catch (e) { console.error('获取统计数据失败:', e); }
     finally { setLoading(false); }
   };

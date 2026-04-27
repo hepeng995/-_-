@@ -906,28 +906,83 @@ onMounted(() => {
 /* 响应式设计 */
 @media (max-width: 768px) {
   .forum-detail-container {
-    padding: 15px;
+    padding: 12px;
   }
 
   .post-header {
     flex-direction: column;
-    gap: 15px;
+    gap: 12px;
+  }
+
+  .post-meta {
+    gap: 6px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+
+  .post-time {
+    font-size: 12px;
   }
 
   .post-title {
-    font-size: 24px;
+    font-size: 20px;
   }
 
   .post-actions {
     flex-direction: column;
-    gap: 15px;
-    align-items: flex-start;
+    gap: 12px;
+    align-items: stretch;
+  }
+
+  .post-stats {
+    gap: 12px;
+  }
+
+  .action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .action-buttons .el-button {
+    width: 100%;
   }
 
   .author-info {
-    flex-direction: column;
-    align-items: flex-start;
+    padding: 12px 0;
+    margin-bottom: 16px;
+  }
+
+  .post-content {
+    margin-bottom: 16px;
+  }
+
+  .content-text {
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  .post-images {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 8px;
+  }
+
+  .post-image {
+    max-width: 100%;
+  }
+
+  /* 评论区 */
+  .comment-form {
+    padding: 12px;
+  }
+
+  .form-header {
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .comment-item {
+    padding: 12px 0;
   }
 
   .comment-main {
@@ -935,9 +990,98 @@ onMounted(() => {
     gap: 8px;
   }
 
+  .comment-avatar {
+    display: flex;
+  }
+
+  .comment-header {
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+
+  .comment-text {
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 8px;
+  }
+
+  .comment-actions {
+    gap: 12px;
+  }
+
   .replies-list {
-    margin-left: 20px;
-    padding-left: 12px;
+    margin-left: 12px;
+    padding-left: 10px;
+  }
+
+  .reply-item {
+    padding: 8px 0;
+    gap: 6px;
+  }
+
+  .reply-header {
+    gap: 6px;
+    margin-bottom: 4px;
+  }
+
+  .reply-text {
+    font-size: 13px;
+    line-height: 1.4;
+    margin-bottom: 6px;
+  }
+
+  .comments-header {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .forum-detail-container {
+    padding: 8px;
+  }
+
+  .post-title {
+    font-size: 18px;
+  }
+
+  .content-text {
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .post-images {
+    grid-template-columns: 1fr;
+  }
+
+  .post-image {
+    height: 180px;
+    object-fit: cover;
+  }
+
+  .comment-form {
+    padding: 10px;
+  }
+
+  .author-info {
+    gap: 6px;
+  }
+
+  .author-name {
+    font-size: 14px;
+  }
+
+  .author-meta {
+    font-size: 12px;
+  }
+
+  .stat-item {
+    font-size: 12px;
+  }
+
+  .replies-list {
+    margin-left: 8px;
+    padding-left: 8px;
   }
 }
 </style>

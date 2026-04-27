@@ -840,6 +840,10 @@ watch(() => userStore.isLoggedIn, (newVal) => {
 
 /* 响应式设计 */
 @media (max-width: 768px) {
+  .forum-header {
+    padding: 40px 0;
+  }
+
   .header-content {
     flex-direction: column;
     text-align: center;
@@ -847,12 +851,20 @@ watch(() => userStore.isLoggedIn, (newVal) => {
   }
 
   .forum-title {
-    font-size: 28px;
+    font-size: 24px;
+  }
+
+  .forum-subtitle {
+    font-size: 14px;
+  }
+
+  .category-filter {
+    padding: 20px 0;
   }
 
   .filter-container {
     flex-direction: column;
-    gap: 15px;
+    gap: 8px;
   }
 
   .posts-list {
@@ -860,7 +872,18 @@ watch(() => userStore.isLoggedIn, (newVal) => {
   }
 
   .post-item {
-    padding: 16px;
+    padding: 12px;
+  }
+
+  .post-title {
+    font-size: 14px;
+  }
+
+  .post-content {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
   .post-footer {
@@ -872,12 +895,29 @@ watch(() => userStore.isLoggedIn, (newVal) => {
   .pagination-container {
     padding: 0 15px;
   }
+
+  .pagination-container :deep(.el-pagination) {
+    --el-pagination-button-width: 28px;
+    --el-pagination-button-height: 28px;
+  }
 }
 
 @media (max-width: 480px) {
+  .forum-title {
+    font-size: 13px;
+  }
+
   .category-filter :deep(.el-radio-group) {
     flex-wrap: wrap;
     gap: 8px;
+  }
+
+  .post-item {
+    padding: 10px;
+  }
+
+  .post-title {
+    font-size: 13px;
   }
 
   .post-images {

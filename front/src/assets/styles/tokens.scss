@@ -160,4 +160,28 @@
   --sidebar-bg:           var(--color-bg-sidebar);
   --toolbar-height:       56px;
   --content-padding:      var(--space-6);
+
+  // === 移动端布局 ===
+  --mobile-header-height:  48px;
+  --mobile-card-gap:       10px;
+  --mobile-card-img-height: 130px;
+  --mobile-card-padding:   10px;
+  --mobile-page-padding:   12px;
+  --mobile-tab-padding:    6px 14px;
+  --mobile-drawer-width:   85vw;
+  --mobile-radius:         8px;
+}
+
+// === 移动端 Token 覆写 ===
+@media screen and (max-width: 767px) {
+  :root {
+    --content-padding: var(--space-3);
+    --toolbar-height: 48px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  :root {
+    --content-padding: var(--space-2);
+  }
 }

@@ -71,7 +71,7 @@ export default function ForumComments() {
           <button onClick={handleSearch} className="bg-bamboo-500 hover:bg-bamboo-400 text-white px-4 py-1.5 rounded text-sm">查询</button>
           <button onClick={handleReset} className="bg-white border border-gray-300 text-gray-600 px-4 py-1.5 rounded text-sm">重置</button>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 mt-4">
           <button onClick={() => handleBatchAudit(1)} disabled={selectedIds.length === 0} className="bg-sprout-500 text-white px-4 py-1.5 rounded text-sm disabled:opacity-50">批量通过</button>
           <button onClick={() => handleBatchAudit(2)} disabled={selectedIds.length === 0} className="bg-harvest-500 text-white px-4 py-1.5 rounded text-sm disabled:opacity-50">批量拒绝</button>
           <button onClick={handleBatchDelete} disabled={selectedIds.length === 0} className="bg-terracotta-500 text-white px-4 py-1.5 rounded text-sm disabled:opacity-50">批量删除</button>

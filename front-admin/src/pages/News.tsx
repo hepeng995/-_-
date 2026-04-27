@@ -134,10 +134,12 @@ export default function News() {
           <button onClick={handleBackfill} className="bg-purple-500 hover:bg-purple-400 text-white px-4 py-1.5 rounded text-sm">回填正文</button>
           <button onClick={handleBackfillCovers} className="bg-orange-500 hover:bg-orange-400 text-white px-4 py-1.5 rounded text-sm">回填封面图</button>
         </div>
-        <button onClick={handleOpenAdd} className="bg-bamboo-500 hover:bg-bamboo-400 text-white px-4 py-1.5 rounded text-sm">发布资讯</button>
-        <button onClick={handleBatchDelete} disabled={selectedIds.length === 0} className="bg-terracotta-500 hover:bg-terracotta-400 text-white px-4 py-1.5 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed">批量删除</button>
-        <button onClick={() => handleBatchStatus(1)} disabled={selectedIds.length === 0} className="bg-sprout-500 hover:bg-sprout-400 text-white px-4 py-1.5 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed">批量发布</button>
-        <button onClick={() => handleBatchStatus(2)} disabled={selectedIds.length === 0} className="bg-harvest-500 hover:bg-harvest-400 text-white px-4 py-1.5 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed">批量下线</button>
+        <div className="flex items-center gap-3 mt-4">
+          <button onClick={handleOpenAdd} className="bg-bamboo-500 hover:bg-bamboo-400 text-white px-4 py-1.5 rounded text-sm">发布资讯</button>
+          <button onClick={handleBatchDelete} disabled={selectedIds.length === 0} className="bg-terracotta-500 hover:bg-terracotta-400 text-white px-4 py-1.5 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed">批量删除</button>
+          <button onClick={() => handleBatchStatus(1)} disabled={selectedIds.length === 0} className="bg-sprout-500 hover:bg-sprout-400 text-white px-4 py-1.5 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed">批量发布</button>
+          <button onClick={() => handleBatchStatus(2)} disabled={selectedIds.length === 0} className="bg-harvest-500 hover:bg-harvest-400 text-white px-4 py-1.5 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed">批量下线</button>
+        </div>
       </Card>
 
       <Card className="p-0 overflow-hidden">

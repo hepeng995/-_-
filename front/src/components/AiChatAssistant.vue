@@ -1072,44 +1072,44 @@ const getModuleAccentClass = (type) => {
   /* 悬浮按钮缩小 */
   .floating-button {
     right: 16px;
-    bottom: 16px;
+    bottom: 20px;
   }
 
   .button-inner {
-    width: 56px;
-    height: 56px;
+    width: 52px;
+    height: 52px;
   }
 
   .mascot-image {
-    width: 56px;
-    height: 56px;
+    width: 52px;
+    height: 52px;
   }
 
   .pulse-ring {
-    width: 56px;
-    height: 56px;
+    width: 52px;
+    height: 52px;
   }
 
   @keyframes pulse {
     0% {
-      width: 56px;
-      height: 56px;
+      width: 52px;
+      height: 52px;
       opacity: 0.8;
     }
     100% {
-      width: 88px;
-      height: 88px;
+      width: 84px;
+      height: 84px;
       opacity: 0;
     }
   }
 
-  /* 聊天窗口近乎全屏 */
+  /* 聊天窗口全屏 */
   .chat-window {
-    right: 16px;
-    bottom: 80px;
-    width: calc(100vw - 32px);
-    height: calc(100vh - 100px);
-    border-radius: 12px;
+    right: 0;
+    bottom: 0;
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
   }
 
   /* 消息气泡最大宽度增加 */
@@ -1117,14 +1117,38 @@ const getModuleAccentClass = (type) => {
     max-width: 85%;
   }
 
+  /* 快捷问题横向滚动 */
+  .quick-questions {
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+
+  .quick-question {
+    padding: 8px 10px;
+    font-size: 11px;
+  }
+
   /* 卡片图片适配移动端 */
   .card-image {
-    width: 72px;
-    height: 72px;
+    width: 68px;
+    height: 68px;
   }
 
   .recommend-card {
     border-radius: 8px;
+  }
+
+  .card-title {
+    font-size: 12px;
+  }
+
+  .card-desc {
+    font-size: 10px;
+  }
+
+  .chat-input-area {
+    padding: 10px 12px;
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
   }
 }
 </style>

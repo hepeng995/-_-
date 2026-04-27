@@ -703,52 +703,102 @@ onMounted(() => {
 
 /* 响应式设计 */
 @media (max-width: 768px) {
+  .page-header {
+    padding: 40px 0;
+  }
+
   .page-header h1 {
-    font-size: 32px;
+    font-size: 24px;
+  }
+
+  .page-header p {
+    font-size: 14px;
+  }
+
+  .search-section {
+    padding: 20px 0;
   }
 
   .search-form {
     flex-direction: column;
     align-items: stretch;
+    gap: 8px;
   }
 
   .search-form .el-input {
     width: 100%;
   }
 
+  .category-tabs {
+    padding: 12px 0;
+  }
+
+  .tabs-wrapper {
+    gap: 10px;
+  }
+
+  .category-tab {
+    padding: 6px 14px;
+  }
+
   .products-grid {
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .product-image {
+    height: 130px;
+  }
+
+  .product-overlay {
+    display: none;
+  }
+
+  .product-info {
+    padding: 12px;
+  }
+
+  .product-name {
+    font-size: 14px;
   }
 
   .product-meta {
     flex-direction: column;
     align-items: flex-start;
-    gap: 8px;
+    gap: 4px;
+  }
+
+  .product-quantity {
+    display: none;
+  }
+
+  .product-actions {
+    flex-direction: column;
+    gap: 6px;
   }
 
   .cart-float {
     bottom: 20px;
     right: 20px;
   }
+
+  .pagination-wrapper :deep(.el-pagination) {
+    --el-pagination-button-width: 28px;
+    --el-pagination-button-height: 28px;
+  }
 }
 
 @media (max-width: 480px) {
-  .products-grid {
-    grid-template-columns: 1fr;
+  .product-image {
+    height: 110px;
   }
 
   .product-info {
-    padding: 16px;
+    padding: 10px;
   }
 
-  .tabs-wrapper {
-    gap: 12px;
-  }
-
-  .category-tab {
-    padding: 6px 16px;
-    font-size: 14px;
+  .product-name {
+    font-size: 13px;
   }
 }
 </style>

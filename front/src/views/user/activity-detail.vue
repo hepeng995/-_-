@@ -972,41 +972,163 @@ onMounted(() => {
 }
 
 @media (max-width: 768px) {
-  .act-title {
-    font-size: 22px;
+  .container {
+    padding: 0 12px;
   }
 
-  .info-grid {
+  .breadcrumb-section {
+    padding: 12px 0;
+  }
+
+  .cover-section {
+    padding: 20px 0 0;
+  }
+
+  .cover-carousel {
+    height: 200px;
+  }
+
+  .cover-section :deep(.el-carousel__container) {
+    height: 200px !important;
+  }
+
+  .detail-body {
+    padding: 20px 0 60px;
+  }
+
+  .body-layout {
     grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .main-column {
     gap: 16px;
   }
 
   .info-card {
-    padding: 24px;
+    padding: 16px;
+  }
+
+  .info-card-header {
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .act-title {
+    font-size: 20px;
+    line-height: 1.3;
+  }
+
+  .category-tag {
+    font-size: 12px;
+    padding: 4px 10px;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .info-item {
+    padding: 6px;
+  }
+
+  .info-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+  }
+
+  .info-value {
+    font-size: 13px;
   }
 
   .desc-card {
-    padding: 24px;
+    padding: 16px;
+  }
+
+  .card-section-title {
+    font-size: 18px;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+  }
+
+  .desc-content {
+    font-size: 14px;
+    line-height: 1.8;
+  }
+
+  .register-card {
+    padding: 16px;
+  }
+
+  .register-fee {
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+  }
+
+  .fee-value {
+    font-size: 24px;
+  }
+
+  .register-progress {
+    margin-bottom: 16px;
+  }
+
+  .progress-numbers {
+    font-size: 12px;
+  }
+
+  .register-btn {
+    height: 46px;
+    font-size: 15px;
+  }
+
+  .related-section {
+    margin-top: 32px;
   }
 
   .related-grid {
     grid-template-columns: 1fr;
-  }
-
-  .cover-carousel {
-    height: 260px;
-  }
-
-  .cover-section :deep(.el-carousel__container) {
-    height: 260px !important;
+    gap: 16px;
   }
 
   .related-image {
     height: 160px;
   }
+
+  .related-body {
+    padding: 12px;
+  }
+
+  .related-body h4 {
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
 }
 
 @media (max-width: 480px) {
+  .container {
+    padding: 0 10px;
+  }
+
+  .breadcrumb-section {
+    padding: 10px 0;
+  }
+
+  .cover-section {
+    padding: 16px 0 0;
+  }
+
+  .cover-carousel {
+    height: 180px;
+  }
+
+  .cover-section :deep(.el-carousel__container) {
+    height: 180px !important;
+  }
+
   .info-card-header {
     flex-direction: column;
   }
@@ -1015,16 +1137,49 @@ onMounted(() => {
     align-self: flex-start;
   }
 
+  .act-title {
+    font-size: 18px;
+  }
+
+  .info-card {
+    padding: 12px;
+  }
+
+  .desc-card {
+    padding: 12px;
+  }
+
+  .card-section-title {
+    font-size: 16px;
+  }
+
+  .desc-content {
+    font-size: 13px;
+  }
+
   .register-card {
-    padding: 20px;
+    padding: 14px;
   }
 
   .fee-value {
-    font-size: 24px;
+    font-size: 22px;
   }
 
   .register-btn {
-    height: 48px;
+    height: 44px;
+    font-size: 14px;
+  }
+
+  .related-body {
+    padding: 10px;
+  }
+
+  .related-body h4 {
+    font-size: 13px;
+  }
+
+  .related-meta {
+    font-size: 11px;
   }
 }
 </style>

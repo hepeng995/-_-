@@ -543,22 +543,26 @@ onMounted(() => {
 }
 
 @media (max-width: 768px) {
+  .page-hero {
+    padding: 40px 0;
+  }
+
   .hero-title {
-    font-size: 32px;
+    font-size: 24px;
   }
 
   .hero-subtitle {
-    font-size: 15px;
+    font-size: 14px;
   }
 
-  .page-hero {
-    padding: 40px 0 36px;
+  .filter-section {
+    padding: 20px 0;
   }
 
   .filter-bar {
     flex-direction: column;
     align-items: stretch;
-    gap: 12px;
+    gap: 8px;
   }
 
   .filter-tabs {
@@ -566,31 +570,56 @@ onMounted(() => {
   }
 
   .routes-grid {
-    grid-template-columns: 1fr;
-    gap: 20px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .card-cover {
+    height: 130px;
+  }
+
+  .card-body {
+    padding: 12px;
+  }
+
+  .route-name {
+    font-size: 14px;
   }
 
   .route-info-row {
     gap: 10px;
   }
+
+  .route-card:hover {
+    transform: none;
+  }
+
+  .route-card:hover .card-cover img {
+    transform: none;
+  }
+
+  .pagination-wrapper :deep(.el-pagination) {
+    --el-pagination-button-width: 28px;
+    --el-pagination-button-height: 28px;
+  }
 }
 
 @media (max-width: 480px) {
-  .hero-title {
-    font-size: 28px;
+  .card-cover {
+    height: 110px;
+  }
+
+  .card-body {
+    padding: 10px;
+  }
+
+  .route-name {
+    font-size: 13px;
   }
 
   .filter-tab {
     padding: 6px 14px;
     font-size: 13px;
-  }
-
-  .card-body {
-    padding: 16px;
-  }
-
-  .route-name {
-    font-size: 16px;
   }
 }
 </style>

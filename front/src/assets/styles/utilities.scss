@@ -133,6 +133,19 @@
   .grid-4 {
     grid-template-columns: 1fr;
   }
+  // 移动端双列卡片网格（覆盖上面的1fr）
+  .mobile-grid-2 {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: var(--mobile-card-gap) !important;
+  }
+  // 移动端紧凑 padding
+  .mobile-compact {
+    padding: var(--mobile-page-padding) !important;
+  }
+  // 移动端隐藏文字截断
+  .mobile-hide {
+    display: none !important;
+  }
 }
 
 @media screen and (min-width: 768px) {

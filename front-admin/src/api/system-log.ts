@@ -3,7 +3,10 @@ import type { PageResult, PageParams, SystemLog } from '../types';
 
 /** 分页查询系统日志 */
 export function getSystemLogPage(params: PageParams) {
-  return request.get<PageResult<SystemLog>>('/system/logs/page', { params });
+  const { current, size, ...rest } = params;
+  return request.get<any>('/system/logs/page', {
+    params: { pageNum: current, pageSize: size, ...rest }
+  });
 }
 
 /** 获取系统日志详情 */

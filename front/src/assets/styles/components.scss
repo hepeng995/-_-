@@ -271,6 +271,16 @@
       outline-offset: 2px;
     }
   }
+
+  @media screen and (max-width: 767px) {
+    gap: 6px;
+    padding: var(--space-2) 0;
+
+    .category-tab {
+      padding: var(--mobile-tab-padding);
+      font-size: var(--text-xs);
+    }
+  }
 }
 
 // --- 面包屑 ---
@@ -353,7 +363,12 @@
   }
 
   @media screen and (max-width: 767px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--mobile-card-gap);
+  }
+
+  @media screen and (max-width: 360px) {
     grid-template-columns: 1fr;
-    gap: var(--space-4);
+    gap: var(--space-3);
   }
 }

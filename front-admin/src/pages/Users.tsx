@@ -233,7 +233,7 @@ export default function Users() {
             <button onClick={handleResetFilters} className="bg-white border border-gray-300 hover:text-bamboo-500 hover:border-bamboo-500 text-gray-600 px-4 py-1.5 rounded text-sm transition-colors">重置</button>
           </div>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 mt-4">
           <button onClick={handleOpenAdd} className="bg-bamboo-500 hover:bg-bamboo-400 text-white px-4 py-1.5 rounded text-sm transition-colors">添加用户</button>
           <button onClick={handleBatchDelete} disabled={selectedIds.length === 0}
             className="bg-terracotta-500 hover:bg-terracotta-400 text-white px-4 py-1.5 rounded text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed">批量删除</button>

@@ -477,43 +477,89 @@ onMounted(() => {
 
 /* 响应式设计 */
 @media (max-width: 768px) {
+  .page-header {
+    padding: 40px 0;
+  }
+
   .page-header h1 {
-    font-size: 32px;
+    font-size: 24px;
+  }
+
+  .page-header p {
+    font-size: 14px;
+  }
+
+  .search-section {
+    padding: 20px 0;
   }
 
   .search-form {
     flex-direction: column;
     align-items: stretch;
+    gap: 8px;
   }
 
   .search-form .el-input {
     width: 100%;
   }
 
+  .category-tabs {
+    padding: 12px 0;
+  }
+
+  .tabs-wrapper {
+    gap: 10px;
+  }
+
+  .category-tab {
+    padding: 6px 14px;
+  }
+
   .attractions-grid {
-    grid-template-columns: 1fr;
-    gap: 20px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .attraction-image {
+    height: 130px;
+  }
+
+  .attraction-overlay {
+    display: none;
+  }
+
+  .attraction-info {
+    padding: 12px;
+  }
+
+  .attraction-info h3 {
+    font-size: 14px;
+    margin-bottom: 8px;
   }
 
   .attraction-meta {
     flex-direction: column;
     align-items: flex-start;
-    gap: 12px;
+    gap: 4px;
+  }
+
+  .pagination-wrapper :deep(.el-pagination) {
+    --el-pagination-button-width: 28px;
+    --el-pagination-button-height: 28px;
   }
 }
 
 @media (max-width: 480px) {
+  .attraction-image {
+    height: 110px;
+  }
+
   .attraction-info {
-    padding: 20px;
+    padding: 10px;
   }
 
-  .tabs-wrapper {
-    gap: 12px;
-  }
-
-  .category-tab {
-    padding: 6px 16px;
-    font-size: 14px;
+  .attraction-info h3 {
+    font-size: 13px;
   }
 }
 </style>

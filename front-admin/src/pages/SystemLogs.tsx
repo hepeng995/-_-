@@ -45,7 +45,7 @@ export default function SystemLogs() {
         status: filterStatus ? (filterStatus === '成功' ? 1 : 0) : undefined,
       });
       if (res.code === 200 && res.data) {
-        setLogs(res.data.records || []);
+        setLogs(res.data.list || res.data.records || []);
         setTotal(res.data.total || 0);
       }
     } catch (e) { console.error('获取日志失败:', e); }
@@ -143,7 +143,7 @@ export default function SystemLogs() {
       <div className="bg-white rounded-sm shadow-sm border border-gray-100">
         <div className="p-4 flex justify-between items-center border-b border-gray-100">
           <h3 className="text-base font-bold text-gray-800">系统日志列表</h3>
-          <div className="flex gap-2">
+          <div className="flex items-center gap-3">
             <button onClick={handleExport} className="bg-bamboo-500 hover:bg-bamboo-400 text-white px-4 py-1.5 rounded text-sm transition-colors">导出</button>
             <button onClick={handleBatchDelete} disabled={selectedIds.length === 0} className="bg-harvest-500 hover:bg-harvest-400 text-white px-4 py-1.5 rounded text-sm transition-colors disabled:opacity-50">批量删除</button>
             <button onClick={handleClearLogs} className="bg-terracotta-500 hover:bg-terracotta-400 text-white px-4 py-1.5 rounded text-sm transition-colors">清空日志</button>

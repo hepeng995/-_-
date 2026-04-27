@@ -72,12 +72,16 @@ export default function Dashboard() {
 
         let pendingPayment = 0, paid = 0, shipped = 0, completed = 0, cancelled = 0;
         if (orderRes.status === 'fulfilled' && orderRes.value.code === 200 && orderRes.value.data) {
-          const d = orderRes.value.data;
-          pendingPayment = d.pendingPayment || 0;
-          paid = d.paid || 0;
-          shipped = d.shipped || 0;
-          completed = d.completed || 0;
-          cancelled = d.cancelled || 0;
+          const d = orderRes.value.data as any;
+          if (d.statusStats && Array.isArray(d.statusStats)) {
+            const statusMap: Record<string, number> = {};
+            d.statusStats.forEach((s: any) => { statusMap[s.status] = s.count; });
+            pendingPayment = statusMap['PENDING'] || 0;
+            paid = statusMap['PAID'] || 0;
+            shipped = statusMap['SHIPPED'] || 0;
+            completed = statusMap['COMPLETED'] || 0;
+            cancelled = statusMap['CANCELLED'] || 0;
+          }
         }
 
         setStats({ attractionCount, productCount, orderCount, newsCount, totalPosts, totalComments, activeUsers, pendingPayment, paid, shipped, completed, cancelled });
