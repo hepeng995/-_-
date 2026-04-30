@@ -69,6 +69,7 @@
       v-model="dialogVisible" 
       :title="isEdit ? '编辑地址' : '添加地址'" 
       width="600px"
+      class="mobile-dialog"
       @close="resetForm"
     >
       <el-form 
@@ -473,6 +474,7 @@ onMounted(() => {
   display: flex;
   gap: 12px;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .receiver-name {
@@ -563,7 +565,21 @@ onMounted(() => {
     justify-content: flex-start;
     flex-wrap: wrap;
   }
-  
+
+  :deep(.el-form-item__label) {
+    width: 100% !important;
+    justify-content: flex-start;
+    padding: 0 0 6px;
+  }
+
+  :deep(.el-form-item__content) {
+    margin-left: 0 !important;
+  }
+
+  :deep(.el-select),
+  :deep(.el-select__wrapper) {
+    width: 100%;
+  }
 }
 
 @media (max-width: 480px) {

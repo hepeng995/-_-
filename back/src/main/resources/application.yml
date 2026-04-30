@@ -1,22 +1,18 @@
 server:
-  port: 7070
+  port: ${SERVER_PORT:7070}
 
 # LangChain4j 自动配置插件
 langchain4j:
   open-ai:
     chat-model:
-      api-key: sk-67eae102ebec4dc99464ef08e40635bd  # 你的DashScope API Key（无需修改格式，直接填）
-      model-name: qwen-turbo                         # 千问模型名（qwen-turbo/qwen-plus/qwen-max等）
-      log-responses: true                           # 可选：打印响应日志
-      log-requests: true                            # 可选：打印请求日志
-      base-url: https://dashscope.aliyuncs.com/compatible-mode/v1  # 千问OpenAI兼容接口地址
-      # 🔥 重试次数：1次（平衡容错+不触发SSL握手报错，不设0也不设2）
+      api-key: sk-67eae102ebec4dc99464ef08e40635bd
+      model-name: qwen-turbo
+      log-responses: true
+      log-requests: true
+      base-url: https://dashscope.aliyuncs.com/compatible-mode/v1
       max-retries: 1
-      # 超时时间：10秒（本地开发稳定）
       timeout: 60s
-      # 🔥 温度：0.7（默认值！回答自然、能理解问题，不僵硬、不发懵）
       temperature: 0.7
-      # 最大返回token：限制长度，提速响应
       max-tokens: 3092
 chroma:
   url: http://localhost:7003
@@ -28,9 +24,9 @@ spring:
   # 数据库配置
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/village?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
-    username: root
-    password: 1234
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:village}?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:}
 
   # 文件上传配置
   servlet:
@@ -41,10 +37,10 @@ spring:
   # Redis配置
   data:
     redis:
-      host: localhost
-      port: 6379
-      database: 0
-      timeout: 10000ms
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      database: ${REDIS_DATABASE:0}
+      timeout: ${REDIS_TIMEOUT:10000ms}
 
 # MyBatis配置
 mybatis:
@@ -71,27 +67,27 @@ mybatis-plus:
 
 # JWT配置
 jwt:
-  secret-key: cinemaBookingSystemSecretKey12345678901234567890
-  expiration: 86400000  # 24小时有效期(毫秒)
+  secret-key: ${JWT_SECRET_KEY:cinemaBookingSystemSecretKey12345678901234567890}
+  expiration: ${JWT_EXPIRATION:86400000}
 
 # 自定义配置
 cinema:
   # 图片上传路径
-  image-upload-path: ./uploads/images/
+  image-upload-path: ${IMAGE_UPLOAD_PATH:./uploads/images/}
   # 默认管理员账号
   admin:
-    username: admin
-    password: 123456
-    email: admin@cinema.com
+    username: ${DEFAULT_ADMIN_USERNAME:admin}
+    password: ${DEFAULT_ADMIN_PASSWORD:change-me}
+    email: ${DEFAULT_ADMIN_EMAIL:admin@example.com}
   ai:
     embedding-model-name: text-embedding-v3
-    qdrant-host: localhost
-    qdrant-http-port: 6333
-    qdrant-grpc-port: 6334
-    knowledge-collection: village_knowledge_base_qwen_v3_1024
-    knowledge-vector-size: 1024
-    vector-min-score: 0.5
-    smoke-test-query: 有什么特色特产推荐？
+    qdrant-host: ${QDRANT_HOST:localhost}
+    qdrant-http-port: ${QDRANT_HTTP_PORT:6333}
+    qdrant-grpc-port: ${QDRANT_GRPC_PORT:6334}
+    knowledge-collection: ${QDRANT_COLLECTION:village_knowledge_base_qwen_v3_1024}
+    knowledge-vector-size: ${QDRANT_VECTOR_SIZE:1024}
+    vector-min-score: ${QDRANT_VECTOR_MIN_SCORE:0.5}
+    smoke-test-query: ${QDRANT_SMOKE_TEST_QUERY:有什么特色特产推荐？}
     legacy-collections:
       - village_knowledge_base
 
@@ -123,4 +119,7 @@ amap:
 # 文件上传配置
 file:
   upload:
-    path: ..\files  # 文件上传保存路径（与back同级的files目录）
+    path: ${FILE_UPLOAD_PATH:./files}
+
+app:
+  public-base-url: ${APP_PUBLIC_BASE_URL:}

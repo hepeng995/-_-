@@ -255,11 +255,12 @@
                   <el-button
                     v-if="userInfo"
                     type="primary"
-                    @click="showReviewDialog = true"
+                    :disabled="!reviewEligibility.canReview"
+                    @click="openReviewDialog"
                     size="large"
                   >
                     <el-icon><EditPen /></el-icon>
-                    写评价
+                    {{ reviewEligibility.canReview ? '写评价' : (reviewEligibility.hasReviewed ? '已评价' : '暂不可评价') }}
                   </el-button>
                   <el-button
                     v-else
@@ -387,7 +388,7 @@
     </div>
 
     <!-- 写评价对话框 -->
-    <el-dialog v-model="showReviewDialog" title="写评价" width="600px" :close-on-click-modal="false">
+    <el-dialog v-model="showReviewDialog" title="写评价" width="600px" :close-on-click-modal="false" class="mobile-dialog">
       <el-form ref="reviewFormRef" :model="reviewForm" :rules="reviewRules" label-width="80px">
         <el-form-item label="评分" prop="rating" required>
           <el-rate v-model="reviewForm.rating" :texts="['极差', '失望', '一般', '满意', '惊喜']" show-text />
@@ -497,6 +498,13 @@ const reviewFilter = ref({
 const showReviewDialog = ref(false)
 const submittingReview = ref(false)
 const canWriteReview = ref(false)
+const autoReviewHandled = ref(false)
+const reviewEligibility = ref({
+  canReview: false,
+  hasReviewed: false,
+  orderId: null,
+  reason: ''
+})
 const reviewFormRef = ref(null)
 const uploadRef = ref(null)
 const reviewForm = ref({
@@ -530,6 +538,7 @@ const loadProduct = async () => {
   }
 
   loading.value = true
+  autoReviewHandled.value = false
   try {
     const res = await productApi.getProductById(id)
     if (res.code === 200) {
@@ -645,8 +654,56 @@ const loadReviews = async () => {
 
 // 检查用户是否可以写评价
 const checkReviewEligibility = async () => {
-  // 简化逻辑：只要用户登录就可以评价
-  canWriteReview.value = !!userInfo.value
+  if (!userInfo.value || !product.value) {
+    canWriteReview.value = false
+    reviewEligibility.value = {
+      canReview: false,
+      hasReviewed: false,
+      orderId: null,
+      reason: '请先登录'
+    }
+    return
+  }
+
+  try {
+    const routeOrderId = route.query.orderId ? Number(route.query.orderId) : undefined
+    const res = await productApi.checkReviewEligibility(product.value.id, routeOrderId)
+    if (res.code === 200) {
+      reviewEligibility.value = {
+        canReview: !!res.data.canReview,
+        hasReviewed: !!res.data.hasReviewed,
+        orderId: res.data.orderId || routeOrderId || null,
+        reason: res.data.reason || ''
+      }
+      canWriteReview.value = reviewEligibility.value.canReview
+
+      if (route.query.action === 'review' && !autoReviewHandled.value) {
+        autoReviewHandled.value = true
+        if (reviewEligibility.value.canReview) {
+          showReviewDialog.value = true
+        } else if (reviewEligibility.value.reason) {
+          ElMessage.warning(reviewEligibility.value.reason)
+        }
+      }
+    }
+  } catch (error) {
+    console.error('检查评价资格失败:', error)
+    canWriteReview.value = false
+    reviewEligibility.value = {
+      canReview: false,
+      hasReviewed: false,
+      orderId: null,
+      reason: '检查评价资格失败'
+    }
+  }
+}
+
+const openReviewDialog = () => {
+  if (!reviewEligibility.value.canReview) {
+    ElMessage.warning(reviewEligibility.value.reason || '当前商品暂无可评价订单')
+    return
+  }
+  showReviewDialog.value = true
 }
 
 // 预览图片
@@ -752,7 +809,6 @@ const goToProduct = (id) => {
   // 重新加载数据
   nextTick(() => {
     loadProduct()
-    window.scrollTo({ top: 0, behavior: 'smooth' })
   })
 }
 
@@ -907,9 +963,9 @@ const submitReview = async () => {
 
             // 处理不同的响应格式
             if (uploadRes.data) {
-              if (uploadRes.data.code === 200 && uploadRes.data.data) {
-                console.log('成功获取图片URL:', uploadRes.data.data)
-                imageUrls.push(uploadRes.data.data)
+              if (uploadRes.data.code === 200 && uploadRes.data.data?.url) {
+                console.log('成功获取图片URL:', uploadRes.data.data.url)
+                imageUrls.push(uploadRes.data.data.url)
               } else if (uploadRes.data.code === 200) {
                 console.log('成功获取图片URL:', uploadRes.data)
                 imageUrls.push(uploadRes.data)
@@ -927,6 +983,7 @@ const submitReview = async () => {
 
     const reviewData = {
       productId: product.value.id,
+      orderId: reviewEligibility.value.orderId,
       rating: reviewForm.value.rating,
       content: reviewForm.value.content,
       images: imageUrls.length > 0 ? JSON.stringify(imageUrls) : null,
@@ -940,6 +997,7 @@ const submitReview = async () => {
       resetReviewForm()
       // 重新加载评价列表
       await loadReviews()
+      await checkReviewEligibility()
       // 重新加载商品信息（更新评价统计）
       await loadProduct()
     } else {
@@ -996,8 +1054,6 @@ watch(
       currentImage.value = ''
       // 重新加载商品数据
       loadProduct()
-      // 滚动到页面顶部
-      window.scrollTo({ top: 0, behavior: 'smooth' })
     }
   }
 )
@@ -1723,6 +1779,32 @@ watch(
   .action-buttons .el-button {
     width: 100%;
     flex: none;
+    min-height: 46px;
+    padding-inline: 16px;
+  }
+
+  .action-buttons .el-button + .el-button {
+    margin-left: 0;
+  }
+
+  .action-buttons :deep(.el-button > span) {
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-align: center;
+  }
+
+  .action-buttons :deep(.el-button .el-icon) {
+    margin: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    line-height: 1;
+    vertical-align: middle;
+    flex-shrink: 0;
   }
 
   .service-guarantee {
@@ -1737,6 +1819,48 @@ watch(
 
   .detail-tabs {
     padding: 16px;
+  }
+
+  .detail-tabs :deep(.el-tabs__header) {
+    margin-bottom: 12px;
+  }
+
+  .detail-tabs :deep(.el-tabs__nav-wrap.is-scrollable) {
+    padding: 0;
+  }
+
+  .detail-tabs :deep(.el-tabs__nav-prev),
+  .detail-tabs :deep(.el-tabs__nav-next) {
+    display: none;
+  }
+
+  .detail-tabs :deep(.el-tabs__nav-wrap) {
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x;
+  }
+
+  .detail-tabs :deep(.el-tabs__nav-wrap::-webkit-scrollbar) {
+    display: none;
+  }
+
+  .detail-tabs :deep(.el-tabs__nav-scroll) {
+    overflow: visible;
+  }
+
+  .detail-tabs :deep(.el-tabs__nav) {
+    display: flex;
+    width: max-content;
+    min-width: 100%;
+    transform: none !important;
+  }
+
+  .detail-tabs :deep(.el-tabs__item) {
+    flex: 0 0 auto;
+    white-space: nowrap;
+    padding: 0 16px;
   }
 
   .reviews-summary {
@@ -1812,6 +1936,11 @@ watch(
 
   .detail-tabs {
     padding: 12px;
+  }
+
+  .detail-tabs :deep(.el-tabs__item) {
+    padding: 0 14px;
+    font-size: 13px;
   }
 
   .review-item {

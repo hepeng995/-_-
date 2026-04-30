@@ -166,7 +166,8 @@ import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { Search, Star, Calendar, Flag, User } from '@element-plus/icons-vue'
 import tourRouteApi from '@/api/tourRoute'
-import headerBg from '@/assets/image/旅游路线规划背景.png'
+import headerBg from '@/assets/image/旅游路线规划背景.webp'
+import { scrollMainContentToTop } from '@/utils/scroll'
 
 const router = useRouter()
 
@@ -259,7 +260,7 @@ const handleSizeChange = () => {
 const handlePageChange = (page) => {
   queryParams.current = page
   loadRoutes()
-  window.scrollTo({ top: 0, behavior: 'smooth' })
+  scrollMainContentToTop()
 }
 
 // 跳转详情
@@ -468,9 +469,14 @@ onMounted(() => {
   margin-bottom: 12px;
 }
 
+:deep(.route-rating .el-rate) {
+  min-width: 0;
+}
+
 .rating-count {
   font-size: 12px;
   color: var(--color-text-placeholder);
+  white-space: nowrap;
 }
 
 .route-info-row {
@@ -514,11 +520,26 @@ onMounted(() => {
 .route-tags {
   display: flex;
   flex-wrap: wrap;
+  align-items: flex-start;
+  align-content: flex-start;
   gap: 6px;
 }
 
 .route-tag {
   border-radius: var(--radius-lg);
+  flex: 0 0 auto;
+  align-self: flex-start;
+  max-width: 100%;
+}
+
+:deep(.route-tag.el-tag) {
+  min-height: 24px;
+}
+
+.route-tag :deep(.el-tag__content) {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* ========== 空状态 ========== */
@@ -578,6 +599,30 @@ onMounted(() => {
     height: 130px;
   }
 
+  .official-badge {
+    top: 8px;
+    left: 8px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    gap: 3px;
+    line-height: 1;
+  }
+
+  .official-badge .el-icon {
+    font-size: 11px;
+  }
+
+  .days-badge {
+    top: 8px;
+    right: 8px;
+    padding: 4px 9px;
+    min-height: 22px;
+    border-radius: 999px;
+    font-size: 11px;
+    line-height: 1;
+  }
+
   .card-body {
     padding: 12px;
   }
@@ -586,8 +631,68 @@ onMounted(() => {
     font-size: 14px;
   }
 
+  .route-rating {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+    margin-bottom: 10px;
+  }
+
+  :deep(.route-rating .el-rate) {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 0;
+    max-width: 100%;
+    line-height: 1;
+  }
+
+  :deep(.route-rating .el-rate__item) {
+    margin-right: 0;
+  }
+
+  :deep(.route-rating .el-rate__icon) {
+    font-size: 12px;
+  }
+
+  :deep(.route-rating .el-rate__text) {
+    margin-left: 4px;
+    font-size: 12px;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .rating-count {
+    display: block;
+    max-width: 100%;
+    font-size: 11px;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+
   .route-info-row {
     gap: 10px;
+  }
+
+  .route-tags {
+    gap: 4px;
+    align-items: flex-start;
+    align-content: flex-start;
+  }
+
+  :deep(.route-tag.el-tag) {
+    max-width: 100%;
+    min-height: 20px;
+    height: 20px;
+    padding: 0 7px;
+    border-radius: 999px;
+    font-size: 11px;
+    line-height: 18px;
+  }
+
+  .route-tag :deep(.el-tag__content) {
+    line-height: 18px;
+    white-space: nowrap;
   }
 
   .route-card:hover {
@@ -609,6 +714,26 @@ onMounted(() => {
     height: 110px;
   }
 
+  .official-badge {
+    top: 6px;
+    left: 6px;
+    padding: 3px 8px;
+    font-size: 10px;
+    gap: 2px;
+  }
+
+  .official-badge .el-icon {
+    font-size: 10px;
+  }
+
+  .days-badge {
+    top: 6px;
+    right: 6px;
+    padding: 3px 8px;
+    min-height: 20px;
+    font-size: 10px;
+  }
+
   .card-body {
     padding: 10px;
   }
@@ -620,6 +745,23 @@ onMounted(() => {
   .filter-tab {
     padding: 6px 14px;
     font-size: 13px;
+  }
+
+  :deep(.route-rating .el-rate__icon) {
+    font-size: 11px;
+  }
+
+  :deep(.route-rating .el-rate__text) {
+    font-size: 11px;
+  }
+
+  .rating-count {
+    font-size: 10px;
+  }
+
+  :deep(.route-tag.el-tag) {
+    padding: 0 6px;
+    font-size: 10px;
   }
 }
 </style>

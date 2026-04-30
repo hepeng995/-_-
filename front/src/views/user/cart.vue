@@ -244,7 +244,7 @@ const getCartItems = async () => {
 // 获取推荐商品
 const getRecommendedProducts = async () => {
   try {
-    const res = await productApi.getRecommendProducts(6)
+    const res = await productApi.getFeaturedProducts(6)
     if (res.code === 200) {
       recommendedProducts.value = res.data
     }
@@ -748,6 +748,36 @@ onMounted(() => {
     font-size: 24px;
   }
 
+  .page-header {
+    margin-bottom: 24px;
+  }
+
+  .empty-cart {
+    padding: 28px 16px 36px;
+  }
+
+  .empty-cart :deep(.el-empty) {
+    padding: 0;
+  }
+
+  .empty-cart :deep(.el-empty__image) {
+    width: min(180px, 48vw);
+    max-height: 160px;
+    margin-bottom: 12px;
+  }
+
+  .empty-cart :deep(.el-empty__description) {
+    margin-top: 8px;
+  }
+
+  .recommended-products {
+    margin-top: 20px;
+  }
+
+  .recommended-products h2 {
+    margin-bottom: 16px;
+  }
+
   .cart-item {
     grid-template-columns: auto 60px 1fr;
     gap: 12px;
@@ -769,6 +799,29 @@ onMounted(() => {
 }
 
 @media (max-width: 480px) {
+  .page-header {
+    margin-bottom: 20px;
+  }
+
+  .empty-cart {
+    padding: 20px 12px 28px;
+  }
+
+  .empty-cart :deep(.el-empty__image) {
+    width: min(152px, 42vw);
+    max-height: 132px;
+    margin-bottom: 8px;
+  }
+
+  .recommended-products {
+    margin-top: 16px;
+  }
+
+  .recommended-products h2 {
+    margin-bottom: 12px;
+    font-size: 22px;
+  }
+
   .products-grid {
     grid-template-columns: repeat(2, 1fr);
   }

@@ -364,7 +364,6 @@ onMounted(() => {
 watch(() => route.params.id, (newId) => {
   if (newId) {
     loadNews()
-    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 })
 </script>

@@ -3,8 +3,8 @@
 // 乡村振兴·智兴乡村平台 用户端前端
 // ============================================================
 
-@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&display=swap');
-
+// Noto Serif SC 已移除 Google Fonts CDN 引用（国内被墙导致 30s+ 白屏）
+// 回退字体栈：Source Han Serif SC > STSong > SimSun > serif，覆盖主流中文设备
 :root {
   // === 品牌主色 - 竹翠 (Bamboo Jade) ===
   --color-primary-50:  #f0fdf4;
@@ -160,6 +160,11 @@
   --sidebar-bg:           var(--color-bg-sidebar);
   --toolbar-height:       56px;
   --content-padding:      var(--space-6);
+  --app-height:           100vh;
+  --app-dvh:              100dvh;
+  --safe-area-top:        env(safe-area-inset-top, 0px);
+  --safe-area-bottom:     env(safe-area-inset-bottom, 0px);
+  --mobile-dialog-width:  calc(100vw - 24px);
 
   // === 移动端布局 ===
   --mobile-header-height:  48px;

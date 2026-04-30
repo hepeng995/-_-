@@ -6,6 +6,7 @@
     top="5vh"
     :close-on-click-modal="false"
     :close-on-press-escape="true"
+    class="mobile-dialog mobile-dialog--fullscreen location-map-dialog"
     @close="handleClose"
   >
     <div class="map-container">
@@ -270,7 +271,9 @@ onUnmounted(() => {
 
 <style scoped>
 .map-container {
-  height: 80vh;
+  height: calc(var(--app-height) - 160px);
+  height: calc(var(--app-dvh) - 160px);
+  min-height: 420px;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -309,7 +312,7 @@ onUnmounted(() => {
 
 .amap-container {
   flex: 1;
-  min-height: 500px;
+  min-height: 320px;
   position: relative;
 }
 
@@ -396,6 +399,11 @@ onUnmounted(() => {
 
 /* 响应式设计 */
 @media (max-width: 768px) {
+  .map-container {
+    height: calc(var(--app-dvh) - 140px);
+    min-height: 0;
+  }
+
   .map-toolbar {
     flex-direction: column;
     gap: 12px;
@@ -405,6 +413,7 @@ onUnmounted(() => {
   .map-actions {
     width: 100%;
     justify-content: space-between;
+    flex-wrap: wrap;
   }
   
   .nearby-places {
@@ -422,6 +431,10 @@ onUnmounted(() => {
   
   .zoom-controls {
     margin-bottom: 12px;
+  }
+
+  .amap-container {
+    min-height: 280px;
   }
 }
 

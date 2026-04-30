@@ -254,7 +254,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, nextTick } from 'vue'
+import { ref, reactive, onMounted, nextTick, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { ElMessage } from 'element-plus'
@@ -601,6 +601,30 @@ onMounted(() => {
   getPostDetail()
   getComments()
 })
+
+watch(
+  () => route.params.id,
+  (newId, oldId) => {
+    if (newId && newId !== oldId) {
+      postDetail.value = null
+      comments.value = []
+      commentTotal.value = 0
+      imageViewerVisible.value = false
+      previewImages.value = []
+      previewIndex.value = 0
+      commentQuery.current = 1
+      commentQuery.postId = newId
+      commentForm.postId = newId
+      replyForm.postId = newId
+      replyingCommentId.value = null
+      replyForm.parentId = null
+      replyForm.targetUsername = ''
+      replyForm.content = ''
+      getPostDetail()
+      getComments()
+    }
+  }
+)
 </script>
 
 <style scoped>

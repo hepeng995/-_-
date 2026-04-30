@@ -19,9 +19,15 @@
             size="large"
             clearable
             @keyup.enter="handleSearch"
+            class="search-input"
           >
             <template #prefix>
               <el-icon><Search /></el-icon>
+            </template>
+            <template #append>
+              <el-button @click="handleSearch">
+                <el-icon><Search /></el-icon>
+              </el-button>
             </template>
           </el-input>
           <el-select
@@ -29,7 +35,7 @@
             placeholder="选择分类"
             size="large"
             clearable
-            style="width: 200px"
+            class="search-select"
           >
             <el-option
               v-for="category in categories"
@@ -38,10 +44,6 @@
               :value="category.id"
             />
           </el-select>
-          <el-button type="primary" size="large" @click="handleSearch">
-            <el-icon><Search /></el-icon>
-            搜索
-          </el-button>
         </div>
       </div>
     </div>
@@ -132,7 +134,8 @@ import { ref, reactive, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { Search, MapLocation } from '@element-plus/icons-vue'
 import attractionApi from '@/api/attraction'
-import headerBg from '@/assets/image/景点导览背景.png'
+import headerBg from '@/assets/image/景点导览背景.webp'
+import { scrollMainContentToTop } from '@/utils/scroll'
 
 const router = useRouter()
 const route = useRoute()
@@ -210,8 +213,7 @@ const handleSizeChange = (size) => {
 const handleCurrentChange = (page) => {
   searchParams.pageNum = page
   getAttractions()
-  // 滚动到顶部
-  window.scrollTo({ top: 0, behavior: 'smooth' })
+  scrollMainContentToTop()
 }
 
 // 跳转到详情页
@@ -286,7 +288,7 @@ onMounted(() => {
 /* 搜索区域 */
 .search-section {
   background: var(--color-bg-surface);
-  padding: 30px 0;
+  padding: 20px 0;
   border-bottom: 1px solid var(--color-border);
 }
 
@@ -295,12 +297,15 @@ onMounted(() => {
   gap: 16px;
   align-items: center;
   justify-content: center;
-  flex-wrap: wrap;
 }
 
-.search-form .el-input {
-  width: 400px;
-  max-width: 100%;
+.search-input {
+  max-width: 400px;
+}
+
+.search-select {
+  width: 200px;
+  flex-shrink: 0;
 }
 
 /* 分类标签 */
@@ -478,7 +483,7 @@ onMounted(() => {
 /* 响应式设计 */
 @media (max-width: 768px) {
   .page-header {
-    padding: 40px 0;
+    padding: 30px 0;
   }
 
   .page-header h1 {
@@ -490,17 +495,19 @@ onMounted(() => {
   }
 
   .search-section {
-    padding: 20px 0;
+    padding: 12px 0;
   }
 
   .search-form {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 8px;
+    gap: 0;
   }
 
-  .search-form .el-input {
-    width: 100%;
+  .search-input {
+    max-width: 100%;
+  }
+
+  .search-select {
+    display: none;
   }
 
   .category-tabs {
@@ -529,18 +536,38 @@ onMounted(() => {
   }
 
   .attraction-info {
-    padding: 12px;
+    padding: 10px;
   }
 
   .attraction-info h3 {
     font-size: 14px;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
+  }
+
+  .attraction-desc {
+    display: none;
   }
 
   .attraction-meta {
     flex-direction: column;
     align-items: flex-start;
-    gap: 4px;
+    gap: 2px;
+  }
+
+  .attraction-meta :deep(.el-rate) {
+    --el-rate-icon-size: 12px;
+  }
+
+  .attraction-meta :deep(.el-rate__text) {
+    font-size: 11px;
+  }
+
+  .location {
+    font-size: 11px;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .pagination-wrapper :deep(.el-pagination) {
@@ -555,11 +582,15 @@ onMounted(() => {
   }
 
   .attraction-info {
-    padding: 10px;
+    padding: 8px;
   }
 
   .attraction-info h3 {
     font-size: 13px;
+  }
+
+  .location {
+    font-size: 10px;
   }
 }
 </style>

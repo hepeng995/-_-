@@ -94,6 +94,24 @@ public class UserController {
     }
 
     /**
+     * 更新用户头像
+     */
+    @Operation(summary = "更新用户头像")
+    @SystemOperation(module = "用户管理", operation = "更新头像", description = "用户更新个人头像")
+    @PutMapping("/avatar")
+    public Result<Void> updateAvatar(@RequestBody Map<String, String> payload) {
+        String avatar = payload.get("avatar");
+        if (avatar == null || avatar.isBlank()) {
+            return Result.fail("头像地址不能为空");
+        }
+
+        UserDTO userDTO = new UserDTO();
+        userDTO.setAvatar(avatar);
+        boolean success = userService.updateProfile(userDTO);
+        return success ? Result.success() : Result.fail("更新头像失败");
+    }
+
+    /**
      * 修改密码
      */
     @Operation(summary = "修改个人密码")

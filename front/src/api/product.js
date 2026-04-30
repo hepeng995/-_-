@@ -70,6 +70,13 @@ export default {
   },
 
   /**
+   * 兼容旧调用：推荐商品列表
+   */
+  getRecommendProducts(limit = 6) {
+    return this.getFeaturedProducts(limit)
+  },
+
+  /**
    * 获取商品评价信息（包含评价列表、统计信息、分布等）
    */
   getProductReviews(productId, params = {}) {

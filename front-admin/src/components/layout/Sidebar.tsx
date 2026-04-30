@@ -1,96 +1,19 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import {
-  LayoutDashboard,
-  Users,
-  Map,
-  ShoppingCart,
-  Newspaper,
-  MessageSquare,
-  Settings,
-  ChevronDown,
-  MapPin,
-  Package
-} from 'lucide-react';
+import { ChevronDown, X } from 'lucide-react';
 import { cn } from '../ui/Card';
-
-const navItems = [
-  { name: '首页', path: '/', icon: LayoutDashboard },
-  { 
-    name: '系统用户管理', 
-    icon: Users,
-    children: [
-      { name: '用户列表', path: '/users' }
-    ]
-  },
-  {
-    name: '乡村风采管理',
-    icon: Map,
-    children: [
-      { name: '景点管理', path: '/attractions' },
-      { name: '商品管理', path: '/products' },
-      { name: '分类管理', path: '/product-categories' },
-    ]
-  },
-  {
-    name: '订单管理',
-    icon: ShoppingCart,
-    children: [
-      { name: '订单列表', path: '/orders' }
-    ]
-  },
-  {
-    name: '资讯管理',
-    icon: Newspaper,
-    children: [
-      { name: '动态资讯', path: '/news' }
-    ]
-  },
-  {
-    name: '路线与活动管理',
-    icon: MapPin,
-    children: [
-      { name: '旅游路线管理', path: '/tour-routes' },
-      { name: '活动管理', path: '/activities-admin' },
-      { name: '报名管理', path: '/activity-registrations' },
-    ]
-  },
-  {
-    name: '溯源管理',
-    icon: Package,
-    children: [
-      { name: '溯源记录', path: '/trace-records' },
-    ]
-  },
-  {
-    name: '论坛管理',
-    icon: MessageSquare,
-    children: [
-      { name: '帖子管理', path: '/forum-posts' },
-      { name: '评论管理', path: '/forum-comments' },
-      { name: '数据统计', path: '/forum-statistics' },
-    ]
-  },
-  {
-    name: '系统管理',
-    icon: Settings,
-    children: [
-      { name: '个人中心', path: '/person' },
-      { name: '系统配置', path: '/system-config' },
-      { name: '操作日志', path: '/system-logs' },
-    ]
-  }
-];
+import { navItems } from './navigation';
 
 interface NavItemProps {
   item: any;
   location: any;
   isOpen?: boolean;
   onToggle?: () => void;
+  onNavigate?: () => void;
   key?: string;
 }
 
-function NavItem({ item, location, isOpen, onToggle }: NavItemProps) {
+function NavItem({ item, location, isOpen, onToggle, onNavigate }: NavItemProps) {
   const hasChildren = !!item.children;
   const isChildActive = hasChildren && item.children.some((child: any) => location.pathname === child.path);
   const isActive = !hasChildren && location.pathname === item.path;
@@ -131,6 +54,7 @@ function NavItem({ item, location, isOpen, onToggle }: NavItemProps) {
                 <Link
                   key={child.path}
                   to={child.path}
+                  onClick={onNavigate}
                   className={cn(
                     "block px-4 py-2 rounded-lg text-sm transition-all duration-200",
                     isChildItemActive
@@ -151,6 +75,7 @@ function NavItem({ item, location, isOpen, onToggle }: NavItemProps) {
   return (
     <Link
       to={item.path}
+      onClick={onNavigate}
       className={cn(
         "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group",
         isActive
@@ -167,7 +92,60 @@ function NavItem({ item, location, isOpen, onToggle }: NavItemProps) {
   );
 }
 
-export function Sidebar() {
+interface SidebarProps {
+  mobileOpen?: boolean;
+  onClose?: () => void;
+}
+
+function SidebarContent({
+  location,
+  openMenu,
+  handleToggle,
+  onNavigate,
+  mobile,
+  onClose,
+}: {
+  location: ReturnType<typeof useLocation>;
+  openMenu: string | null;
+  handleToggle: (name: string) => void;
+  onNavigate?: () => void;
+  mobile?: boolean;
+  onClose?: () => void;
+}) {
+  return (
+    <>
+      <div className="flex h-16 items-center justify-between border-b border-gray-50 px-5 sm:h-20 sm:px-6 lg:px-8">
+        <div className="flex items-center gap-3">
+          <span className="text-lg font-bold tracking-tight text-gray-800 sm:text-xl">后台管理</span>
+        </div>
+        {mobile && (
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex h-10 w-10 items-center justify-center rounded-2xl border border-gray-200 text-gray-500 transition-colors hover:border-bamboo-200 hover:text-bamboo-500"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        )}
+      </div>
+
+      <div className="scrollbar-hide flex-1 overflow-y-auto px-4 py-5 sm:py-6 space-y-2">
+        {navItems.map((item) => (
+          <NavItem
+            key={item.name}
+            item={item}
+            location={location}
+            isOpen={openMenu === item.name}
+            onToggle={() => handleToggle(item.name)}
+            onNavigate={onNavigate}
+          />
+        ))}
+      </div>
+    </>
+  );
+}
+
+export function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
   const location = useLocation();
 
   const [openMenu, setOpenMenu] = useState<string | null>(() => {
@@ -191,25 +169,45 @@ export function Sidebar() {
   };
 
   return (
-    <aside className="w-64 bg-white border-r border-gray-100 flex flex-col shadow-[4px_0_24px_rgba(0,0,0,0.02)] z-10">
-      <div className="h-20 flex items-center px-8 border-b border-gray-50">
-        <div className="flex items-center gap-3">
-          <span className="text-xl font-bold text-gray-800 tracking-tight">后台管理</span>
-        </div>
-      </div>
-      
-      <div className="flex-1 overflow-y-auto py-6 px-4 space-y-2 scrollbar-hide">
-        {navItems.map((item) => (
-          <NavItem 
-            key={item.name} 
-            item={item} 
-            location={location} 
-            isOpen={openMenu === item.name}
-            onToggle={() => handleToggle(item.name)}
+    <>
+      <aside className="hidden w-64 flex-col border-r border-gray-100 bg-white shadow-[4px_0_24px_rgba(0,0,0,0.02)] md:flex">
+        <SidebarContent
+          location={location}
+          openMenu={openMenu}
+          handleToggle={handleToggle}
+        />
+      </aside>
+
+      <div
+        className={cn(
+          'fixed inset-0 z-40 md:hidden',
+          mobileOpen ? 'pointer-events-auto' : 'pointer-events-none',
+        )}
+      >
+        <div
+          className={cn(
+            'absolute inset-0 bg-ink-950/40 transition-opacity',
+            mobileOpen ? 'opacity-100' : 'opacity-0',
+          )}
+          onClick={onClose}
+        />
+        <aside
+          className={cn(
+            'absolute inset-y-0 left-0 flex w-[280px] max-w-[85vw] flex-col bg-white shadow-[12px_0_40px_rgba(0,0,0,0.18)] transition-transform',
+            mobileOpen ? 'translate-x-0' : '-translate-x-full',
+          )}
+        >
+          <SidebarContent
+            location={location}
+            openMenu={openMenu}
+            handleToggle={handleToggle}
+            onNavigate={onClose}
+            mobile
+            onClose={onClose}
           />
-        ))}
+        </aside>
       </div>
-    </aside>
+    </>
   );
 }
 

@@ -1,5 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ChevronDown, Clock, ChevronLeft, ChevronRight, MoreHorizontal, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Card } from '../components/ui/Card';
+import { Modal } from '../components/ui/Modal';
+import { MobileFilterPanel } from '../components/ui/MobileFilterPanel';
+import { MobileBatchActionBar } from '../components/ui/MobileBatchActionBar';
+import { MobileDataCard } from '../components/ui/MobileDataCard';
 import * as logApi from '../api/system-log';
 import type { SystemLog } from '../types';
 import { useToast } from '../contexts/ToastContext';
@@ -105,42 +110,46 @@ export default function SystemLogs() {
     <div className="space-y-4">
       {confirmDialog}
       {/* 筛选 */}
-      <div className="bg-white p-4 rounded-sm shadow-sm border border-gray-100">
-        <div className="flex flex-wrap gap-4 items-center">
-          <div className="flex items-center">
+      <MobileFilterPanel className="rounded-sm" title="日志筛选与操作">
+        <div className="flex flex-col gap-4">
+        <div className="grid grid-cols-1 gap-3 md:flex md:flex-wrap md:items-center md:gap-4">
+          <div className="flex flex-col gap-1 md:flex-row md:items-center">
             <span className="text-gray-600 text-sm mr-2 whitespace-nowrap">用户名</span>
-            <input type="text" value={filterUsername} onChange={(e) => setFilterUsername(e.target.value)} placeholder="请输入用户名" className="border border-gray-300 rounded px-3 py-1.5 text-sm w-48 focus:outline-none focus-visible:ring-2 focus-visible:ring-bamboo-500/40 focus-visible:border-bamboo-500" />
+            <input type="text" value={filterUsername} onChange={(e) => setFilterUsername(e.target.value)} placeholder="请输入用户名" className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-bamboo-500/40 focus-visible:border-bamboo-500 md:w-48 md:py-1.5" />
           </div>
-          <div className="flex items-center">
+          <div className="flex flex-col gap-1 md:flex-row md:items-center">
             <span className="text-gray-600 text-sm mr-2 whitespace-nowrap">操作模块</span>
-            <select value={filterModule} onChange={(e) => setFilterModule(e.target.value)} className="border border-gray-300 rounded px-3 py-1.5 text-sm w-48 focus:outline-none focus-visible:ring-2 focus-visible:ring-bamboo-500/40 focus-visible:border-bamboo-500 bg-white">
+            <select value={filterModule} onChange={(e) => setFilterModule(e.target.value)} className="w-full rounded border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-bamboo-500/40 focus-visible:border-bamboo-500 md:w-48 md:py-1.5">
               <option value="">请选择操作模块</option>
               {modules.map(m => <option key={m} value={m}>{m}</option>)}
             </select>
           </div>
-          <div className="flex items-center">
+          <div className="flex flex-col gap-1 md:flex-row md:items-center">
             <span className="text-gray-600 text-sm mr-2 whitespace-nowrap">操作类型</span>
-            <select value={filterOperation} onChange={(e) => setFilterOperation(e.target.value)} className="border border-gray-300 rounded px-3 py-1.5 text-sm w-48 focus:outline-none focus-visible:ring-2 focus-visible:ring-bamboo-500/40 focus-visible:border-bamboo-500 bg-white">
+            <select value={filterOperation} onChange={(e) => setFilterOperation(e.target.value)} className="w-full rounded border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-bamboo-500/40 focus-visible:border-bamboo-500 md:w-48 md:py-1.5">
               <option value="">请选择操作类型</option>
               {operationTypes.map(t => <option key={t} value={t}>{t}</option>)}
             </select>
           </div>
-          <div className="flex items-center">
+          <div className="flex flex-col gap-1 md:flex-row md:items-center">
             <span className="text-gray-600 text-sm mr-2 whitespace-nowrap">操作状态</span>
-            <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="border border-gray-300 rounded px-3 py-1.5 text-sm w-48 focus:outline-none focus-visible:ring-2 focus-visible:ring-bamboo-500/40 focus-visible:border-bamboo-500 bg-white">
+            <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="w-full rounded border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-bamboo-500/40 focus-visible:border-bamboo-500 md:w-48 md:py-1.5">
               <option value="">请选择操作状态</option>
               <option value="成功">成功</option><option value="失败">失败</option>
             </select>
           </div>
         </div>
-        <div className="flex flex-wrap gap-4 items-center mt-4">
-          <button onClick={handleSearch} className="bg-bamboo-500 hover:bg-bamboo-400 text-white px-4 py-1.5 rounded text-sm transition-colors">搜索</button>
-          <button onClick={handleReset} className="bg-white border border-gray-300 text-gray-600 hover:text-bamboo-500 hover:border-bamboo-500 px-4 py-1.5 rounded text-sm transition-colors">重置</button>
+        <div className="grid grid-cols-2 gap-3 md:flex md:flex-wrap md:items-center">
+          <button onClick={handleSearch} className="rounded-2xl bg-bamboo-500 px-4 py-2 text-sm text-white transition-colors hover:bg-bamboo-400 md:rounded md:py-1.5">搜索</button>
+          <button onClick={handleReset} className="rounded-2xl border border-gray-300 bg-white px-4 py-2 text-sm text-gray-600 transition-colors hover:border-bamboo-500 hover:text-bamboo-500 md:rounded md:py-1.5">重置</button>
+          <button onClick={handleExport} className="rounded-2xl bg-bamboo-500 px-4 py-2 text-sm text-white transition-colors hover:bg-bamboo-400 md:hidden">导出</button>
+          <button onClick={handleClearLogs} className="rounded-2xl bg-terracotta-500 px-4 py-2 text-sm text-white transition-colors hover:bg-terracotta-400 md:hidden">清空</button>
         </div>
-      </div>
+        </div>
+      </MobileFilterPanel>
 
       {/* 表格 */}
-      <div className="bg-white rounded-sm shadow-sm border border-gray-100">
+      <div className="hidden rounded-sm border border-gray-100 bg-white shadow-sm md:block">
         <div className="p-4 flex justify-between items-center border-b border-gray-100">
           <h3 className="text-base font-bold text-gray-800">系统日志列表</h3>
           <div className="flex items-center gap-3">
@@ -214,15 +223,67 @@ export default function SystemLogs() {
         </div>
       </div>
 
-      {/* 详情弹窗 */}
-      {isModalOpen && selectedLog && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded shadow-lg w-full max-w-[800px] flex flex-col max-h-[90vh]">
-            <div className="flex justify-between items-center p-4 border-b border-gray-100">
-              <h3 className="text-lg font-medium text-gray-800">日志详情</h3>
-              <button onClick={() => { setIsModalOpen(false); setSelectedLog(null); }} className="text-gray-400 hover:text-gray-600"><X className="w-5 h-5" /></button>
+      <div className="space-y-3 md:hidden">
+        {loading && <Card className="p-4 text-center text-sm text-gray-400">加载中...</Card>}
+        {!loading && logs.length === 0 && <Card className="p-8 text-center text-sm text-gray-500">暂无数据</Card>}
+        {logs.map((log) => (
+          <MobileDataCard
+            key={log.id}
+            title={`${log.module} / ${log.operation}`}
+            subtitle={log.createdAt ? `操作时间：${log.createdAt}` : '暂无操作时间'}
+            selected={selectedIds.includes(log.id)}
+            onSelect={() => handleSelectOne(log.id)}
+            tags={[
+              <span key="user" className="rounded-full border border-bamboo-200 bg-bamboo-50 px-2 py-0.5 text-[11px] text-bamboo-500">
+                {log.username}
+              </span>,
+              <span key="status" className={`rounded-full border px-2 py-0.5 text-[11px] ${log.status === 1 ? 'border-sprout-200 bg-sprout-50 text-sprout-500' : 'border-terracotta-200 bg-terracotta-50 text-terracotta-500'}`}>
+                {log.status === 1 ? '成功' : '失败'}
+              </span>,
+            ]}
+            fields={[
+              { label: '描述', value: log.description || '-' },
+              { label: 'IP 地址', value: log.ipAddress || '-' },
+              { label: '耗时', value: `${log.executionTime ?? 0} ms` },
+            ]}
+            details={[
+              { label: '请求方法', value: log.requestMethod || '-' },
+              { label: '请求地址', value: log.requestUrl || '-', fullWidth: true },
+            ]}
+            actions={[
+              { label: '详情', onClick: () => handleOpenDetails(log), tone: 'primary' },
+              { label: '删除', onClick: () => handleDelete(log.id), tone: 'danger' },
+            ]}
+          />
+        ))}
+      </div>
+
+      <Card className="p-4 md:hidden">
+        <div className="flex flex-col gap-3 text-sm text-gray-600">
+          <div className="flex items-center justify-between">
+            <span>共 {total} 条</span>
+            <span>{current} / {totalPages || 1}</span>
+          </div>
+          <div className="flex items-center justify-between gap-3">
+            <select value={pageSize} onChange={(e) => { setPageSize(Number(e.target.value)); setCurrent(1); }} className="rounded border border-gray-300 bg-white px-3 py-2">
+              <option value={10}>10条/页</option><option value={20}>20条/页</option><option value={50}>50条/页</option>
+            </select>
+            <div className="flex items-center gap-2">
+              <button onClick={() => setCurrent(Math.max(1, current - 1))} disabled={current <= 1} className="rounded-2xl border border-gray-200 px-3 py-2 disabled:opacity-50"><ChevronLeft className="h-4 w-4" /></button>
+              <button onClick={() => setCurrent(Math.min(totalPages, current + 1))} disabled={current >= totalPages} className="rounded-2xl border border-gray-200 px-3 py-2 disabled:opacity-50"><ChevronRight className="h-4 w-4" /></button>
             </div>
-            <div className="p-6 overflow-y-auto">
+          </div>
+        </div>
+      </Card>
+
+      <MobileBatchActionBar count={selectedIds.length}>
+        <button onClick={handleBatchDelete} className="rounded-full bg-harvest-500 px-3 py-2 text-xs font-medium text-white">批量删除</button>
+      </MobileBatchActionBar>
+
+      {/* 详情弹窗 */}
+      <Modal isOpen={isModalOpen && !!selectedLog} onClose={() => { setIsModalOpen(false); setSelectedLog(null); }} title="日志详情" className="max-w-4xl">
+        {selectedLog && (
+            <div className="overflow-y-auto">
               <table className="w-full text-sm border-collapse border border-gray-200">
                 <tbody>
                   <tr><td className="py-3 px-4 bg-gray-50 text-gray-600 font-medium w-32 border border-gray-200">操作用户</td><td colSpan={3} className="py-3 px-4 text-gray-800 border border-gray-200">{selectedLog.username}</td></tr>
@@ -235,13 +296,12 @@ export default function SystemLogs() {
                   {selectedLog.errorMessage && <tr><td className="py-3 px-4 bg-gray-50 text-gray-600 font-medium border border-gray-200">错误信息</td><td colSpan={3} className="py-3 px-4 text-red-600 border border-gray-200">{selectedLog.errorMessage}</td></tr>}
                 </tbody>
               </table>
+              <div className="flex justify-end pt-4">
+                <button onClick={() => { setIsModalOpen(false); setSelectedLog(null); }} className="w-full rounded-2xl border border-gray-300 px-4 py-2 text-sm text-gray-600 hover:text-gray-800 sm:w-auto sm:rounded">关闭</button>
+              </div>
             </div>
-            <div className="p-4 border-t border-gray-100 flex justify-end">
-              <button onClick={() => { setIsModalOpen(false); setSelectedLog(null); }} className="px-4 py-2 border border-gray-300 text-gray-600 rounded hover:text-gray-800 text-sm">关闭</button>
-            </div>
-          </div>
-        </div>
-      )}
+        )}
+      </Modal>
     </div>
   );
 }

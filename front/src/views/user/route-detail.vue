@@ -150,10 +150,7 @@
                     <!-- 时间轴左侧 -->
                     <div class="timeline-left">
                       <div class="timeline-dot"></div>
-                      <div
-                        v-if="index < dayItems.length - 1"
-                        class="timeline-line"
-                      ></div>
+                      <div class="timeline-line"></div>
                     </div>
 
                     <!-- 时间轴右侧内容 -->
@@ -230,7 +227,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import {
@@ -305,12 +302,16 @@ const toggleDay = (dayNum) => {
   expandedDays[dayNum] = !expandedDays[dayNum]
 }
 
-// 初始化展开所有天
+// 初始化为全部折叠，并清理旧路线残留状态
 const initExpandedDays = () => {
+  Object.keys(expandedDays).forEach((day) => {
+    delete expandedDays[day]
+  })
+
   if (!routeData.value || !routeData.value.items) return
   const daySet = new Set(routeData.value.items.map((item) => item.dayNumber))
   daySet.forEach((day) => {
-    expandedDays[day] = true
+    expandedDays[day] = false
   })
 }
 
@@ -379,6 +380,17 @@ const fallbackShare = () => {
 onMounted(() => {
   loadRouteDetail()
 })
+
+watch(
+  () => route.params.id,
+  (newId, oldId) => {
+    if (newId && newId !== oldId) {
+      routeData.value = null
+      isCollected.value = false
+      loadRouteDetail()
+    }
+  }
+)
 </script>
 
 <style scoped>
@@ -677,6 +689,10 @@ onMounted(() => {
   padding-bottom: 28px;
 }
 
+.timeline-item:last-child .timeline-right {
+  padding-bottom: 0;
+}
+
 /* 交通指示 */
 .transport-indicator {
   display: inline-flex;
@@ -841,6 +857,32 @@ onMounted(() => {
 
   .action-buttons .el-button {
     width: 100%;
+    min-height: 46px;
+    padding-inline: 16px;
+  }
+
+  .action-buttons .el-button + .el-button {
+    margin-left: 0;
+  }
+
+  .action-buttons :deep(.el-button > span) {
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-align: center;
+  }
+
+  .action-buttons :deep(.el-button .el-icon) {
+    margin: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    line-height: 1;
+    vertical-align: middle;
+    flex-shrink: 0;
   }
 
   .description-section {
@@ -887,15 +929,62 @@ onMounted(() => {
     padding: 16px 0 4px 0;
   }
 
+  .timeline {
+    padding-left: 0;
+  }
+
+  .timeline-item {
+    align-items: flex-start;
+  }
+
+  .timeline-left {
+    width: 20px;
+  }
+
+  .timeline-dot {
+    width: 12px;
+    height: 12px;
+    border-width: 2px;
+    margin-top: 2px;
+  }
+
+  .timeline-line {
+    min-height: 36px;
+    margin: 3px 0 0;
+  }
+
   .timeline-right {
-    padding-left: 16px;
+    padding-left: 14px;
     padding-bottom: 20px;
+  }
+
+  .timeline-item:last-child .timeline-right {
+    padding-bottom: 0;
+  }
+
+  .transport-indicator {
+    display: inline-flex;
+    align-items: center;
+    align-self: flex-start;
+    gap: 6px;
+    max-width: 100%;
+    width: fit-content;
+    padding: 4px 10px;
+    margin: 0 0 10px;
+    box-sizing: border-box;
+  }
+
+  .transport-text {
+    line-height: 1.3;
   }
 
   .spot-card {
     flex-direction: column;
+    align-items: flex-start;
     gap: 12px;
-    padding: 14px;
+    width: 100%;
+    padding: 12px;
+    box-sizing: border-box;
   }
 
   .spot-cover {
@@ -905,6 +994,28 @@ onMounted(() => {
 
   .spot-cover img {
     max-width: 100%;
+  }
+
+  .spot-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+  }
+
+  .spot-meta,
+  .spot-note {
+    width: 100%;
+  }
+
+  .spot-meta {
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+
+  .nav-link {
+    align-self: flex-start;
+    margin-top: 10px;
   }
 
   .weather-section,
@@ -968,9 +1079,17 @@ onMounted(() => {
     font-size: 15px;
   }
 
+  .timeline-left {
+    width: 18px;
+  }
+
   .timeline-right {
-    padding-left: 12px;
+    padding-left: 10px;
     padding-bottom: 16px;
+  }
+
+  .timeline-item:last-child .timeline-right {
+    padding-bottom: 0;
   }
 
   .spot-card {
@@ -986,8 +1105,18 @@ onMounted(() => {
   }
 
   .transport-indicator {
-    padding: 3px 10px;
+    gap: 4px;
+    padding: 3px 8px;
     font-size: 12px;
+  }
+
+  .transport-text {
+    line-height: 1.25;
+  }
+
+  .nav-link {
+    margin-top: 8px;
+    padding: 4px 10px;
   }
 }
 

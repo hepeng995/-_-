@@ -60,9 +60,9 @@ export default function ForumStatistics() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-xl font-bold text-ink-600">论坛数据分析</h2>
-        <button onClick={fetchAllData} disabled={loading} className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded text-sm text-gray-600 hover:text-bamboo-500 hover:border-bamboo-500 disabled:opacity-50">
+        <button onClick={fetchAllData} disabled={loading} className="flex items-center justify-center gap-2 rounded-2xl border border-gray-300 bg-white px-4 py-2 text-sm text-gray-600 hover:border-bamboo-500 hover:text-bamboo-500 disabled:opacity-50 sm:w-auto sm:rounded">
           <RefreshCw size={14} className={loading ? 'animate-spin' : ''} /> 刷新数据
         </button>
       </div>
@@ -96,7 +96,7 @@ export default function ForumStatistics() {
           {/* 图表行 */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* 分类分布 */}
-            <Card className="p-6">
+            <Card className="p-4 sm:p-6">
               <h3 className="text-base font-bold text-ink-600 mb-4">建议类型分布</h3>
               {categoryData.length > 0 ? (
                 <ResponsiveContainer width="100%" height={300}>
@@ -108,7 +108,7 @@ export default function ForumStatistics() {
             </Card>
 
             {/* 审核状态 */}
-            <Card className="p-6">
+            <Card className="p-4 sm:p-6">
               <h3 className="text-base font-bold text-ink-600 mb-4">审核状态分布</h3>
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart><Pie data={auditChartData} cx="50%" cy="50%" innerRadius={60} outerRadius={100} dataKey="value" label={({ name, value }) => `${name}: ${value}`}>
@@ -119,7 +119,7 @@ export default function ForumStatistics() {
           </div>
 
           {/* 月度趋势 */}
-          <Card className="p-6">
+          <Card className="p-4 sm:p-6">
             <h3 className="text-base font-bold text-ink-600 mb-4">月度趋势</h3>
             {monthlyData.length > 0 ? (
               <ResponsiveContainer width="100%" height={300}>
@@ -132,7 +132,7 @@ export default function ForumStatistics() {
           </Card>
 
           {/* 热度排行 */}
-          <Card className="p-6">
+          <Card className="p-4 sm:p-6">
             <h3 className="text-base font-bold text-ink-600 mb-4">热度排行</h3>
             {hotPosts.length > 0 ? (
               <ResponsiveContainer width="100%" height={300}>

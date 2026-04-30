@@ -122,17 +122,19 @@ const handleLogin = () => {
 
 <style scoped>
 .login-container {
-  height: 100vh;
+  min-height: var(--app-height);
+  min-height: var(--app-dvh);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   background: linear-gradient(135deg, var(--color-bg-body) 0%, #e4e8f1 100%);
   position: relative;
+  padding: max(24px, var(--safe-area-top)) 16px max(24px, var(--safe-area-bottom));
 }
 
 .login-card {
-  width: 400px;
+  width: min(100%, 400px);
   padding: 40px;
   background-color: var(--color-bg-surface);
   border-radius: var(--radius-lg);
@@ -194,10 +196,10 @@ h3 {
 }
 
 .footer {
-  position: absolute;
-  bottom: 20px;
+  margin-top: 24px;
   color: var(--color-text-placeholder);
   font-size: 13px;
+  text-align: center;
 }
 
 :deep(.el-input__wrapper) {
@@ -212,5 +214,30 @@ h3 {
 
 :deep(.el-input__wrapper.is-focus) {
   box-shadow: 0 0 0 1px var(--color-info) inset !important;
+}
+
+@media (max-width: 767px) {
+  .login-container {
+    justify-content: flex-start;
+    padding-top: clamp(56px, 14vh, 120px);
+  }
+
+  .login-card {
+    padding: 28px 20px;
+  }
+
+  h1 {
+    font-size: 20px;
+  }
+
+  h3 {
+    font-size: 16px;
+    margin-bottom: 24px;
+  }
+
+  .login-btn,
+  :deep(.el-input__wrapper) {
+    height: 46px;
+  }
 }
 </style>

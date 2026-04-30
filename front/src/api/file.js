@@ -28,16 +28,19 @@ export default {
    */
   uploadFiles(files) {
     const formData = new FormData()
-    files.forEach((file, index) => {
-      formData.append(`files`, file)
+    files.forEach((file) => {
+      formData.append('files', file)
     })
-    
-    return request({
-      url: '/file/upload/batch',
+
+    const token = sessionStorage.getItem('token')
+
+    return axios({
+      url: '/api/file/upload/batch',
       method: 'post',
       data: formData,
       headers: {
-        'Content-Type': 'multipart/form-data'
+        'Content-Type': 'multipart/form-data',
+        'Authorization': token ? `Bearer ${token}` : ''
       }
     })
   },
@@ -46,9 +49,14 @@ export default {
    * 删除文件
    */
   deleteFile(filename) {
-    return request({
-      url: `/file/delete/${filename}`,
-      method: 'delete'
+    const token = sessionStorage.getItem('token')
+
+    return axios({
+      url: `/api/file/delete/${filename}`,
+      method: 'delete',
+      headers: {
+        'Authorization': token ? `Bearer ${token}` : ''
+      }
     })
   }
 }

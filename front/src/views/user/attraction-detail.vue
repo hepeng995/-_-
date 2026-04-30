@@ -165,7 +165,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElImageViewer } from 'element-plus'
 import { MapLocation, Compass, Share } from '@element-plus/icons-vue'
@@ -301,17 +301,24 @@ const previewImage = (index) => {
 // 跳转到其他景点
 const goToAttraction = (id) => {
   router.push(`/attractions/${id}`)
-  // 重新加载数据
-  nextTick(() => {
-    loadAttraction()
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  })
 }
 
 // 初始化
 onMounted(() => {
   loadAttraction()
 })
+
+watch(
+  () => route.params.id,
+  (newId, oldId) => {
+    if (newId && newId !== oldId) {
+      attraction.value = null
+      relatedAttractions.value = []
+      mapDialogVisible.value = false
+      loadAttraction()
+    }
+  }
+)
 </script>
 
 <style scoped>
@@ -685,6 +692,32 @@ onMounted(() => {
 
   .action-buttons .el-button {
     width: 100%;
+    min-height: 46px;
+    padding-inline: 16px;
+  }
+
+  .action-buttons .el-button + .el-button {
+    margin-left: 0;
+  }
+
+  .action-buttons :deep(.el-button > span) {
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-align: center;
+  }
+
+  .action-buttons :deep(.el-button .el-icon) {
+    margin: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    line-height: 1;
+    vertical-align: middle;
+    flex-shrink: 0;
   }
 
   .attraction-details {

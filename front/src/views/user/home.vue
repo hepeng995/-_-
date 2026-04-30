@@ -2,7 +2,7 @@
   <div class="home-page">
     <!-- 轮播图区域 - 调整高度 -->
     <section class="hero-section">
-      <el-carousel height="450px" indicator-position="outside" arrow="hover" :interval="5000">
+      <el-carousel height="450px" arrow="hover" :interval="5000">
         <el-carousel-item v-for="(item, index) in bannerImages" :key="index">
           <div class="carousel-item" :style="{ backgroundImage: `url(${item.image})` }">
             <div class="carousel-overlay">
@@ -167,11 +167,11 @@ import homeApi from '@/api/home'
 const router = useRouter()
 
 // 轮播图数据
-import 景点导览背景 from '@/assets/image/景点导览背景.png'
-import 特产商城背景 from '@/assets/image/特产商城背景.png'
-import 动态资讯背景 from '@/assets/image/动态资讯背景.png'
-import 建言献策背景 from '@/assets/image/建言献策背景.png'
-import 乡村概览 from '@/assets/image/乡村概览新.jpg'
+import 景点导览背景 from '@/assets/image/景点导览背景.webp'
+import 特产商城背景 from '@/assets/image/特产商城背景.webp'
+import 动态资讯背景 from '@/assets/image/动态资讯背景.webp'
+import 建言献策背景 from '@/assets/image/建言献策背景.webp'
+import 乡村概览 from '@/assets/image/乡村概览新.webp'
 
 const bannerImages = ref([
   {
@@ -891,14 +891,15 @@ section.latest-news {
   bottom: 15px;
 }
 
-:deep(.el-carousel__indicator) {
+:deep(.el-carousel__button) {
   background: rgba(255, 255, 255, 0.4);
   border-radius: 6px;
   width: 30px;
   height: 4px;
+  opacity: 1;
 }
 
-:deep(.el-carousel__indicator.is-active) {
+:deep(.el-carousel__indicator.is-active .el-carousel__button) {
   background: rgba(255, 255, 255, 0.9);
 }
 
@@ -954,15 +955,15 @@ section.latest-news {
 }
 
 @media (max-width: 768px) {
-  .main-content {
-    padding: 0 var(--mobile-page-padding);
-  }
-
-  .container {
-    padding: 0 var(--mobile-page-padding);
+  .hero-section {
+    overflow: hidden;
   }
 
   /* 轮播图高度：45vw 自适应，限高 250px */
+  :deep(.el-carousel__container) {
+    height: clamp(150px, 45vw, 250px) !important;
+  }
+
   .carousel-item {
     height: clamp(150px, 45vw, 250px);
   }
@@ -1146,6 +1147,10 @@ section.latest-news {
     padding: 0 10px;
   }
 
+  :deep(.el-carousel__container) {
+    height: clamp(140px, 42vw, 200px) !important;
+  }
+
   .carousel-item {
     height: clamp(140px, 42vw, 200px);
   }
@@ -1157,6 +1162,11 @@ section.latest-news {
   .carousel-subtitle {
     font-size: 12px;
     margin-bottom: 12px;
+  }
+
+  :deep(.el-carousel__indicator) {
+    padding: 2px;
+    width: 20px;
   }
 
   .overview-content {

@@ -2,7 +2,7 @@
   <aside v-if="showSidebar" class="sidebar" :class="{ collapsed }" role="navigation" aria-label="主导航">
     <!-- Logo区 -->
     <div class="sidebar-logo" @click="$router.push('/home')">
-      <img src="@/assets/image/IP3.png" alt="Logo" class="sidebar-logo__img" />
+      <img src="@/assets/image/IP3.webp" alt="Logo" class="sidebar-logo__img" />
       <transition name="fade">
         <span v-if="!collapsed" class="sidebar-logo__text">{{ systemName }}</span>
       </transition>

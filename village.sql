@@ -219,6 +219,71 @@ INSERT INTO `route_items` (`route_id`, `day_number`, `sort_order`, `attraction_i
 (3, 3, 2, 4, '1.5小时', '步行约20分钟',            '参拜古禅寺"江南第一宫"');
 
 -- ============================================================
+-- 活动模块
+-- ============================================================
+
+DROP TABLE IF EXISTS `activity_registrations`;
+DROP TABLE IF EXISTS `activities`;
+
+CREATE TABLE `activities` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '活动ID',
+  `title` varchar(120) NOT NULL COMMENT '活动标题',
+  `cover_images` text COMMENT '封面图列表(JSON)',
+  `description` text COMMENT '活动描述',
+  `category` varchar(50) NOT NULL COMMENT '活动分类',
+  `start_time` datetime NOT NULL COMMENT '开始时间',
+  `end_time` datetime NOT NULL COMMENT '结束时间',
+  `location` varchar(255) NOT NULL COMMENT '活动地点',
+  `organizer` varchar(120) DEFAULT NULL COMMENT '主办方',
+  `contact_phone` varchar(30) DEFAULT NULL COMMENT '联系电话',
+  `fee` decimal(10,2) DEFAULT 0.00 COMMENT '报名费用',
+  `max_participants` int DEFAULT 0 COMMENT '最大人数，0表示不限',
+  `current_participants` int DEFAULT 0 COMMENT '当前报名人数',
+  `registration_deadline` datetime DEFAULT NULL COMMENT '报名截止时间',
+  `status` varchar(30) DEFAULT 'registering' COMMENT '活动状态',
+  `images` text COMMENT '详情图(JSON)',
+  `tags` text COMMENT '标签(JSON)',
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` tinyint(1) DEFAULT 0 COMMENT '逻辑删除',
+  PRIMARY KEY (`id`),
+  KEY `idx_category` (`category`),
+  KEY `idx_status` (`status`),
+  KEY `idx_start_time` (`start_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='乡村活动表';
+
+CREATE TABLE `activity_registrations` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '报名ID',
+  `activity_id` bigint NOT NULL COMMENT '活动ID',
+  `user_id` bigint DEFAULT NULL COMMENT '用户ID',
+  `contact_name` varchar(60) NOT NULL COMMENT '联系人姓名',
+  `contact_phone` varchar(30) NOT NULL COMMENT '联系电话',
+  `participant_count` int NOT NULL DEFAULT 1 COMMENT '参加人数',
+  `remark` varchar(255) DEFAULT NULL COMMENT '备注',
+  `status` varchar(30) NOT NULL DEFAULT 'pending' COMMENT '报名状态',
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` tinyint(1) DEFAULT 0 COMMENT '逻辑删除',
+  PRIMARY KEY (`id`),
+  KEY `idx_activity_id` (`activity_id`),
+  KEY `idx_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='活动报名表';
+
+INSERT INTO `activities` (`id`, `title`, `cover_images`, `description`, `category`, `start_time`, `end_time`, `location`, `organizer`, `contact_phone`, `fee`, `max_participants`, `current_participants`, `registration_deadline`, `status`, `images`, `tags`, `created_at`, `updated_at`, `deleted`) VALUES
+(1, '2026乡村生态文化节', '["https://picsum.photos/seed/act1a/800/500","https://picsum.photos/seed/act1b/800/500"]', '一年一度的乡村生态文化节盛大开幕，包含花海摄影、乡村美食品鉴、民俗巡游等丰富活动。', 'festival', '2026-04-20 09:00:00', '2026-05-05 18:00:00', '示范县田园生态景区', '示范县文化和旅游局', '0736-6688888', 0.00, 500, 356, '2026-04-30 23:59:00', 'ongoing', '["https://picsum.photos/seed/act1c/400/300"]', '["花海","摄影","美食"]', '2026-03-15 10:00:00', '2026-03-15 10:00:00', 0),
+(2, '春日茶园采摘体验', '["https://picsum.photos/seed/act2a/800/500"]', '亲手采摘明前茶，跟随茶农学习杀青、揉捻、烘干等传统制茶工艺。', 'picking', '2026-05-10 08:00:00', '2026-05-10 17:00:00', '示范县云岭镇高山茶园', '示范县茶叶合作社', '0736-6551234', 128.00, 30, 22, '2026-05-08 23:59:00', 'registering', '["https://picsum.photos/seed/act2b/400/300"]', '["茶叶","采摘","制茶体验"]', '2026-03-20 09:00:00', '2026-03-20 09:00:00', 0),
+(3, '非遗竹编手作课堂', '["https://picsum.photos/seed/act3a/800/500"]', '跟随非遗传承人学习竹编技艺，从选竹、劈篾到编织成型，全程沉浸式体验。', 'workshop', '2026-05-18 09:00:00', '2026-05-18 12:00:00', '示范县绿野镇文化站', '示范县非遗保护中心', '0736-6623456', 68.00, 15, 8, '2026-05-16 23:59:00', 'registering', '[]', '["非遗","竹编","手作"]', '2026-03-28 10:30:00', '2026-03-28 10:30:00', 0),
+(4, '乡村美食市集', '["https://picsum.photos/seed/act4a/800/500"]', '五一特别企划，汇集各乡镇特色美食，现场有厨艺比拼与大众投票。', 'market', '2026-05-01 10:00:00', '2026-05-03 20:00:00', '示范县文化广场', '示范县商务局', '0736-6634567', 0.00, 0, 0, NULL, 'registering', '[]', '["美食","市集","五一"]', '2026-04-01 11:00:00', '2026-04-01 11:00:00', 0),
+(5, '美丽乡村摄影大赛', '["https://picsum.photos/seed/act5a/800/500"]', '用镜头记录乡村之美，设一等奖、二等奖和三等奖多个奖项。', 'competition', '2026-04-10 00:00:00', '2026-06-10 23:59:00', '示范县全域', '示范县文联', '0736-6645678', 0.00, 200, 156, '2026-05-20 23:59:00', 'ongoing', '[]', '["摄影","比赛","风光"]', '2026-03-10 09:30:00', '2026-03-10 09:30:00', 0),
+(6, '端午龙舟文化节', '["https://picsum.photos/seed/act6a/800/500"]', '端午佳节龙舟竞渡，现场还有包粽子、编五彩绳、挂艾草等传统民俗互动。', 'festival', '2026-05-31 08:00:00', '2026-05-31 18:00:00', '示范县碧江段', '示范县体育局', '0736-6667890', 0.00, 1000, 234, '2026-05-29 23:59:00', 'registering', '[]', '["端午","龙舟","民俗"]', '2026-04-05 15:00:00', '2026-04-05 15:00:00', 0);
+
+INSERT INTO `activity_registrations` (`id`, `activity_id`, `user_id`, `contact_name`, `contact_phone`, `participant_count`, `remark`, `status`, `created_at`, `updated_at`, `deleted`) VALUES
+(1, 2, NULL, '张三', '13800138001', 2, '希望安排制茶体验', 'confirmed', '2026-04-21 09:00:00', '2026-04-21 09:00:00', 0),
+(2, 2, NULL, '李四', '13800138002', 1, '', 'confirmed', '2026-04-22 10:00:00', '2026-04-22 10:00:00', 0),
+(3, 3, NULL, '王五', '13800138003', 3, '带两个孩子参加', 'pending', '2026-04-23 11:00:00', '2026-04-23 11:00:00', 0),
+(4, 5, NULL, '赵六', '13800138004', 1, '专业摄影师', 'confirmed', '2026-04-24 12:00:00', '2026-04-24 12:00:00', 0);
+
+-- ============================================================
 -- 论坛模块
 -- ============================================================
 

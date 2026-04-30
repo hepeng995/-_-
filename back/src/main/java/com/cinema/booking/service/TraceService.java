@@ -10,6 +10,8 @@ import java.util.Map;
 
 public interface TraceService {
 
+    String buildTraceQrCode(String batchNo);
+
     Map<String, Object> getTraceByProductId(Long productId);
 
     Map<String, Object> getTraceByBatchNo(String batchNo);

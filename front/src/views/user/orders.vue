@@ -167,15 +167,15 @@
     </div>
     
     <!-- 订单详情对话框 -->
-    <el-dialog v-model="detailDialogVisible" title="订单详情" width="800px">
+    <el-dialog v-model="detailDialogVisible" title="订单详情" width="800px" class="mobile-dialog mobile-dialog--wide order-detail-dialog">
       <div v-if="currentOrder" class="order-detail">
         <!-- 订单基本信息 -->
         <el-card class="order-info-card">
           <template #header>
             <span>订单信息</span>
           </template>
-          <el-row :gutter="20">
-            <el-col :span="12">
+          <el-row :gutter="20" class="order-meta-grid">
+            <el-col :xs="24" :sm="12">
               <p><strong>订单号：</strong>{{ currentOrder.orderNo }}</p>
               <p><strong>下单时间：</strong>{{ formatDate(currentOrder.createdAt) }}</p>
               <p><strong>订单状态：</strong>
@@ -189,7 +189,7 @@
                 </el-tag>
               </p>
             </el-col>
-            <el-col :span="12">
+            <el-col :xs="24" :sm="12">
               <p><strong>收货人：</strong>{{ currentOrder.deliveryName }}</p>
               <p><strong>收货电话：</strong>{{ currentOrder.deliveryPhone }}</p>
               <p><strong>收货地址：</strong>{{ currentOrder.deliveryAddress }}</p>
@@ -203,30 +203,62 @@
           <template #header>
             <span>商品信息</span>
           </template>
-          <el-table :data="currentOrder.orderItems" border>
-            <el-table-column prop="productImage" label="商品图片" width="100">
-              <template #default="scope">
+          <div class="order-items-table mobile-scroll-x">
+            <el-table :data="currentOrder.orderItems" border>
+              <el-table-column prop="productImage" label="商品图片" width="100">
+                <template #default="scope">
+                  <el-image
+                    v-if="scope.row.productImage"
+                    :src="scope.row.productImage"
+                    style="width: 60px; height: 45px"
+                    fit="cover"
+                  />
+                </template>
+              </el-table-column>
+              <el-table-column prop="productName" label="商品名称" />
+              <el-table-column prop="productPrice" label="单价" width="100">
+                <template #default="scope">
+                  ￥{{ scope.row.productPrice }}
+                </template>
+              </el-table-column>
+              <el-table-column prop="quantity" label="数量" width="80" />
+              <el-table-column prop="totalPrice" label="小计" width="100">
+                <template #default="scope">
+                  <span class="amount">￥{{ scope.row.totalPrice }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column v-if="currentOrder.orderStatus === 4" label="操作" width="120">
+                <template #default="scope">
+                  <el-button size="small" type="primary" text @click="goToReview(currentOrder, scope.row)">
+                    评价商品
+                  </el-button>
+                </template>
+              </el-table-column>
+            </el-table>
+          </div>
+          <div class="order-items-mobile">
+            <div v-for="item in currentOrder.orderItems" :key="item.id" class="dialog-product-card">
+              <div class="dialog-product-card__top">
                 <el-image
-                  v-if="scope.row.productImage"
-                  :src="scope.row.productImage"
-                  style="width: 60px; height: 45px"
+                  v-if="item.productImage"
+                  :src="item.productImage"
+                  class="dialog-product-card__image"
                   fit="cover"
                 />
-              </template>
-            </el-table-column>
-            <el-table-column prop="productName" label="商品名称" />
-            <el-table-column prop="productPrice" label="单价" width="100">
-              <template #default="scope">
-                ￥{{ scope.row.productPrice }}
-              </template>
-            </el-table-column>
-            <el-table-column prop="quantity" label="数量" width="80" />
-            <el-table-column prop="totalPrice" label="小计" width="100">
-              <template #default="scope">
-                <span class="amount">￥{{ scope.row.totalPrice }}</span>
-              </template>
-            </el-table-column>
-          </el-table>
+                <div class="dialog-product-card__info">
+                  <div class="dialog-product-card__name">{{ item.productName }}</div>
+                  <div class="dialog-product-card__meta">单价：￥{{ item.productPrice }}</div>
+                  <div class="dialog-product-card__meta">数量：×{{ item.quantity }}</div>
+                </div>
+              </div>
+              <div class="dialog-product-card__amount">小计：￥{{ item.totalPrice }}</div>
+              <div v-if="currentOrder.orderStatus === 4" class="dialog-product-card__action">
+                <el-button size="small" type="primary" plain @click="goToReview(currentOrder, item)">
+                  评价商品
+                </el-button>
+              </div>
+            </div>
+          </div>
         </el-card>
 
         <!-- 金额信息 -->
@@ -283,6 +315,7 @@ import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import orderApi from '@/api/order'
+import { scrollMainContentToTop } from '@/utils/scroll'
 
 const router = useRouter()
 
@@ -398,8 +431,7 @@ const handleSizeChange = (size) => {
 const handleCurrentChange = (page) => {
   searchParams.pageNum = page
   getOrders()
-  // 滚动到顶部
-  window.scrollTo({ top: 0, behavior: 'smooth' })
+  scrollMainContentToTop()
 }
 
 // 支付订单
@@ -464,8 +496,45 @@ const confirmOrder = async (order) => {
 
 // 评价订单
 const reviewOrder = (order) => {
-  // 跳转到评价页面或打开评价弹窗
-  ElMessage.info('评价功能开发中...')
+  const openSelector = async () => {
+    let targetOrder = order
+    if (!targetOrder.orderItems || targetOrder.orderItems.length === 0) {
+      const res = await orderApi.getOrderById(order.id)
+      if (res.code === 200) {
+        targetOrder = res.data
+      }
+    }
+
+    if (!targetOrder.orderItems || targetOrder.orderItems.length === 0) {
+      ElMessage.warning('订单中暂无可评价商品')
+      return
+    }
+
+    if (targetOrder.orderItems.length === 1) {
+      goToReview(targetOrder, targetOrder.orderItems[0])
+      return
+    }
+
+    currentOrder.value = targetOrder
+    detailDialogVisible.value = true
+    ElMessage.info('请选择要评价的商品')
+  }
+
+  openSelector().catch((error) => {
+    console.error('打开评价入口失败:', error)
+    ElMessage.error('打开评价入口失败')
+  })
+}
+
+const goToReview = (order, item) => {
+  detailDialogVisible.value = false
+  router.push({
+    path: `/products/${item.productId}`,
+    query: {
+      orderId: order.id,
+      action: 'review'
+    }
+  })
 }
 
 // 查看订单详情
@@ -741,6 +810,58 @@ onMounted(() => {
   margin-bottom: 20px;
 }
 
+.order-items-mobile {
+  display: none;
+}
+
+.dialog-product-card {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 12px;
+}
+
+.dialog-product-card + .dialog-product-card {
+  margin-top: 12px;
+}
+
+.dialog-product-card__top {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.dialog-product-card__image {
+  width: 72px;
+  height: 72px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.dialog-product-card__info {
+  min-width: 0;
+  flex: 1;
+}
+
+.dialog-product-card__name {
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 6px;
+}
+
+.dialog-product-card__meta {
+  color: var(--color-text-tertiary);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.dialog-product-card__amount {
+  margin-top: 10px;
+  font-weight: 600;
+  color: var(--color-danger);
+  text-align: right;
+}
+
 .amount-info {
   text-align: right;
 }
@@ -808,6 +929,22 @@ onMounted(() => {
 
   .dialog-actions {
     justify-content: center;
+  }
+
+  .order-items-table {
+    display: none;
+  }
+
+  .order-items-mobile {
+    display: block;
+  }
+
+  .amount-info {
+    text-align: left;
+  }
+
+  .dialog-actions > * {
+    flex: 1 1 100%;
   }
 }
 

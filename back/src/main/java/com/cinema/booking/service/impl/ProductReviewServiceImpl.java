@@ -11,6 +11,7 @@ import com.cinema.booking.entity.ReviewHelpful;
 import com.cinema.booking.exception.ServiceException;
 import com.cinema.booking.mapper.ProductReviewMapper;
 import com.cinema.booking.mapper.ReviewHelpfulMapper;
+import com.cinema.booking.mapper.OrderMapper;
 import com.cinema.booking.security.SecurityService;
 import com.cinema.booking.service.ProductReviewService;
 import lombok.RequiredArgsConstructor;
@@ -34,18 +35,23 @@ public class ProductReviewServiceImpl implements ProductReviewService {
     private final ReviewHelpfulMapper reviewHelpfulMapper;
     private final ProductReviewStatsService productReviewStatsService;
     private final SecurityService securityService;
+    private final OrderMapper orderMapper;
 
     @Override
     @Transactional
     public ProductReviewDTO createReview(ProductReviewDTO reviewDTO) {
-        // 移除重复评价限制，允许用户对同一商品进行多次评价
-        // 这样用户可以在不同时间点分享不同的使用体验
+        Long orderId = resolveReviewableOrderId(reviewDTO.getUserId(), reviewDTO.getProductId(), reviewDTO.getOrderId());
+        reviewDTO.setOrderId(orderId);
+
+        if (Boolean.TRUE.equals(hasReviewedOrderProduct(reviewDTO.getUserId(), reviewDTO.getProductId(), orderId))) {
+            throw new ServiceException("该订单中的商品已经评价过了");
+        }
 
         // 构建评价实体
         ProductReview review = ProductReview.builder()
                 .productId(reviewDTO.getProductId())
                 .userId(reviewDTO.getUserId())
-                .orderId(reviewDTO.getOrderId())
+                .orderId(orderId)
                 .rating(reviewDTO.getRating())
                 .content(reviewDTO.getContent())
                 .images(reviewDTO.getImages())
@@ -65,6 +71,31 @@ public class ProductReviewServiceImpl implements ProductReviewService {
 
         // 返回创建的评价信息
         return getReviewById(review.getId(), reviewDTO.getUserId());
+    }
+
+    private Long resolveReviewableOrderId(Long userId, Long productId, Long orderId) {
+        if (userId == null || productId == null) {
+            throw new ServiceException("评价信息不完整");
+        }
+
+        if (orderId != null) {
+            Integer count = orderMapper.countCompletedOrderItemsForReview(userId, productId, orderId);
+            if (count == null || count <= 0) {
+                throw new ServiceException("该订单中的商品不可评价，请确认订单已完成");
+            }
+            return orderId;
+        }
+
+        Long resolvedOrderId = orderMapper.selectLatestReviewableOrderId(userId, productId);
+        if (resolvedOrderId == null) {
+            throw new ServiceException("未找到可评价的已完成订单");
+        }
+        return resolvedOrderId;
+    }
+
+    private Boolean hasReviewedOrderProduct(Long userId, Long productId, Long orderId) {
+        Integer count = productReviewMapper.checkUserReviewed(userId, productId, orderId);
+        return count != null && count > 0;
     }
 
     @Override

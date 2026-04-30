@@ -112,19 +112,19 @@ export default function Dashboard() {
   return (
     <div className="space-y-6">
       {/* 顶部横幅 */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <div className="lg:col-span-9 bg-white rounded-2xl p-8 shadow-sm border border-gray-100 flex flex-col lg:flex-row justify-between lg:items-center relative overflow-hidden gap-8">
-          <div className="absolute right-0 top-0 w-64 h-64 bg-bamboo-50 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-12 lg:gap-6">
+        <div className="relative flex flex-col justify-between gap-6 overflow-hidden rounded-2xl border border-gray-100 bg-white p-5 shadow-sm sm:p-6 lg:col-span-9 lg:flex-row lg:items-center lg:gap-8 lg:p-8">
+          <div className="pointer-events-none absolute right-0 top-0 h-48 w-48 rounded-full bg-bamboo-50 blur-3xl -mr-16 -mt-16 sm:h-64 sm:w-64 sm:-mr-20 sm:-mt-20"></div>
           <div className="relative z-10">
-            <h2 className="text-2xl font-bold text-ink-600 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-bamboo-100 flex items-center justify-center shadow-inner"><Sprout className="w-5 h-5 text-bamboo-500" /></div>
+            <h2 className="flex items-center gap-3 text-xl font-bold text-ink-600 sm:text-2xl">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-bamboo-100 shadow-inner"><Sprout className="h-5 w-5 text-bamboo-500" /></div>
               乡村振兴·智兴乡村平台
             </h2>
-            <p className="text-gray-500 mt-3 text-sm">数据驱动决策，智慧助力乡村振兴发展</p>
+            <p className="mt-3 text-sm text-gray-500">数据驱动决策，智慧助力乡村振兴发展</p>
           </div>
-          <div className="relative z-10 flex flex-wrap gap-10 lg:border-l lg:border-t-0 border-t border-gray-50 pt-6 lg:pt-0 lg:pl-10">
+          <div className="relative z-10 grid grid-cols-2 gap-4 border-t border-gray-50 pt-5 sm:grid-cols-3 sm:gap-6 lg:border-l lg:border-t-0 lg:pt-0 lg:pl-10">
             <div>
-              <p className="text-xs text-gray-400 mb-1 font-medium uppercase tracking-wider">景点总数</p>
+              <p className="mb-1 text-xs font-medium uppercase tracking-wider text-gray-400">景点总数</p>
               <p className="text-2xl font-bold text-ink-600">{stats.attractionCount}</p>
             </div>
             <div>
@@ -138,12 +138,12 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="lg:col-span-3 bg-ink-600 rounded-2xl p-8 shadow-sm flex flex-col items-center justify-center relative overflow-hidden text-white">
+        <div className="relative flex flex-col items-center justify-center overflow-hidden rounded-2xl bg-ink-600 p-5 text-white shadow-sm sm:p-8 lg:col-span-3">
           <div className="absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-bamboo-400 via-transparent to-transparent"></div>
           <div className="relative z-10 text-center w-full">
             <div className="text-sm text-bamboo-200 font-medium tracking-widest uppercase mb-3">当前时间</div>
-            <div className="text-4xl lg:text-5xl font-light tracking-tight font-mono mb-4 tabular-nums">{formatTime(time)}</div>
-            <div className="inline-block px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/10 text-sm text-bamboo-100 font-medium">
+            <div className="mb-4 font-mono text-3xl font-light tracking-tight tabular-nums sm:text-4xl lg:text-5xl">{formatTime(time)}</div>
+            <div className="inline-block rounded-full border border-white/10 bg-white/10 px-4 py-1.5 text-sm font-medium text-bamboo-100 backdrop-blur-sm">
               {formatDate(time)}
             </div>
           </div>
@@ -151,23 +151,23 @@ export default function Dashboard() {
       </div>
 
       {/* 统计卡片 */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="p-6">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
+        <Card className="p-5 sm:p-6">
           <div className="w-12 h-12 rounded-lg bg-lotus-500 flex items-center justify-center text-white mb-4 shadow-sm"><MapPin size={24} /></div>
           <h3 className="text-3xl font-bold text-ink-600">{stats.attractionCount}</h3>
           <p className="text-sm text-gray-500 mt-1">景点总数</p>
         </Card>
-        <Card className="p-6">
+        <Card className="p-5 sm:p-6">
           <div className="w-12 h-12 rounded-lg bg-lotus-500 flex items-center justify-center text-white mb-4 shadow-sm"><ShoppingBag size={24} /></div>
           <h3 className="text-3xl font-bold text-ink-600">{stats.productCount}</h3>
           <p className="text-sm text-gray-500 mt-1">商品总数</p>
         </Card>
-        <Card className="p-6">
+        <Card className="p-5 sm:p-6">
           <div className="w-12 h-12 rounded-lg bg-lotus-300 flex items-center justify-center text-white mb-4 shadow-sm"><ShoppingCart size={24} /></div>
           <h3 className="text-3xl font-bold text-ink-600">{stats.orderCount}</h3>
           <p className="text-sm text-gray-500 mt-1">订单总数</p>
         </Card>
-        <Card className="p-6">
+        <Card className="p-5 sm:p-6">
           <div className="w-12 h-12 rounded-lg bg-lotus-300 flex items-center justify-center text-white mb-4 shadow-sm"><FileText size={24} /></div>
           <h3 className="text-3xl font-bold text-ink-600">{stats.newsCount}</h3>
           <p className="text-sm text-gray-500 mt-1">资讯总数</p>
@@ -175,14 +175,14 @@ export default function Dashboard() {
       </div>
 
       {/* 图表行 */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card className="p-6 lg:col-span-2">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3 lg:gap-6">
+        <Card className="p-5 sm:p-6 lg:col-span-2">
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-base font-bold text-ink-600 flex items-center gap-2">
               <Activity size={18} className="text-lotus-500" /> 业务分布
             </h3>
           </div>
-          <div className="flex flex-col items-center justify-center h-72 relative">
+          <div className="relative flex h-72 flex-col items-center justify-center">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie data={distributionData} cx="50%" cy="45%" innerRadius={60} outerRadius={90} paddingAngle={0} dataKey="value" stroke="none">
@@ -191,7 +191,7 @@ export default function Dashboard() {
                 <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }} />
               </PieChart>
             </ResponsiveContainer>
-            <div className="w-full mt-4 grid grid-cols-2 gap-y-3 gap-x-2 px-4">
+            <div className="mt-4 grid w-full grid-cols-1 gap-x-2 gap-y-3 px-1 sm:grid-cols-2 sm:px-4">
               {distributionData.map((item, index) => (
                 <div key={index} className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: DIST_COLORS[index] }}></div>
@@ -202,7 +202,7 @@ export default function Dashboard() {
           </div>
         </Card>
 
-        <Card className="p-6">
+        <Card className="p-5 sm:p-6">
           <h3 className="text-base font-bold text-ink-600 mb-6 flex items-center gap-2">
             <ClipboardList size={18} className="text-lotus-500" /> 订单状态
           </h3>
@@ -229,27 +229,27 @@ export default function Dashboard() {
       </div>
 
       {/* 底部行 */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="p-6">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3 lg:gap-6">
+        <Card className="p-5 sm:p-6">
           <h3 className="text-base font-bold text-ink-600 mb-6 flex items-center gap-2">
             <MessageSquare size={18} className="text-lotus-500" /> 论坛活跃度
           </h3>
           <div className="space-y-4">
-            <div className="flex items-center gap-4 bg-gray-50 p-4 rounded-xl">
+            <div className="flex items-center gap-3 rounded-xl bg-gray-50 p-4 sm:gap-4">
               <div className="w-12 h-12 rounded-lg bg-lotus-500 flex items-center justify-center text-white"><FileText size={24} /></div>
               <div>
                 <h4 className="text-xl font-bold text-ink-600">{stats.totalPosts}</h4>
                 <p className="text-sm text-gray-500">总帖子数</p>
               </div>
             </div>
-            <div className="flex items-center gap-4 bg-gray-50 p-4 rounded-xl">
+            <div className="flex items-center gap-3 rounded-xl bg-gray-50 p-4 sm:gap-4">
               <div className="w-12 h-12 rounded-lg bg-lotus-500 flex items-center justify-center text-white"><MessageCircle size={24} /></div>
               <div>
                 <h4 className="text-xl font-bold text-ink-600">{stats.totalComments}</h4>
                 <p className="text-sm text-gray-500">总评论数</p>
               </div>
             </div>
-            <div className="flex items-center gap-4 bg-gray-50 p-4 rounded-xl">
+            <div className="flex items-center gap-3 rounded-xl bg-gray-50 p-4 sm:gap-4">
               <div className="w-12 h-12 rounded-lg bg-lotus-300 flex items-center justify-center text-white"><User size={24} /></div>
               <div>
                 <h4 className="text-xl font-bold text-ink-600">{stats.activeUsers}</h4>
@@ -259,11 +259,11 @@ export default function Dashboard() {
           </div>
         </Card>
 
-        <Card className="p-6">
+        <Card className="p-5 sm:p-6">
           <h3 className="text-base font-bold text-ink-600 mb-6 flex items-center gap-2">
             <Settings size={18} className="text-lotus-500" /> 快捷操作
           </h3>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
             <button onClick={() => navigate('/attractions')} className="bg-bamboo-500 hover:bg-bamboo-400 text-white py-3 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-colors">
               <MapPin size={16} /> 管理景点
             </button>
@@ -285,7 +285,7 @@ export default function Dashboard() {
           </div>
         </Card>
 
-        <Card className="p-6">
+        <Card className="p-5 sm:p-6">
           <h3 className="text-base font-bold text-ink-600 mb-6 flex items-center gap-2">
             <Settings size={18} className="text-lotus-500" /> 系统信息
           </h3>

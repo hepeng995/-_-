@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Card } from '../components/ui/Card';
-import { getRegistrationPage, confirmRegistration, cancelRegistration } from '../api/activity';
-import { activities } from '../mock/activityData';
-import type { ActivityRegistration } from '../types';
+import { MobileFilterPanel } from '../components/ui/MobileFilterPanel';
+import { MobileBatchActionBar } from '../components/ui/MobileBatchActionBar';
+import { MobileDataCard } from '../components/ui/MobileDataCard';
+import { getRegistrationPage, confirmRegistration, cancelRegistration, getActivityPage } from '../api/activity';
+import type { Activity, ActivityRegistration } from '../types';
 import { useToast } from '../contexts/ToastContext';
 import { useConfirm } from '../hooks/useConfirm';
 import { Search } from 'lucide-react';
@@ -18,6 +20,7 @@ export default function ActivityRegistrations() {
   const { confirm, dialog: confirmDialog } = useConfirm();
 
   const [list, setList] = useState<ActivityRegistration[]>([]);
+  const [activities, setActivities] = useState<Activity[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
@@ -51,6 +54,20 @@ export default function ActivityRegistrations() {
   useEffect(() => {
     fetchData();
   }, [current, pageSize]);
+
+  useEffect(() => {
+    const fetchActivities = async () => {
+      try {
+        const res = await getActivityPage({ current: 1, size: 100 });
+        if (res.code === 200 && res.data) {
+          setActivities(res.data.records || []);
+        }
+      } catch (e) {
+        toast.error('获取活动选项失败');
+      }
+    };
+    fetchActivities();
+  }, []);
 
   const handleSearch = () => {
     setCurrent(1);
@@ -127,14 +144,15 @@ export default function ActivityRegistrations() {
       {confirmDialog}
 
       {/* 筛选区域 */}
-      <Card className="p-6">
-        <div className="flex flex-wrap items-center gap-6 mb-6">
-          <div className="flex items-center gap-2">
+      <MobileFilterPanel title="报名筛选与操作">
+        <div className="flex flex-col gap-4">
+        <div className="grid grid-cols-1 gap-3 md:flex md:flex-wrap md:items-center md:gap-6">
+          <div className="flex flex-col gap-1 md:flex-row md:items-center md:gap-2">
             <label className="text-sm text-gray-600">活动</label>
             <select
               value={filterActivityId}
               onChange={(e) => setFilterActivityId(e.target.value)}
-              className="border border-gray-300 rounded px-3 py-1.5 text-sm w-56 bg-white"
+              className="w-full rounded border border-gray-300 bg-white px-3 py-2 text-sm md:w-56 md:py-1.5"
             >
               <option value="">全部活动</option>
               {activities.map((a) => (
@@ -144,12 +162,12 @@ export default function ActivityRegistrations() {
               ))}
             </select>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col gap-1 md:flex-row md:items-center md:gap-2">
             <label className="text-sm text-gray-600">状态</label>
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="border border-gray-300 rounded px-3 py-1.5 text-sm w-32 bg-white"
+              className="w-full rounded border border-gray-300 bg-white px-3 py-2 text-sm md:w-32 md:py-1.5"
             >
               <option value="">全部</option>
               <option value="confirmed">已确认</option>
@@ -159,25 +177,26 @@ export default function ActivityRegistrations() {
           </div>
           <button
             onClick={handleSearch}
-            className="bg-bamboo-500 hover:bg-bamboo-400 text-white px-4 py-1.5 rounded text-sm flex items-center gap-1"
+            className="rounded-2xl bg-bamboo-500 px-4 py-2 text-sm text-white flex items-center justify-center gap-1 md:rounded md:py-1.5"
           >
             <Search size={14} /> 查询
           </button>
           <button
             onClick={handleReset}
-            className="bg-white border border-gray-300 text-gray-600 px-4 py-1.5 rounded text-sm"
+            className="rounded-2xl border border-gray-300 bg-white px-4 py-2 text-sm text-gray-600 md:rounded md:py-1.5"
           >
             重置
           </button>
         </div>
-        <div className="flex items-center gap-3 mt-4">
-          <button onClick={handleBatchConfirm} disabled={selectedIds.length === 0} className="bg-sprout-500 hover:bg-sprout-400 text-white px-4 py-1.5 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed">批量确认</button>
-          <button onClick={handleBatchCancel} disabled={selectedIds.length === 0} className="bg-terracotta-500 hover:bg-terracotta-400 text-white px-4 py-1.5 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed">批量取消</button>
+        <div className="grid grid-cols-2 gap-3 md:flex md:flex-wrap md:items-center">
+          <button onClick={handleBatchConfirm} disabled={selectedIds.length === 0} className="rounded-2xl bg-sprout-500 px-4 py-2 text-sm text-white disabled:opacity-50 disabled:cursor-not-allowed md:rounded md:py-1.5">批量确认</button>
+          <button onClick={handleBatchCancel} disabled={selectedIds.length === 0} className="rounded-2xl bg-terracotta-500 px-4 py-2 text-sm text-white disabled:opacity-50 disabled:cursor-not-allowed md:rounded md:py-1.5">批量取消</button>
         </div>
-      </Card>
+        </div>
+      </MobileFilterPanel>
 
       {/* 表格区域 */}
-      <Card className="p-0 overflow-hidden">
+      <Card className="hidden overflow-hidden p-0 md:block">
         {loading && <div className="p-4 text-center text-sm text-gray-400">加载中...</div>}
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse border border-gray-300">
@@ -301,6 +320,67 @@ export default function ActivityRegistrations() {
           </div>
         </div>
       </Card>
+
+      <div className="space-y-3 md:hidden">
+        {loading && <Card className="p-4 text-center text-sm text-gray-400">加载中...</Card>}
+        {!loading && list.length === 0 && <Card className="p-8 text-center text-sm text-gray-500">暂无数据</Card>}
+        {list.map((item) => (
+          <MobileDataCard
+            key={item.id}
+            title={item.activityTitle}
+            subtitle={item.createdAt || '暂无报名时间'}
+            selected={selectedIds.includes(item.id)}
+            onSelect={() => handleSelectOne(item.id)}
+            tags={[
+              <span key="status" className={`rounded-full border px-2 py-0.5 text-[11px] ${STATUS_MAP[item.status]?.color || ''}`}>
+                {STATUS_MAP[item.status]?.label || item.status}
+              </span>,
+            ]}
+            fields={[
+              { label: '联系人', value: item.contactName || '-' },
+              { label: '手机号', value: item.contactPhone || '-' },
+              { label: '参加人数', value: item.participantCount },
+            ]}
+            details={[
+              { label: '备注', value: item.remark || '-', fullWidth: true },
+            ]}
+            actions={[
+              ...(item.status === 'pending' ? [
+                { label: '确认', onClick: () => handleConfirm(item), tone: 'success' as const },
+                { label: '取消', onClick: () => handleCancel(item), tone: 'danger' as const },
+              ] : []),
+              ...(item.status === 'confirmed' ? [
+                { label: '取消报名', onClick: () => handleCancel(item), tone: 'warning' as const },
+              ] : []),
+            ]}
+          />
+        ))}
+      </div>
+
+      <Card className="p-4 md:hidden">
+        <div className="flex flex-col gap-3 text-sm text-gray-600">
+          <div className="flex items-center justify-between">
+            <span>共 {total} 条</span>
+            <span>{current}/{totalPages || 1}</span>
+          </div>
+          <div className="flex items-center justify-between gap-3">
+            <select value={pageSize} onChange={(e) => { setPageSize(Number(e.target.value)); setCurrent(1); }} className="rounded border border-gray-300 bg-white px-3 py-2">
+              <option value={10}>10条/页</option>
+              <option value={20}>20条/页</option>
+              <option value={50}>50条/页</option>
+            </select>
+            <div className="flex items-center gap-2">
+              <button onClick={() => setCurrent(Math.max(1, current - 1))} disabled={current <= 1} className="rounded-2xl border border-gray-200 px-3 py-2 disabled:opacity-50">&lt;</button>
+              <button onClick={() => setCurrent(Math.min(totalPages, current + 1))} disabled={current >= totalPages} className="rounded-2xl border border-gray-200 px-3 py-2 disabled:opacity-50">&gt;</button>
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      <MobileBatchActionBar count={selectedIds.length}>
+        <button onClick={handleBatchConfirm} className="rounded-full bg-sprout-500 px-3 py-2 text-xs font-medium text-white">确认</button>
+        <button onClick={handleBatchCancel} className="rounded-full bg-terracotta-500 px-3 py-2 text-xs font-medium text-white">取消</button>
+      </MobileBatchActionBar>
     </div>
   );
 }

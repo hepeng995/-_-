@@ -216,7 +216,7 @@
       title="活动报名"
       width="500px"
       :close-on-click-modal="false"
-      class="register-dialog"
+      class="register-dialog mobile-dialog"
     >
       <div class="dialog-activity-info" v-if="activity">
         <h4>{{ activity.title }}</h4>
@@ -264,7 +264,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, nextTick } from 'vue'
+import { ref, reactive, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import {
@@ -348,10 +348,6 @@ const loadRelatedActivities = async (activityId) => {
 // ==================== 跳转其他活动 ====================
 const goToActivity = (id) => {
   router.push(`/activities/${id}`)
-  nextTick(() => {
-    loadActivity()
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  })
 }
 
 // ==================== 报名对话框 ====================
@@ -425,6 +421,18 @@ const submitRegister = async () => {
 onMounted(() => {
   loadActivity()
 })
+
+watch(
+  () => route.params.id,
+  (newId, oldId) => {
+    if (newId && newId !== oldId) {
+      activity.value = null
+      relatedActivities.value = []
+      registerDialogVisible.value = false
+      loadActivity()
+    }
+  }
+)
 </script>
 
 <style scoped>

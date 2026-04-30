@@ -181,7 +181,8 @@ import { Search, MapLocation, ShoppingCart } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/user'
 import { useCartStore } from '@/stores/cart'
 import productApi from '@/api/product'
-import headerBg from '@/assets/image/特产商城背景.png'
+import headerBg from '@/assets/image/特产商城背景.webp'
+import { scrollMainContentToTop } from '@/utils/scroll'
 
 const router = useRouter()
 const route = useRoute()
@@ -287,8 +288,7 @@ const handleSizeChange = (size) => {
 const handleCurrentChange = (page) => {
   searchParams.pageNum = page
   getProducts()
-  // 滚动到顶部
-  window.scrollTo({ top: 0, behavior: 'smooth' })
+  scrollMainContentToTop()
 }
 
 // 加入购物车
@@ -773,8 +773,38 @@ onMounted(() => {
   }
 
   .product-actions {
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 6px;
+  }
+
+  .product-actions .el-button {
+    min-width: 0;
+    min-height: 34px;
+    padding-inline: 8px;
+    font-size: 12px;
+    margin-left: 0;
+  }
+
+  .product-actions :deep(.el-button > span) {
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .product-actions :deep(.el-button .el-icon) {
+    margin: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    line-height: 1;
+    flex-shrink: 0;
   }
 
   .cart-float {
@@ -799,6 +829,24 @@ onMounted(() => {
 
   .product-name {
     font-size: 13px;
+  }
+
+  .product-actions {
+    gap: 4px;
+  }
+
+  .product-actions .el-button {
+    min-height: 32px;
+    padding-inline: 6px;
+    font-size: 11px;
+  }
+
+  .product-actions :deep(.el-button > span) {
+    gap: 3px;
+  }
+
+  .product-actions :deep(.el-button .el-icon) {
+    font-size: 12px;
   }
 }
 </style>

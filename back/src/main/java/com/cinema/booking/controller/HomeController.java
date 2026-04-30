@@ -1,9 +1,18 @@
 package com.cinema.booking.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.cinema.booking.dto.AttractionDTO;
 import com.cinema.booking.dto.CategoryDTO;
 import com.cinema.booking.dto.NewsDTO;
 import com.cinema.booking.dto.ProductDTO;
+import com.cinema.booking.entity.Attraction;
+import com.cinema.booking.entity.News;
+import com.cinema.booking.entity.Order;
+import com.cinema.booking.entity.Product;
+import com.cinema.booking.mapper.AttractionMapper;
+import com.cinema.booking.mapper.NewsMapper;
+import com.cinema.booking.mapper.OrderMapper;
+import com.cinema.booking.mapper.ProductMapper;
 import com.cinema.booking.service.AttractionService;
 import com.cinema.booking.service.NewsService;
 import com.cinema.booking.service.OrderService;
@@ -39,6 +48,10 @@ public class HomeController {
     private final ProductService productService;
     private final NewsService newsService;
     private final OrderService orderService;
+    private final AttractionMapper attractionMapper;
+    private final ProductMapper productMapper;
+    private final NewsMapper newsMapper;
+    private final OrderMapper orderMapper;
     
     @Operation(summary = "获取首页数据")
     @GetMapping("/data")
@@ -76,6 +89,41 @@ public class HomeController {
         
         return Result.ok(homeData);
     }
+
+    @Operation(summary = "获取首页轮播图")
+    @GetMapping("/banners")
+    public Result<List<Map<String, Object>>> getBanners() {
+        List<Map<String, Object>> banners = new ArrayList<>();
+
+        attractionService.getRecommendAttractions(1).stream().findFirst().ifPresent(item ->
+                banners.add(Map.of(
+                        "image", item.getCoverImage(),
+                        "title", item.getName(),
+                        "subtitle", truncate(item.getDescription(), 28),
+                        "path", "/attractions/" + item.getId(),
+                        "buttonText", "查看景点"
+                )));
+
+        productService.getFeaturedProducts(1).stream().findFirst().ifPresent(item ->
+                banners.add(Map.of(
+                        "image", item.getCoverImage(),
+                        "title", item.getName(),
+                        "subtitle", truncate(item.getDescription(), 28),
+                        "path", "/products/" + item.getId(),
+                        "buttonText", "进入商城"
+                )));
+
+        newsService.getFeaturedNews(2).forEach(item ->
+                banners.add(Map.of(
+                        "image", item.getCoverImage(),
+                        "title", item.getTitle(),
+                        "subtitle", truncate(item.getSummary(), 28),
+                        "path", "/news/" + item.getId(),
+                        "buttonText", "查看资讯"
+                )));
+
+        return Result.ok(banners);
+    }
     
     @Operation(summary = "获取乡村概览数据")
     @GetMapping("/overview")
@@ -104,9 +152,9 @@ public class HomeController {
         ));
         
         // 统计数据
-        overview.setAttractionCount(attractionService.getRecommendAttractions(999).size());
-        overview.setProductCount(productService.getFeaturedProducts(999).size());
-        overview.setNewsCount(newsService.getFeaturedNews(999).size());
+        overview.setAttractionCount(Math.toIntExact(countAttractions()));
+        overview.setProductCount(Math.toIntExact(countProducts()));
+        overview.setNewsCount(Math.toIntExact(countNews()));
 
         return Result.ok(overview);
     }
@@ -115,9 +163,9 @@ public class HomeController {
     @GetMapping("/stats")
     public Result<Map<String, Object>> getHomeStats() {
         Map<String, Object> stats = new HashMap<>();
-        stats.put("attractionCount", attractionService.getRecommendAttractions(9999).size());
-        stats.put("productCount", productService.getFeaturedProducts(9999).size());
-        stats.put("newsCount", newsService.getFeaturedNews(9999).size());
+        stats.put("attractionCount", countAttractions());
+        stats.put("productCount", countProducts());
+        stats.put("newsCount", countNews());
         stats.put("orderCount", orderService.getOrderStats().getTotalOrders());
         return Result.ok(stats);
     }
@@ -153,20 +201,12 @@ public class HomeController {
                 dateLabels.add(dayStart.format(DateTimeFormatter.ofPattern("MM-dd")));
             }
             
-            // 统计各类数据（这里使用模拟数据，实际项目中应该查询数据库）
-            // 景点数据
             int attractionCount = getCountByDateRange("attractions", dayStart, dayEnd);
             attractionData.add(attractionCount);
-            
-            // 商品数据
             int productCount = getCountByDateRange("products", dayStart, dayEnd);
             productData.add(productCount);
-            
-            // 订单数据
             int orderCount = getCountByDateRange("orders", dayStart, dayEnd);
             orderData.add(orderCount);
-            
-            // 资讯数据
             int newsCount = getCountByDateRange("news", dayStart, dayEnd);
             newsData.add(newsCount);
         }
@@ -181,26 +221,62 @@ public class HomeController {
     }
     
     private int getCountByDateRange(String table, LocalDateTime start, LocalDateTime end) {
-        // 这里使用简化的逻辑，实际项目中应该注入对应的Service并查询数据库
-        // 为了演示效果，返回基于时间的模拟数据
-        long daysDiff = java.time.Duration.between(start, LocalDateTime.now()).toDays();
-        
         switch (table) {
             case "attractions":
-                // 景点数据：基础值 + 随机增长
-                return (int) (2 + Math.random() * 3 + daysDiff * 0.5);
+                return Math.toIntExact(attractionMapper.selectCount(
+                        new LambdaQueryWrapper<Attraction>()
+                                .eq(Attraction::getDeleted, false)
+                                .between(Attraction::getCreatedAt, start, end)
+                ));
             case "products":
-                // 商品数据：基础值 + 随机增长
-                return (int) (5 + Math.random() * 8 + daysDiff * 0.8);
+                return Math.toIntExact(productMapper.selectCount(
+                        new LambdaQueryWrapper<Product>()
+                                .eq(Product::getDeleted, false)
+                                .between(Product::getCreatedAt, start, end)
+                ));
             case "orders":
-                // 订单数据：基础值 + 随机增长
-                return (int) (3 + Math.random() * 6 + daysDiff * 0.6);
+                return Math.toIntExact(orderMapper.selectCount(
+                        new LambdaQueryWrapper<Order>()
+                                .eq(Order::getDeleted, false)
+                                .between(Order::getCreatedAt, start, end)
+                ));
             case "news":
-                // 资讯数据：基础值 + 随机增长
-                return (int) (1 + Math.random() * 2 + daysDiff * 0.3);
+                return Math.toIntExact(newsMapper.selectCount(
+                        new LambdaQueryWrapper<News>()
+                                .eq(News::getDeleted, false)
+                                .between(News::getCreatedAt, start, end)
+                ));
             default:
                 return 0;
         }
+    }
+
+    private long countAttractions() {
+        return attractionMapper.selectCount(new LambdaQueryWrapper<Attraction>()
+                .eq(Attraction::getDeleted, false)
+                .eq(Attraction::getStatus, 1));
+    }
+
+    private long countProducts() {
+        return productMapper.selectCount(new LambdaQueryWrapper<Product>()
+                .eq(Product::getDeleted, false)
+                .eq(Product::getStatus, 1));
+    }
+
+    private long countNews() {
+        return newsMapper.selectCount(new LambdaQueryWrapper<News>()
+                .eq(News::getDeleted, false)
+                .eq(News::getStatus, 1));
+    }
+
+    private String truncate(String text, int maxLength) {
+        if (text == null || text.isBlank()) {
+            return "查看平台精选内容";
+        }
+        if (text.length() <= maxLength) {
+            return text;
+        }
+        return text.substring(0, maxLength) + "...";
     }
     
     /**

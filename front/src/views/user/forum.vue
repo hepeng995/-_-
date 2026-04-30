@@ -200,6 +200,7 @@
       title="发布建议"
       width="800px"
       :close-on-click-modal="false"
+      class="mobile-dialog mobile-dialog--wide"
     >
       <el-form :model="publishForm" :rules="publishRules" ref="publishFormRef" label-width="100px">
         <el-form-item label="建议标题" prop="title">
@@ -287,7 +288,7 @@ import {
   ChatRound
 } from '@element-plus/icons-vue'
 import { forumPostAPI, forumUtils } from '@/api/forum'
-import headerBg from '@/assets/image/建言献策背景.png'
+import headerBg from '@/assets/image/建言献策背景.webp'
 
 const router = useRouter()
 const userStore = useUserStore()

@@ -33,14 +33,6 @@ public class GlobalExceptionHandler {
         log.error("业务异常: {}", e.getMessage(), e);
         return Result.fail(e.getCode(), e.getMessage());
     }
-    // 你的GlobalExceptionHandler添加
-    @ExceptionHandler(RuntimeException.class)
-    public Result<?> handleAiException(RuntimeException e) {
-        log.error("AI服务异常：{}", e.getMessage());
-        // 🔥 前端友好提示，不暴露系统错误
-        return Result.fail(500, "AI服务繁忙，请稍后再试~", null);
-    }
-
     /**
      * 处理认证异常
      */

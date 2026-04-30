@@ -95,7 +95,7 @@
       </div>
 
       <!-- 头像上传弹窗 -->
-      <el-dialog v-model="showAvatarUpload" title="更换头像" width="400px">
+      <el-dialog v-model="showAvatarUpload" title="更换头像" width="400px" class="mobile-dialog">
         <el-upload
           class="avatar-uploader"
           :action="uploadUrl"
@@ -549,6 +549,44 @@ onMounted(() => {
     width: 100%;
     flex-direction: row;
     justify-content: space-between;
+  }
+
+  .profile-card,
+  .recent-orders-card {
+    padding: 20px;
+  }
+
+  .user-meta {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  :deep(.el-form-item__label) {
+    width: 100% !important;
+    justify-content: flex-start;
+    padding: 0 0 6px;
+  }
+
+  :deep(.el-form-item__content) {
+    margin-left: 0 !important;
+  }
+
+  :deep(.el-form-item:last-child .el-form-item__content) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  :deep(.el-form-item:last-child .el-button) {
+    flex: 1 1 100%;
+    margin-left: 0;
+  }
+
+  .avatar-uploader :deep(.el-upload) {
+    width: min(200px, 100%);
+    height: auto;
+    aspect-ratio: 1;
   }
 }
 </style>

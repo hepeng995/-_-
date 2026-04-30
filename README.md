@@ -418,18 +418,38 @@ npm run dev
 | 论坛 | POST | `/forum/posts` | 创建帖子 |
 | 论坛 | POST | `/forum/posts/{id}/like` | 点赞 / 取消点赞 |
 | AI | POST | `/api/ai/chat` | AI 对话 |
+| AI | GET | `/ai/health` | AI 配置与依赖自检 |
 
 ## 部署
 
 ### Docker Compose 一键部署
 
 ```bash
-# 构建后端 JAR
+# 1. 先编辑 Ubuntu 服务器上的 AI / 第三方接口配置文件
+vim deploy/application-prod.server.yml
+
+# 至少替换以下占位项，否则后端会在启动阶段直接失败
+# - PLEASE_SET_DASHSCOPE_API_KEY
+# - PLEASE_SET_QWEATHER_API_KEY
+# - PLEASE_SET_TIANAPI_API_KEY
+# - PLEASE_SET_AMAP_WEB_KEY
+
+# 2. 构建后端 JAR
 cd back && mvn clean package -DskipTests && cd ..
 
-# 启动全部服务（后端 + Redis + Qdrant）
-docker-compose up -d
+# 3. 校验 Compose 配置
+docker compose -p village-platform config
+
+# 4. 启动全部服务
+docker compose -p village-platform up -d --build
 ```
+
+**说明：**
+
+- `deploy/application-prod.server.yml` 会以挂载文件的形式覆盖容器内的生产 AI 配置。
+- AI 模块使用配置文件直配，不依赖 `DASHSCOPE_API_KEY` 之类的环境变量。
+- 如果 DashScope API Key 未配置或仍然是占位值，后端会在启动阶段直接失败，避免带坏配置上线。
+- 启动后可访问 `GET /api/ai/health` 检查 AI 配置是否生效。
 
 ### 手动部署
 
@@ -440,6 +460,14 @@ cd back
 mvn clean package -DskipTests
 java -jar target/village-revival-system-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod
 ```
+
+如果是 Ubuntu 手动部署，建议直接编辑 `back/src/main/resources/application-prod.yml`，确保以下配置为真实值：
+
+- `langchain4j.open-ai.chat-model.api-key`
+- `cinema.ai.embedding-model-name`
+- `qweather.api-key`
+- `tianapi.api-key`
+- `amap.web-key`
 
 **2. 前端构建**
 

@@ -1,0 +1,50 @@
+langchain4j:
+  open-ai:
+    chat-model:
+      api-key: sk-67eae102ebec4dc99464ef08e40635bd
+      model-name: qwen-turbo
+      log-responses: true
+      log-requests: true
+      base-url: https://dashscope.aliyuncs.com/compatible-mode/v1
+      max-retries: 1
+      timeout: 60s
+      temperature: 0.7
+      max-tokens: 3092
+
+cinema:
+  ai:
+    embedding-model-name: text-embedding-v3
+    qdrant-host: qdrant
+    qdrant-http-port: 6333
+    qdrant-grpc-port: 6334
+    knowledge-collection: village_knowledge_base_qwen_v3_1024
+    knowledge-vector-size: 1024
+    vector-min-score: 0.5
+    smoke-test-query: 有什么特色特产推荐？
+    legacy-collections:
+      - village_knowledge_base
+
+qweather:
+  api-key: a2801b72f2e542b996d08fab62b1eade
+  base-url: https://devapi.qweather.com
+  cache-minutes: 30
+
+tianapi:
+  api-key: dca880bbcd19bf1e4a26035e524b81b6
+  base-url: https://apis.tianapi.com
+  nongye-path: /nongye/index
+  default-num: 20
+  cache-minutes: 60
+
+amap:
+  web-key: 77e1c564894c0b47491fbe4316f018bf
+  text-search-url: https://restapi.amap.com/v5/place/text
+  detail-url: https://restapi.amap.com/v5/place/detail
+  connect-timeout: 5000
+  read-timeout: 10000
+  sync:
+    default-region: 全国
+    default-page-size: 25
+
+app:
+  public-base-url: http://YOUR_DOMAIN_OR_IP:3000

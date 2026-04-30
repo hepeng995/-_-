@@ -9,6 +9,7 @@ export function cn(...inputs: ClassValue[]) {
 interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   children?: ReactNode;
   className?: string;
+  key?: string | number;
 }
 
 export function Card({ children, className, ...props }: CardProps) {

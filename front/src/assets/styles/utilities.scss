@@ -58,9 +58,21 @@
 
 .w-full { width: 100%; }
 .h-full { height: 100%; }
+.min-w-0 { min-width: 0; }
 
 .overflow-hidden { overflow: hidden; }
 .overflow-auto { overflow: auto; }
+.mobile-scroll-x {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.mobile-stack-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
 .truncate {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -125,6 +137,13 @@
 // --- Cursor ---
 .cursor-pointer { cursor: pointer; }
 
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
 // --- Responsive helpers ---
 @media screen and (max-width: 767px) {
   .hidden-mobile { display: none !important; }
@@ -145,6 +164,53 @@
   // 移动端隐藏文字截断
   .mobile-hide {
     display: none !important;
+  }
+
+  .mobile-scroll-x table,
+  .mobile-scroll-x .el-table {
+    min-width: 640px;
+  }
+
+  .mobile-stack-actions > * {
+    flex: 1 1 100%;
+  }
+
+  .mobile-stack-actions > .el-button + .el-button {
+    margin-left: 0;
+  }
+
+  .dialog-footer {
+    width: 100%;
+  }
+
+  .dialog-footer > * {
+    flex: 1 1 100%;
+  }
+
+  .el-form-item__content {
+    min-width: 0;
+  }
+
+  .el-pagination {
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .el-pagination .el-pagination__sizes,
+  .el-pagination .el-pagination__jump,
+  .el-pagination .el-pagination__total {
+    margin: 0 !important;
+  }
+
+  .el-pagination .btn-prev,
+  .el-pagination .btn-next,
+  .el-pagination .el-pager li {
+    min-width: 28px;
+  }
+
+  .el-input-number {
+    max-width: 100%;
   }
 }
 

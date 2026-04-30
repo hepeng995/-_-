@@ -49,7 +49,8 @@ public class SecurityConfig {
                 .requestMatchers("/test").permitAll()
                 .requestMatchers("/file/**").permitAll()
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                // 小程序 MVP 公开浏览接口
+                .requestMatchers("/ai/health").permitAll()
+                // 公开浏览接口（首页、景点、商品、新闻等）
                 .requestMatchers("/home/**").permitAll()
                 .requestMatchers("/attractions/**").permitAll()
                 .requestMatchers("/products/**").permitAll()
@@ -57,6 +58,7 @@ public class SecurityConfig {
                 .requestMatchers("/weather/**").permitAll()
                 .requestMatchers("/trace/**").permitAll()
                 .requestMatchers("/tour-routes/**").permitAll()
+                .requestMatchers("/activities/**").permitAll()
                 // 其他所有请求需要认证
                 .anyRequest().authenticated()
             )

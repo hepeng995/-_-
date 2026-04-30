@@ -1,10 +1,22 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import Components from 'unplugin-vue-components/vite'
+import AutoImport from 'unplugin-auto-import/vite'
+import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
+import viteCompression from 'vite-plugin-compression'
 import path from 'path'
 
-// https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [
+    vue(),
+    AutoImport({
+      resolvers: [ElementPlusResolver()],
+    }),
+    Components({
+      resolvers: [ElementPlusResolver()],
+    }),
+    viteCompression({ algorithm: 'gzip', threshold: 10240 }),
+  ],
   css: {
     preprocessorOptions: {
       scss: {
@@ -16,6 +28,17 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, './src')
     }
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-vue': ['vue', 'vue-router', 'pinia'],
+          'vendor-element-plus': ['element-plus'],
+        }
+      }
+    },
+    chunkSizeWarningLimit: 600,
   },
   server: {
     port: 3000,
@@ -31,21 +54,9 @@ export default defineConfig({
           'Access-Control-Allow-Origin': '*',
           'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
           'Access-Control-Allow-Headers': 'Content-Type, Authorization'
-        },
-        configure: (proxy, options) => {
-          // 代理请求事件
-          proxy.on('error', (err, req, res) => {
-            console.log('代理请求错误:', err);
-          })
-          proxy.on('proxyReq', (proxyReq, req, res) => {
-            console.log('发送请求到目标服务器:', req.url);
-          })
-          proxy.on('proxyRes', (proxyRes, req, res) => {
-            console.log('收到目标服务器响应:', proxyRes.statusCode, req.url);
-          })
         }
       }
     },
     cors: true
   }
-}) 
+})

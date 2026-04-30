@@ -14,11 +14,13 @@
 html,
 body {
   height: 100%;
+  min-height: 100%;
   font-family: var(--font-sans);
   font-size: var(--text-base);
   line-height: var(--leading-normal);
   color: var(--color-text-primary);
   background-color: var(--color-bg-body);
+  overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   // 宣纸底纹
@@ -30,6 +32,8 @@ body {
 
 #app {
   height: 100%;
+  min-height: var(--app-height);
+  min-height: var(--app-dvh);
 }
 
 a {
@@ -83,7 +87,10 @@ img {
 // --- 应用外壳 ---
 .app-layout {
   display: flex;
-  height: 100vh;
+  height: var(--app-height);
+  height: var(--app-dvh);
+  min-height: var(--app-height);
+  min-height: var(--app-dvh);
   overflow: hidden;
 }
 
@@ -139,7 +146,8 @@ img {
   display: flex;
   flex-direction: column;
   margin-left: var(--sidebar-width);
-  min-height: 100vh;
+  min-height: var(--app-height);
+  min-height: var(--app-dvh);
   transition: margin-left var(--duration-slow) var(--ease-flow);
   background-color: var(--color-bg-body);
 
@@ -161,7 +169,8 @@ img {
 
 .app-content__page {
   padding: var(--content-padding);
-  min-height: calc(100vh - 200px);
+  min-height: calc(var(--app-height) - 200px);
+  min-height: calc(var(--app-dvh) - 200px);
 }
 
 // --- 内容区模板控制 ---
@@ -273,6 +282,26 @@ img {
   opacity: 0;
 }
 
+// --- 全局弹窗与表单适配 ---
+.mobile-dialog {
+  width: min(600px, calc(100vw - 24px)) !important;
+  max-width: calc(100vw - 24px) !important;
+}
+
+.mobile-dialog.mobile-dialog--wide {
+  width: min(820px, calc(100vw - 24px)) !important;
+}
+
+.mobile-dialog.mobile-dialog--fullscreen {
+  width: calc(100vw - 16px) !important;
+  max-width: none !important;
+}
+
+.mobile-dialog .el-dialog__body {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
 // ============================================================
 // 响应式
 // ============================================================
@@ -322,6 +351,14 @@ img {
     margin-left: 0 !important;
   }
 
+  .app-content {
+    padding-bottom: var(--safe-area-bottom);
+  }
+
+  .app-content__page {
+    min-height: calc(var(--app-dvh) - var(--mobile-header-height) - 160px);
+  }
+
   .app-footer .footer-grid {
     grid-template-columns: 1fr 1fr;
     gap: var(--space-5);
@@ -346,6 +383,28 @@ img {
     font-size: 11px;
     margin-top: var(--space-5);
     padding-top: var(--space-3);
+  }
+
+  .mobile-dialog {
+    width: var(--mobile-dialog-width) !important;
+    max-width: var(--mobile-dialog-width) !important;
+    margin: max(12px, var(--safe-area-top)) auto !important;
+  }
+
+  .mobile-dialog.mobile-dialog--fullscreen {
+    width: calc(100vw - 16px) !important;
+    max-width: calc(100vw - 16px) !important;
+    min-height: calc(var(--app-dvh) - 16px);
+    margin: 8px auto !important;
+  }
+
+  .mobile-dialog .el-dialog__body {
+    max-height: calc(var(--app-dvh) - 144px);
+    padding-bottom: calc(20px + var(--safe-area-bottom));
+  }
+
+  .mobile-dialog.mobile-dialog--fullscreen .el-dialog__body {
+    max-height: calc(var(--app-dvh) - 120px);
   }
 }
 

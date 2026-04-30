@@ -198,7 +198,8 @@ const changePassword = async () => {
 
 <style scoped>
 .change-password {
-  min-height: 100vh;
+  min-height: var(--app-height);
+  min-height: var(--app-dvh);
   background: var(--color-bg-body);
   padding: 40px 0;
 }
@@ -314,8 +315,25 @@ const changePassword = async () => {
     padding: 20px;
   }
 
-  .el-form :deep(.el-form-item__label) {
-    width: 100px !important;
+  :deep(.el-form-item__label) {
+    width: 100% !important;
+    justify-content: flex-start;
+    padding: 0 0 6px;
+  }
+
+  :deep(.el-form-item__content) {
+    margin-left: 0 !important;
+  }
+
+  :deep(.el-form-item:last-child .el-form-item__content) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  :deep(.el-form-item:last-child .el-button) {
+    flex: 1 1 100%;
+    margin-left: 0;
   }
 }
 </style>

@@ -1,5 +1,25 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { nextTick } from 'vue'
 import { useUserStore } from '@/stores/user'
+import { scrollToTop } from '@/utils/scroll'
+
+const getAdminBaseUrl = () => {
+  const configured = import.meta.env.VITE_ADMIN_URL
+  if (configured) {
+    return configured.replace(/\/$/, '')
+  }
+  const { protocol, hostname, port, origin } = window.location
+  if (import.meta.env.DEV && port === '3000') {
+    return `${protocol}//${hostname}:3001`
+  }
+  return `${origin}/admin`
+}
+
+const redirectToAdmin = (fullPath = '/admin') => {
+  const base = getAdminBaseUrl()
+  const suffix = fullPath.replace(/^\/admin/, '')
+  window.location.href = `${base}${suffix}`
+}
 
 const routes = [
   {
@@ -209,7 +229,7 @@ const routes = [
     path: '/admin',
     name: 'admin',
     beforeEnter: (to) => {
-      window.location.href = 'http://localhost:3001' + to.fullPath
+      redirectToAdmin(to.fullPath)
     },
     meta: { title: '后台管理', requiresAuth: true, roles: ['ADMIN'] }
   },
@@ -217,7 +237,7 @@ const routes = [
     path: '/admin/:pathMatch(.*)*',
     name: 'adminCatchAll',
     beforeEnter: (to) => {
-      window.location.href = 'http://localhost:3001' + to.fullPath
+      redirectToAdmin(to.fullPath)
     },
     meta: { title: '后台管理', requiresAuth: true, roles: ['ADMIN'] }
   },
@@ -241,7 +261,7 @@ router.beforeEach(async (to, from, next) => {
   // 根路径重定向
   if (to.path === '/') {
     if (isLoggedIn && userStore.userRole === 'ADMIN') {
-      window.location.href = 'http://localhost:3001'
+      redirectToAdmin('/admin')
       return
     }
     next('/home')
@@ -273,6 +293,17 @@ router.beforeEach(async (to, from, next) => {
   }
 
   next()
+})
+
+router.afterEach(async (to) => {
+  const usesUserLayout = to.matched.some((record) => record.path === '/')
+
+  if (usesUserLayout) {
+    return
+  }
+
+  await nextTick()
+  scrollToTop(window)
 })
 
 export default router

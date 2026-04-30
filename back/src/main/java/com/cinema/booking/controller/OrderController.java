@@ -210,6 +210,23 @@ public class OrderController {
         OrderDTO confirmed = orderService.confirmReceived(id);
         return Result.ok(confirmed);
     }
+
+    @Operation(summary = "删除订单")
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @SystemOperation(module = "订单管理", operation = "删除订单", description = "管理员逻辑删除订单")
+    public Result<Void> deleteOrder(@PathVariable Long id) {
+        Order order = orderMapper.selectById(id);
+        if (order == null || order.getDeleted()) {
+            return Result.error("订单不存在");
+        }
+        Order updateOrder = new Order();
+        updateOrder.setId(id);
+        updateOrder.setDeleted(true);
+        updateOrder.setUpdatedAt(java.time.LocalDateTime.now());
+        orderMapper.updateById(updateOrder);
+        return Result.ok();
+    }
     
     @Operation(summary = "模拟支付")
     @PostMapping("/pay")

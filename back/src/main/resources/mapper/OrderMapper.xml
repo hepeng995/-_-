@@ -59,4 +59,35 @@
         AND created_at &lt; DATE_SUB(NOW(), INTERVAL #{timeoutMinutes} MINUTE)
     </select>
 
+    <select id="countCompletedOrderItemsForReview" resultType="integer">
+        SELECT COUNT(*)
+        FROM orders o
+        INNER JOIN order_items oi ON oi.order_id = o.id
+        WHERE o.deleted = 0
+          AND o.user_id = #{userId}
+          AND o.id = #{orderId}
+          AND oi.product_id = #{productId}
+          AND o.order_status = 4
+          AND o.payment_status = 1
+    </select>
+
+    <select id="selectLatestReviewableOrderId" resultType="long">
+        SELECT o.id
+        FROM orders o
+        INNER JOIN order_items oi ON oi.order_id = o.id
+        LEFT JOIN product_reviews pr
+            ON pr.order_id = o.id
+           AND pr.product_id = oi.product_id
+           AND pr.user_id = o.user_id
+           AND pr.deleted = 0
+        WHERE o.deleted = 0
+          AND o.user_id = #{userId}
+          AND oi.product_id = #{productId}
+          AND o.order_status = 4
+          AND o.payment_status = 1
+          AND pr.id IS NULL
+        ORDER BY COALESCE(o.received_time, o.updated_at, o.created_at) DESC
+        LIMIT 1
+    </select>
+
 </mapper>

@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Card } from '../components/ui/Card';
 import { Modal } from '../components/ui/Modal';
-import { X } from 'lucide-react';
+import { MobileFilterPanel } from '../components/ui/MobileFilterPanel';
+import { MobileBatchActionBar } from '../components/ui/MobileBatchActionBar';
+import { MobileDataCard } from '../components/ui/MobileDataCard';
 import * as orderApi from '../api/order';
 import type { Order, OrderItem } from '../types';
 import { useToast } from '../contexts/ToastContext';
@@ -95,25 +97,27 @@ export default function Orders() {
     <div className="space-y-6">
       {confirmDialog}
       {promptDialog}
-      <Card className="p-6">
-        <div className="flex flex-wrap items-center gap-6 mb-6">
-          <div className="flex items-center gap-2"><label className="text-sm text-gray-600">订单号</label><input type="text" value={filterOrderNo} onChange={(e) => setFilterOrderNo(e.target.value)} placeholder="搜索订单号" className="border border-gray-300 rounded px-3 py-1.5 text-sm w-48 focus:outline-none focus-visible:ring-2 focus-visible:ring-bamboo-500/40 focus-visible:border-bamboo-500" /></div>
-          <div className="flex items-center gap-2"><label className="text-sm text-gray-600">订单状态</label>
-            <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="border border-gray-300 rounded px-3 py-1.5 text-sm w-32 bg-white">
+      <MobileFilterPanel title="订单筛选与操作">
+        <div className="flex flex-col gap-4">
+          <div className="grid grid-cols-1 gap-3 md:flex md:flex-wrap md:items-center md:gap-6">
+            <div className="flex flex-col gap-1 md:flex-row md:items-center md:gap-2"><label className="text-sm text-gray-600">订单号</label><input type="text" value={filterOrderNo} onChange={(e) => setFilterOrderNo(e.target.value)} placeholder="搜索订单号" className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-bamboo-500/40 focus-visible:border-bamboo-500 md:w-48 md:py-1.5" /></div>
+            <div className="flex flex-col gap-1 md:flex-row md:items-center md:gap-2"><label className="text-sm text-gray-600">订单状态</label>
+            <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="w-full rounded border border-gray-300 bg-white px-3 py-2 text-sm md:w-32 md:py-1.5">
               <option value="">全部</option>
               {Object.entries(ORDER_STATUS_MAP).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
             </select>
+            </div>
           </div>
-          <button onClick={handleSearch} className="bg-bamboo-500 hover:bg-bamboo-400 text-white px-4 py-1.5 rounded text-sm">查询</button>
-          <button onClick={handleReset} className="bg-white border border-gray-300 text-gray-600 px-4 py-1.5 rounded text-sm">重置</button>
+          <div className="grid grid-cols-2 gap-3 md:flex md:flex-wrap md:items-center">
+            <button onClick={handleSearch} className="rounded-2xl bg-bamboo-500 px-4 py-2 text-sm text-white hover:bg-bamboo-400 md:rounded md:py-1.5">查询</button>
+            <button onClick={handleReset} className="rounded-2xl border border-gray-300 bg-white px-4 py-2 text-sm text-gray-600 md:rounded md:py-1.5">重置</button>
+            <button onClick={handleBatchShip} disabled={selectedIds.length === 0} className="rounded-2xl bg-bamboo-500 px-4 py-2 text-sm text-white disabled:cursor-not-allowed disabled:opacity-50 md:rounded md:py-1.5">批量发货</button>
+            <button onClick={handleBatchCancel} disabled={selectedIds.length === 0} className="rounded-2xl bg-terracotta-500 px-4 py-2 text-sm text-white disabled:cursor-not-allowed disabled:opacity-50 md:rounded md:py-1.5">批量取消</button>
+          </div>
         </div>
-        <div className="flex items-center gap-3 mt-4">
-          <button onClick={handleBatchShip} disabled={selectedIds.length === 0} className="bg-bamboo-500 hover:bg-bamboo-400 text-white px-4 py-1.5 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed">批量发货</button>
-          <button onClick={handleBatchCancel} disabled={selectedIds.length === 0} className="bg-terracotta-500 hover:bg-terracotta-400 text-white px-4 py-1.5 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed">批量取消</button>
-        </div>
-      </Card>
+      </MobileFilterPanel>
 
-      <Card className="p-0 overflow-hidden">
+      <Card className="hidden overflow-hidden p-0 md:block">
         {loading && <div className="p-4 text-center text-sm text-gray-400">加载中...</div>}
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse border border-gray-300">
@@ -158,46 +162,124 @@ export default function Orders() {
         </div>
       </Card>
 
-      {/* 订单详情弹窗 */}
-      {isDetailOpen && detailOrder && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white rounded-lg shadow-xl w-[700px] max-w-[90vw] max-h-[85vh] overflow-y-auto">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-              <h3 className="text-lg font-medium text-gray-800">订单详情 - {detailOrder.orderNo}</h3>
-              <button onClick={() => setIsDetailOpen(false)} className="text-gray-400 hover:text-gray-600"><X size={20} /></button>
+      <div className="space-y-3 md:hidden">
+        {loading && <Card className="p-4 text-center text-sm text-gray-400">加载中...</Card>}
+        {!loading && orders.length === 0 && <Card className="p-8 text-center text-sm text-gray-500">暂无数据</Card>}
+        {orders.map((order) => (
+          <MobileDataCard
+            key={order.id}
+            title={order.orderNo}
+            subtitle={order.createdAt ? `创建时间：${order.createdAt}` : '暂无创建时间'}
+            selected={selectedIds.includes(order.id)}
+            onSelect={() => handleSelectOne(order.id)}
+            tags={[
+              <span key="status" className="rounded-full border border-bamboo-200 bg-bamboo-50 px-2 py-0.5 text-[11px] text-bamboo-500">
+                {ORDER_STATUS_MAP[order.orderStatus] || '-'}
+              </span>,
+              <span key="payment" className={`rounded-full px-2 py-0.5 text-[11px] ${order.paymentStatus === 1 ? 'bg-sprout-50 text-sprout-500' : 'bg-harvest-50 text-harvest-500'}`}>
+                {PAYMENT_STATUS_MAP[order.paymentStatus] || '-'}
+              </span>,
+            ]}
+            fields={[
+              { label: '实付金额', value: `¥${order.actualAmount}` },
+              { label: '收货人', value: order.deliveryName || '-' },
+              { label: '支付方式', value: PAYMENT_METHOD_MAP[order.paymentMethod] || order.paymentMethod || '-' },
+            ]}
+            details={[
+              { label: '联系电话', value: order.deliveryPhone || '-' },
+              { label: '收货地址', value: order.deliveryAddress || '-', fullWidth: true },
+            ]}
+            actions={[
+              { label: '详情', onClick: () => handleViewDetail(order), tone: 'primary' },
+              ...getActions(order).map((action) => {
+                const tone: 'danger' | 'success' | 'warning' = action.color.includes('terracotta')
+                  ? 'danger'
+                  : action.color.includes('sprout')
+                    ? 'success'
+                    : 'warning';
+
+                return {
+                  label: action.label,
+                  onClick: action.action,
+                  tone,
+                };
+              }),
+            ]}
+          />
+        ))}
+      </div>
+
+      <Card className="p-4 md:hidden">
+        <div className="flex flex-col gap-3 text-sm text-gray-600">
+          <div className="flex items-center justify-between">
+            <span>共 {total} 条</span>
+            <span>{current}/{totalPages || 1}</span>
+          </div>
+          <div className="flex items-center justify-between gap-3">
+            <select value={pageSize} onChange={(e) => { setPageSize(Number(e.target.value)); setCurrent(1); }} className="rounded border border-gray-300 bg-white px-3 py-2">
+              <option value={10}>10条/页</option><option value={20}>20条/页</option><option value={50}>50条/页</option>
+            </select>
+            <div className="flex items-center gap-2">
+              <button onClick={() => setCurrent(Math.max(1, current - 1))} disabled={current <= 1} className="rounded-2xl border border-gray-200 px-3 py-2 disabled:opacity-50">&lt;</button>
+              <button onClick={() => setCurrent(Math.min(totalPages, current + 1))} disabled={current >= totalPages} className="rounded-2xl border border-gray-200 px-3 py-2 disabled:opacity-50">&gt;</button>
             </div>
-            <div className="p-6 space-y-4">
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div><span className="text-gray-500">收货人：</span>{detailOrder.deliveryName}</div>
-                <div><span className="text-gray-500">联系电话：</span>{detailOrder.deliveryPhone}</div>
-                <div className="col-span-2"><span className="text-gray-500">收货地址：</span>{detailOrder.deliveryAddress}</div>
-                <div><span className="text-gray-500">订单金额：</span>¥{detailOrder.totalAmount}</div>
-                <div><span className="text-gray-500">实付金额：</span><span className="text-terracotta-500 font-bold">¥{detailOrder.actualAmount}</span></div>
-                <div><span className="text-gray-500">支付方式：</span>{PAYMENT_METHOD_MAP[detailOrder.paymentMethod] || detailOrder.paymentMethod}</div>
-                <div><span className="text-gray-500">订单状态：</span>{ORDER_STATUS_MAP[detailOrder.orderStatus]}</div>
-                <div><span className="text-gray-500">创建时间：</span>{detailOrder.createdAt}</div>
-                {detailOrder.remark && <div className="col-span-2"><span className="text-gray-500">备注：</span>{detailOrder.remark}</div>}
-              </div>
-              {detailOrder.orderItems && detailOrder.orderItems.length > 0 && (
-                <div>
-                  <h4 className="font-medium text-gray-700 mb-2">商品列表</h4>
-                  <table className="w-full text-sm border border-gray-200">
-                    <thead><tr className="bg-gray-50"><th className="py-2 px-3 border text-center">商品</th><th className="py-2 px-3 border text-center">单价</th><th className="py-2 px-3 border text-center">数量</th><th className="py-2 px-3 border text-center">小计</th></tr></thead>
+          </div>
+        </div>
+      </Card>
+
+      <MobileBatchActionBar count={selectedIds.length}>
+        <button onClick={handleBatchShip} className="rounded-full bg-bamboo-500 px-3 py-2 text-xs font-medium text-white">发货</button>
+        <button onClick={handleBatchCancel} className="rounded-full bg-terracotta-500 px-3 py-2 text-xs font-medium text-white">取消</button>
+      </MobileBatchActionBar>
+
+      {/* 订单详情弹窗 */}
+      <Modal isOpen={isDetailOpen && !!detailOrder} onClose={() => setIsDetailOpen(false)} title={detailOrder ? `订单详情 - ${detailOrder.orderNo}` : '订单详情'} className="max-w-3xl">
+        {detailOrder && (
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2">
+              <div><span className="text-gray-500">收货人：</span>{detailOrder.deliveryName}</div>
+              <div><span className="text-gray-500">联系电话：</span>{detailOrder.deliveryPhone}</div>
+              <div className="sm:col-span-2"><span className="text-gray-500">收货地址：</span>{detailOrder.deliveryAddress}</div>
+              <div><span className="text-gray-500">订单金额：</span>¥{detailOrder.totalAmount}</div>
+              <div><span className="text-gray-500">实付金额：</span><span className="font-bold text-terracotta-500">¥{detailOrder.actualAmount}</span></div>
+              <div><span className="text-gray-500">支付方式：</span>{PAYMENT_METHOD_MAP[detailOrder.paymentMethod] || detailOrder.paymentMethod}</div>
+              <div><span className="text-gray-500">订单状态：</span>{ORDER_STATUS_MAP[detailOrder.orderStatus]}</div>
+              <div><span className="text-gray-500">创建时间：</span>{detailOrder.createdAt}</div>
+              {detailOrder.remark && <div className="sm:col-span-2"><span className="text-gray-500">备注：</span>{detailOrder.remark}</div>}
+            </div>
+            {detailOrder.orderItems && detailOrder.orderItems.length > 0 && (
+              <div>
+                <h4 className="mb-2 font-medium text-gray-700">商品列表</h4>
+                <div className="hidden overflow-x-auto sm:block">
+                  <table className="w-full border border-gray-200 text-sm">
+                    <thead><tr className="bg-gray-50"><th className="border py-2 px-3 text-center">商品</th><th className="border py-2 px-3 text-center">单价</th><th className="border py-2 px-3 text-center">数量</th><th className="border py-2 px-3 text-center">小计</th></tr></thead>
                     <tbody>
                       {detailOrder.orderItems.map((item, i) => (
-                        <tr key={i}><td className="py-2 px-3 border text-center">{item.productName}</td><td className="py-2 px-3 border text-center">¥{item.productPrice}</td><td className="py-2 px-3 border text-center">{item.quantity}</td><td className="py-2 px-3 border text-center">¥{item.totalPrice}</td></tr>
+                        <tr key={i}><td className="border py-2 px-3 text-center">{item.productName}</td><td className="border py-2 px-3 text-center">¥{item.productPrice}</td><td className="border py-2 px-3 text-center">{item.quantity}</td><td className="border py-2 px-3 text-center">¥{item.totalPrice}</td></tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
-              )}
-            </div>
-            <div className="px-6 py-4 border-t border-gray-100 flex justify-end">
-              <button onClick={() => setIsDetailOpen(false)} className="px-4 py-2 border border-gray-300 rounded text-sm text-gray-600 hover:bg-gray-50">关闭</button>
+                <div className="space-y-3 sm:hidden">
+                  {detailOrder.orderItems.map((item, i) => (
+                    <Card key={i} className="p-4">
+                      <p className="text-sm font-semibold text-ink-600">{item.productName}</p>
+                      <div className="mt-3 grid grid-cols-3 gap-2 text-xs text-gray-500">
+                        <div className="rounded-2xl bg-gray-50 px-3 py-2">单价：¥{item.productPrice}</div>
+                        <div className="rounded-2xl bg-gray-50 px-3 py-2">数量：{item.quantity}</div>
+                        <div className="rounded-2xl bg-gray-50 px-3 py-2">小计：¥{item.totalPrice}</div>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
+            <div className="flex justify-end pt-2">
+              <button onClick={() => setIsDetailOpen(false)} className="w-full rounded-2xl border border-gray-300 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 sm:w-auto sm:rounded">关闭</button>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </Modal>
     </div>
   );
 }

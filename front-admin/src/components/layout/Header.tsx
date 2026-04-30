@@ -1,10 +1,17 @@
 import { useState, useRef, useEffect } from 'react';
-import { Search, Bell, User, Settings, LogOut, Home } from 'lucide-react';
+import { Bell, User, Settings, LogOut, Home, Menu } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { useLocation } from 'react-router-dom';
+import { findActiveNavLabel } from './navigation';
 
-export function Header() {
+interface HeaderProps {
+  onOpenSidebar?: () => void;
+}
+
+export function Header({ onOpenSidebar }: HeaderProps) {
   const { userInfo, logout } = useAuth();
+  const location = useLocation();
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
@@ -27,13 +34,37 @@ export function Header() {
   const displayName = userInfo?.realName || userInfo?.username || '管理员';
   const displayRole = userInfo?.role === 'ADMIN' ? '超级管理员' : userInfo?.role === 'STAFF' ? '工作人员' : '普通用户';
   const avatarUrl = userInfo?.avatar;
+  const currentLabel = findActiveNavLabel(location.pathname);
+  const frontUrl = (() => {
+    if (import.meta.env.VITE_FRONT_URL) return import.meta.env.VITE_FRONT_URL;
+    const { protocol, hostname, port, origin } = window.location;
+    if (import.meta.env.DEV && port === '3001') {
+      return `${protocol}//${hostname}:3000`;
+    }
+    return origin;
+  })();
 
   return (
-    <header className="h-20 px-8 flex items-center justify-end bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-30">
-      <div className="flex items-center gap-4">
+    <header className="fixed inset-x-0 top-0 z-30 flex h-16 items-center justify-between border-b border-gray-100 bg-white/90 px-3 shadow-[0_4px_18px_rgba(12,27,36,0.06)] backdrop-blur-md sm:h-18 sm:px-4 md:left-64 lg:h-20 lg:px-8">
+      <div className="flex min-w-0 items-center gap-3">
+        <button
+          type="button"
+          onClick={onOpenSidebar}
+          className="flex h-10 w-10 items-center justify-center rounded-2xl border border-gray-200 text-gray-600 transition-colors hover:border-bamboo-200 hover:text-bamboo-500 md:hidden"
+        >
+          <Menu className="h-5 w-5" />
+        </button>
+
+        <div className="min-w-0 md:hidden">
+          <p className="text-xs uppercase tracking-[0.2em] text-gray-400">后台管理</p>
+          <p className="truncate text-sm font-semibold text-ink-600">{currentLabel}</p>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-2 sm:gap-3 lg:gap-4">
         <a
-          href="http://localhost:3000"
-          className="flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-bamboo-500 hover:bg-bamboo-50 px-3 py-2 rounded-full transition-all"
+          href={frontUrl}
+          className="flex items-center gap-1.5 rounded-full px-2 py-2 text-sm font-medium text-gray-500 transition-all hover:bg-bamboo-50 hover:text-bamboo-500 sm:px-3"
           title="返回前台"
         >
           <Home className="w-4 h-4" />
@@ -43,7 +74,7 @@ export function Header() {
         <div className="relative" ref={notifRef}>
           <button
             onClick={() => setIsNotifOpen(!isNotifOpen)}
-            className="relative p-2 text-gray-400 hover:text-bamboo-500 hover:bg-bamboo-50 rounded-full transition-all"
+            className="relative rounded-full p-2 text-gray-400 transition-all hover:bg-bamboo-50 hover:text-bamboo-500"
           >
             <Bell className="w-5 h-5" />
             <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
@@ -62,7 +93,7 @@ export function Header() {
           )}
         </div>
 
-        <div className="relative flex items-center gap-3 pl-2 border-l border-gray-200" ref={profileRef}>
+        <div className="relative flex items-center gap-2 border-l border-gray-200 pl-2 sm:gap-3" ref={profileRef}>
           <div className="hidden md:block text-right cursor-pointer" onClick={() => setIsProfileOpen(!isProfileOpen)}>
             <p className="text-sm font-bold text-gray-700 leading-tight">{displayName}</p>
             <p className="text-xs text-gray-500">{displayRole}</p>

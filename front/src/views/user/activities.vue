@@ -155,7 +155,7 @@
       title="活动报名"
       width="500px"
       :close-on-click-modal="false"
-      class="register-dialog"
+      class="register-dialog mobile-dialog"
     >
       <div class="dialog-activity-info" v-if="registeringActivity">
         <h4>{{ registeringActivity.title }}</h4>
@@ -207,7 +207,8 @@ import {
   Clock, Location
 } from '@element-plus/icons-vue'
 import activityApi from '@/api/activity'
-import headerBg from '@/assets/image/景点活动背景.png'
+import headerBg from '@/assets/image/景点活动背景.webp'
+import { scrollMainContentToTop } from '@/utils/scroll'
 
 const router = useRouter()
 
@@ -294,7 +295,7 @@ const loadListData = async () => {
 const handleListPageChange = (page) => {
   listCurrent.value = page
   loadListData()
-  window.scrollTo({ top: 0, behavior: 'smooth' })
+  scrollMainContentToTop()
 }
 
 // 监听列表分类切换
@@ -795,6 +796,38 @@ onMounted(() => {
     -webkit-line-clamp: 2;
   }
 
+  .card-bottom {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .card-fee {
+    font-size: 16px;
+    line-height: 1.2;
+  }
+
+  .card-progress {
+    width: 100%;
+    min-width: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .card-progress :deep(.el-progress) {
+    width: 100% !important;
+    min-width: 0;
+  }
+
+  .progress-label {
+    flex: 0 0 auto;
+    font-size: 11px;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
   .activity-card:hover {
     transform: none;
   }
@@ -824,6 +857,18 @@ onMounted(() => {
 
   .card-title {
     font-size: 13px;
+  }
+
+  .card-bottom {
+    gap: 6px;
+  }
+
+  .card-progress {
+    gap: 4px;
+  }
+
+  .progress-label {
+    font-size: 10px;
   }
 
   .list-tabs {

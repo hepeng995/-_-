@@ -156,6 +156,7 @@
         v-model="showAddressDialog" 
         title="选择收货地址" 
         width="600px"
+        class="mobile-dialog"
         :before-close="handleAddressDialogClose"
       >
         <div class="address-list">
@@ -397,7 +398,8 @@ onMounted(() => {
 
 <style scoped>
 .order-confirm {
-  min-height: 100vh;
+  min-height: var(--app-height);
+  min-height: var(--app-dvh);
   background: var(--color-bg-body);
   padding: 40px 0;
 }
@@ -481,6 +483,7 @@ onMounted(() => {
   align-items: center;
   gap: 12px;
   margin-bottom: 8px;
+  flex-wrap: wrap;
 }
 
 .receiver-name {
@@ -580,7 +583,7 @@ onMounted(() => {
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  padding: 40px;
+  padding: 24px;
   margin-bottom: 12px;
   border: 1px solid var(--color-border);
   border-radius: 8px;
@@ -724,6 +727,13 @@ onMounted(() => {
   background: #eff6ff;
 }
 
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
 /* 响应式设计 */
 @media (max-width: 968px) {
   .container {
@@ -746,6 +756,19 @@ onMounted(() => {
     gap: 12px;
   }
 
+  .address-card,
+  .address-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .address-actions {
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+  }
+
   .product-price,
   .product-subtotal {
     grid-column: 1 / -1;
@@ -758,12 +781,15 @@ onMounted(() => {
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
+    padding: 16px;
   }
 
-  .address-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
+  .delivery-fee {
+    margin-left: 0;
+  }
+
+  .dialog-footer > * {
+    flex: 1 1 100%;
   }
 }
 </style>

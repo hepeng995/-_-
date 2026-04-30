@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Card } from '../components/ui/Card';
 import { Modal } from '../components/ui/Modal';
+import { MobileFilterPanel } from '../components/ui/MobileFilterPanel';
+import { MobileBatchActionBar } from '../components/ui/MobileBatchActionBar';
+import { MobileDataCard } from '../components/ui/MobileDataCard';
 import { AlertCircle, User as UserIcon } from 'lucide-react';
 import * as userApi from '../api/user';
 import type { User } from '../types';
@@ -199,53 +202,53 @@ export default function Users() {
     <div className="space-y-6">
       {confirmDialog}
       {/* 筛选 & 操作 */}
-      <Card className="p-6">
-        <div className="flex flex-wrap items-center gap-6 mb-6">
-          <div className="flex items-center gap-2">
-            <label className="text-sm text-gray-600 whitespace-nowrap">用户名</label>
+      <MobileFilterPanel title="用户筛选与操作">
+        <div className="flex flex-col gap-4">
+          <div className="grid grid-cols-1 gap-3 md:flex md:flex-wrap md:items-center md:gap-6">
+            <div className="flex flex-col gap-1 md:flex-row md:items-center md:gap-2">
+              <label className="text-sm text-gray-600 whitespace-nowrap">用户名</label>
             <input type="text" placeholder="请输入用户名" value={filterUsername}
               onChange={(e) => setFilterUsername(e.target.value)}
-              className="border border-gray-300 rounded px-3 py-1.5 text-sm w-48 focus:outline-none focus-visible:ring-2 focus-visible:ring-bamboo-500/40 focus-visible:border-bamboo-500 transition-colors" />
-          </div>
-          <div className="flex items-center gap-2">
-            <label className="text-sm text-gray-600 whitespace-nowrap">邮箱</label>
+              className="w-full rounded border border-gray-300 px-3 py-2 text-sm transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-bamboo-500/40 focus-visible:border-bamboo-500 md:w-48 md:py-1.5" />
+            </div>
+            <div className="flex flex-col gap-1 md:flex-row md:items-center md:gap-2">
+              <label className="text-sm text-gray-600 whitespace-nowrap">邮箱</label>
             <input type="text" placeholder="请输入邮箱" value={filterEmail}
               onChange={(e) => setFilterEmail(e.target.value)}
-              className="border border-gray-300 rounded px-3 py-1.5 text-sm w-48 focus:outline-none focus-visible:ring-2 focus-visible:ring-bamboo-500/40 focus-visible:border-bamboo-500 transition-colors" />
-          </div>
-          <div className="flex items-center gap-2">
-            <label className="text-sm text-gray-600 whitespace-nowrap">手机号</label>
+              className="w-full rounded border border-gray-300 px-3 py-2 text-sm transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-bamboo-500/40 focus-visible:border-bamboo-500 md:w-48 md:py-1.5" />
+            </div>
+            <div className="flex flex-col gap-1 md:flex-row md:items-center md:gap-2">
+              <label className="text-sm text-gray-600 whitespace-nowrap">手机号</label>
             <input type="text" placeholder="请输入手机号" value={filterPhone}
               onChange={(e) => setFilterPhone(e.target.value)}
-              className="border border-gray-300 rounded px-3 py-1.5 text-sm w-48 focus:outline-none focus-visible:ring-2 focus-visible:ring-bamboo-500/40 focus-visible:border-bamboo-500 transition-colors" />
-          </div>
-          <div className="flex items-center gap-2">
-            <label className="text-sm text-gray-600 whitespace-nowrap">状态</label>
+              className="w-full rounded border border-gray-300 px-3 py-2 text-sm transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-bamboo-500/40 focus-visible:border-bamboo-500 md:w-48 md:py-1.5" />
+            </div>
+            <div className="flex flex-col gap-1 md:flex-row md:items-center md:gap-2">
+              <label className="text-sm text-gray-600 whitespace-nowrap">状态</label>
             <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}
-              className="border border-gray-300 rounded px-3 py-1.5 text-sm w-32 focus:outline-none focus-visible:ring-2 focus-visible:ring-bamboo-500/40 focus-visible:border-bamboo-500 bg-white transition-colors">
+              className="w-full rounded border border-gray-300 bg-white px-3 py-2 text-sm transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-bamboo-500/40 focus-visible:border-bamboo-500 md:w-32 md:py-1.5">
               <option value=""></option>
               <option value="启用">启用</option>
               <option value="禁用">禁用</option>
             </select>
           </div>
-          <div className="flex items-center gap-2 ml-2">
-            <button onClick={handleSearch} className="bg-bamboo-500 hover:bg-bamboo-400 text-white px-4 py-1.5 rounded text-sm transition-colors">查询</button>
-            <button onClick={handleResetFilters} className="bg-white border border-gray-300 hover:text-bamboo-500 hover:border-bamboo-500 text-gray-600 px-4 py-1.5 rounded text-sm transition-colors">重置</button>
-          </div>
         </div>
-        <div className="flex items-center gap-3 mt-4">
-          <button onClick={handleOpenAdd} className="bg-bamboo-500 hover:bg-bamboo-400 text-white px-4 py-1.5 rounded text-sm transition-colors">添加用户</button>
+          <div className="grid grid-cols-2 gap-3 md:flex md:flex-wrap md:items-center">
+            <button onClick={handleSearch} className="rounded-2xl bg-bamboo-500 px-4 py-2 text-sm text-white transition-colors hover:bg-bamboo-400 md:rounded md:py-1.5">查询</button>
+            <button onClick={handleResetFilters} className="rounded-2xl border border-gray-300 bg-white px-4 py-2 text-sm text-gray-600 transition-colors hover:border-bamboo-500 hover:text-bamboo-500 md:rounded md:py-1.5">重置</button>
+            <button onClick={handleOpenAdd} className="rounded-2xl bg-bamboo-500 px-4 py-2 text-sm text-white transition-colors hover:bg-bamboo-400 md:rounded md:py-1.5">添加用户</button>
           <button onClick={handleBatchDelete} disabled={selectedIds.length === 0}
-            className="bg-terracotta-500 hover:bg-terracotta-400 text-white px-4 py-1.5 rounded text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed">批量删除</button>
+              className="rounded-2xl bg-terracotta-500 px-4 py-2 text-sm text-white transition-colors hover:bg-terracotta-400 disabled:cursor-not-allowed disabled:opacity-50 md:rounded md:py-1.5">批量删除</button>
           <button onClick={() => handleBatchStatus(false)} disabled={selectedIds.length === 0}
-            className="bg-harvest-500 hover:bg-harvest-400 text-white px-4 py-1.5 rounded text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed">批量禁用</button>
+              className="rounded-2xl bg-harvest-500 px-4 py-2 text-sm text-white transition-colors hover:bg-harvest-400 disabled:cursor-not-allowed disabled:opacity-50 md:rounded md:py-1.5">批量禁用</button>
           <button onClick={() => handleBatchStatus(true)} disabled={selectedIds.length === 0}
-            className="bg-sprout-500 hover:bg-sprout-400 text-white px-4 py-1.5 rounded text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed">批量启用</button>
+              className="rounded-2xl bg-sprout-500 px-4 py-2 text-sm text-white transition-colors hover:bg-sprout-400 disabled:cursor-not-allowed disabled:opacity-50 md:rounded md:py-1.5">批量启用</button>
+            </div>
         </div>
-      </Card>
+      </MobileFilterPanel>
 
       {/* 数据表格 */}
-      <Card className="p-0 overflow-hidden">
+      <Card className="hidden overflow-hidden p-0 md:block">
         {loading && <div className="p-4 text-center text-sm text-gray-400">加载中...</div>}
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse border border-gray-300">
@@ -319,7 +322,7 @@ export default function Users() {
         </div>
 
         {/* 分页 */}
-        <div className="p-4 border-t border-gray-100 flex items-center text-sm text-gray-600">
+        <div className="flex items-center border-t border-gray-100 p-4 text-sm text-gray-600">
           <span className="mr-4">共 {total} 条</span>
           <select value={pageSize} onChange={(e) => { setPageSize(Number(e.target.value)); setCurrent(1); }}
             className="border border-gray-300 rounded px-2 py-1 mr-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-bamboo-500/40 focus-visible:border-bamboo-500 bg-white transition-colors">
@@ -349,6 +352,88 @@ export default function Users() {
           </div>
         </div>
       </Card>
+
+      <div className="space-y-3 md:hidden">
+        {loading && <Card className="p-4 text-center text-sm text-gray-400">加载中...</Card>}
+        {!loading && users.length === 0 && <Card className="p-8 text-center text-sm text-gray-500">暂无数据</Card>}
+        {users.map((user) => (
+          <MobileDataCard
+            key={user.id}
+            title={user.username}
+            subtitle={user.createdAt ? `注册时间：${user.createdAt}` : '暂无注册时间'}
+            selected={selectedIds.includes(user.id)}
+            onSelect={() => handleSelectOne(user.id)}
+            tags={[
+              <span key="role" className="rounded-full border border-sprout-200 bg-sprout-50 px-2 py-0.5 text-[11px] text-sprout-500">
+                {ROLE_MAP[user.role] || user.role}
+              </span>,
+              <span
+                key="status"
+                className={`rounded-full border px-2 py-0.5 text-[11px] ${
+                  user.enabled
+                    ? 'border-sprout-200 bg-sprout-50 text-sprout-500'
+                    : 'border-terracotta-200 bg-terracotta-50 text-terracotta-500'
+                }`}
+              >
+                {user.enabled ? '启用' : '禁用'}
+              </span>,
+            ]}
+            fields={[
+              { label: '真实姓名', value: user.realName || '-' },
+              { label: '邮箱', value: user.email || '-' },
+              { label: '手机号', value: user.phoneNumber || '-' },
+            ]}
+            details={[
+              {
+                label: '头像',
+                value: user.avatar ? (
+                  <img src={user.avatar} alt="" className="h-12 w-12 rounded-full object-cover" />
+                ) : (
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 text-gray-400">
+                    <UserIcon size={18} />
+                  </div>
+                ),
+              },
+            ]}
+            actions={[
+              { label: '编辑', onClick: () => handleOpenEdit(user), tone: 'primary' },
+              { label: user.enabled ? '禁用' : '启用', onClick: () => toggleUserStatus(user), tone: 'warning' },
+              { label: '重置密码', onClick: () => handleResetPassword(user), tone: 'neutral' },
+              { label: '删除', onClick: () => confirmDelete(user.id), tone: 'danger' },
+            ]}
+          />
+        ))}
+      </div>
+
+      <Card className="p-4 md:hidden">
+        <div className="flex flex-col gap-3 text-sm text-gray-600">
+          <div className="flex items-center justify-between">
+            <span>共 {total} 条</span>
+            <span>{current}/{totalPages || 1}</span>
+          </div>
+          <div className="flex items-center justify-between gap-3">
+            <select
+              value={pageSize}
+              onChange={(e) => { setPageSize(Number(e.target.value)); setCurrent(1); }}
+              className="rounded border border-gray-300 bg-white px-3 py-2"
+            >
+              <option value={10}>10条/页</option>
+              <option value={20}>20条/页</option>
+              <option value={50}>50条/页</option>
+            </select>
+            <div className="flex items-center gap-2">
+              <button onClick={() => setCurrent(Math.max(1, current - 1))} disabled={current <= 1} className="rounded-2xl border border-gray-200 px-3 py-2 disabled:opacity-50">&lt;</button>
+              <button onClick={() => setCurrent(Math.min(totalPages, current + 1))} disabled={current >= totalPages} className="rounded-2xl border border-gray-200 px-3 py-2 disabled:opacity-50">&gt;</button>
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      <MobileBatchActionBar count={selectedIds.length}>
+        <button onClick={handleBatchDelete} className="rounded-full bg-terracotta-500 px-3 py-2 text-xs font-medium text-white">删除</button>
+        <button onClick={() => handleBatchStatus(false)} className="rounded-full bg-harvest-500 px-3 py-2 text-xs font-medium text-white">禁用</button>
+        <button onClick={() => handleBatchStatus(true)} className="rounded-full bg-sprout-500 px-3 py-2 text-xs font-medium text-white">启用</button>
+      </MobileBatchActionBar>
 
       {/* 新增/编辑弹窗 */}
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={modalMode === 'edit' ? "编辑用户" : "新增用户"}>
@@ -395,9 +480,9 @@ export default function Users() {
               <option value="false">禁用</option>
             </select>
           </div>
-          <div className="pt-4 flex justify-end gap-3">
-            <button onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded hover:text-bamboo-500 hover:border-bamboo-500">取消</button>
-            <button onClick={handleSave} disabled={saving} className="px-4 py-2 text-sm font-medium text-white bg-bamboo-500 rounded hover:bg-bamboo-400 disabled:opacity-50">
+          <div className="flex flex-col-reverse gap-3 pt-4 sm:flex-row sm:justify-end">
+            <button onClick={() => setIsModalOpen(false)} className="w-full rounded-2xl border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-600 hover:border-bamboo-500 hover:text-bamboo-500 sm:w-auto sm:rounded">取消</button>
+            <button onClick={handleSave} disabled={saving} className="w-full rounded-2xl bg-bamboo-500 px-4 py-2 text-sm font-medium text-white hover:bg-bamboo-400 disabled:opacity-50 sm:w-auto sm:rounded">
               {saving ? '保存中...' : '确定'}
             </button>
           </div>
@@ -411,9 +496,9 @@ export default function Users() {
             <AlertCircle className="text-harvest-500" size={24} />
             <p className="text-gray-700">此操作将永久删除该用户, 是否继续?</p>
           </div>
-          <div className="flex justify-end gap-3">
-            <button onClick={() => setIsDeleteModalOpen(false)} className="px-4 py-1.5 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded hover:text-bamboo-500">取消</button>
-            <button onClick={handleDelete} className="px-4 py-1.5 text-sm font-medium text-white bg-bamboo-500 rounded hover:bg-bamboo-400">确定</button>
+          <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+            <button onClick={() => setIsDeleteModalOpen(false)} className="w-full rounded-2xl border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-600 hover:text-bamboo-500 sm:w-auto sm:rounded">取消</button>
+            <button onClick={handleDelete} className="w-full rounded-2xl bg-bamboo-500 px-4 py-2 text-sm font-medium text-white hover:bg-bamboo-400 sm:w-auto sm:rounded">确定</button>
           </div>
         </div>
       </Modal>

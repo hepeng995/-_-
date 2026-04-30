@@ -39,19 +39,10 @@
                 <span>批次号：{{ traceData.batch.batchNo }}</span>
               </div>
             </div>
-            <!-- 二维码占位 -->
             <div class="header-qr">
-              <div class="qr-placeholder">
-                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M3 3H10V10H3V3Z" stroke="#94a3b8" stroke-width="2"/>
-                  <path d="M3 14H10V21H3V14Z" stroke="#94a3b8" stroke-width="2"/>
-                  <path d="M14 3H21V10H14V3Z" stroke="#94a3b8" stroke-width="2"/>
-                  <path d="M14 14H17V17H14V14Z" stroke="#94a3b8" stroke-width="2"/>
-                  <path d="M20 14H21V15H20V14Z" stroke="#94a3b8" stroke-width="2"/>
-                  <path d="M14 20H15V21H14V20Z" stroke="#94a3b8" stroke-width="2"/>
-                  <path d="M20 20H21V21H20V20Z" stroke="#94a3b8" stroke-width="2"/>
-                </svg>
-                <span>扫码溯源</span>
+              <img v-if="traceData.qrCodeDataUrl" :src="traceData.qrCodeDataUrl" alt="溯源二维码" class="qr-image" />
+              <div v-else class="qr-placeholder">
+                <span>二维码生成中</span>
               </div>
             </div>
           </div>
@@ -181,9 +172,17 @@ onMounted(async () => {
   font-weight: 500;
 }
 
-/* 二维码占位 */
 .header-qr {
   flex-shrink: 0;
+}
+
+.qr-image {
+  width: 96px;
+  height: 96px;
+  border-radius: var(--radius-lg);
+  border: 1px solid #d1d5db;
+  background: white;
+  padding: 6px;
 }
 
 .qr-placeholder {
@@ -233,6 +232,11 @@ onMounted(async () => {
   }
 
   .qr-placeholder {
+    width: 72px;
+    height: 72px;
+  }
+
+  .qr-image {
     width: 72px;
     height: 72px;
   }

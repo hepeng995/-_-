@@ -1,5 +1,6 @@
 package com.cinema.booking.controller;
 
+import com.cinema.booking.config.AiConfigurationGuard;
 import com.cinema.booking.dto.AiChatResponse;
 import com.cinema.booking.dto.CommonCardDTO;
 import com.cinema.booking.service.ai.RuralDigitalAgent;
@@ -32,6 +33,7 @@ public class AiChatController {
     private final RuralDigitalAgent ruralDigitalAgent;
     private final RuralDigitalTools ruralDigitalTools;
     private final ObjectMapper objectMapper;
+    private final AiConfigurationGuard aiConfigurationGuard;
 
     /**
      * AI 对话主接口（完全兼容你旧接口的返回格式）
@@ -88,6 +90,11 @@ public class AiChatController {
                     .build();
             return Result.fail(500,"抱歉，AI服务暂时异常，请稍后再试~" ,errorResponse);
         }
+    }
+
+    @GetMapping("/health")
+    public Result<Map<String, Object>> health() {
+        return Result.ok(aiConfigurationGuard.healthStatus());
     }
 
     private String normalizeUserMessage(String rawMessage) {

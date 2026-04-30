@@ -1,5 +1,6 @@
 package com.cinema.booking.controller;
 
+import com.cinema.booking.dto.FileUploadResultDTO;
 import com.cinema.booking.utils.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,6 +16,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -34,8 +37,6 @@ public class FileController {
     @Value("${file.upload.path:files}")
     private String uploadPath;
 
-    private static final String SERVER_URL = "http://localhost";
-
     /**
      * 上传文件
      * @param file 文件
@@ -43,7 +44,7 @@ public class FileController {
      * @throws IOException IO异常
      */
     @PostMapping("/upload")
-    public Result<String> uploadFile(@RequestParam("file") MultipartFile file) throws IOException {
+    public Result<FileUploadResultDTO> uploadFile(@RequestParam("file") MultipartFile file) throws IOException {
         if (file.isEmpty()) {
             return Result.fail("文件为空");
         }
@@ -72,9 +73,10 @@ public class FileController {
             
             // 修改为返回相对路径，而不是完整URL，这样可以被前端代理正确处理
             String fileUrl = "/api/file/download/" + newFileName;
+            FileUploadResultDTO uploadResult = new FileUploadResultDTO(fileUrl, newFileName, originalFilename);
             
             log.info("文件上传成功: {}, URL: {}", originalFilename, fileUrl);
-            return Result.success(fileUrl);
+            return Result.success(uploadResult);
         } catch (IOException e) {
             log.error("文件上传失败", e);
             return Result.fail("文件上传失败");
@@ -159,17 +161,17 @@ public class FileController {
      * @return 文件访问URL列表
      */
     @PostMapping("/upload/batch")
-    public Result<String[]> uploadFiles(@RequestParam("files") MultipartFile[] files) {
+    public Result<List<FileUploadResultDTO>> uploadFiles(@RequestParam("files") MultipartFile[] files) {
         if (files == null || files.length == 0) {
             return Result.fail("未选择任何文件");
         }
         
-        String[] urls = new String[files.length];
+        List<FileUploadResultDTO> uploadedFiles = new ArrayList<>();
         for (int i = 0; i < files.length; i++) {
             try {
-                Result<String> result = uploadFile(files[i]);
+                Result<FileUploadResultDTO> result = uploadFile(files[i]);
                 if (result.getCode() == 200) {
-                    urls[i] = result.getData();
+                    uploadedFiles.add(result.getData());
                 } else {
                     return Result.fail("批量上传失败：" + result.getMessage());
                 }
@@ -179,6 +181,21 @@ public class FileController {
             }
         }
         
-        return Result.success(urls);
+        return Result.success(uploadedFiles);
+    }
+
+    @DeleteMapping("/delete/{fileName}")
+    public Result<Void> deleteFile(@PathVariable String fileName) {
+        try {
+            Path filePath = Paths.get(uploadPath, fileName);
+            if (!Files.exists(filePath)) {
+                return Result.fail("文件不存在");
+            }
+            Files.delete(filePath);
+            return Result.success();
+        } catch (IOException e) {
+            log.error("文件删除失败", e);
+            return Result.fail("文件删除失败");
+        }
     }
 } 

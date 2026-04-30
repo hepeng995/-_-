@@ -15,11 +15,18 @@ import com.cinema.booking.utils.BeanCopyUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.ByteArrayOutputStream;
 import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +40,22 @@ public class TraceServiceImpl implements TraceService {
     private final ProductBatchMapper productBatchMapper;
     private final ObjectMapper objectMapper;
 
+    @Value("${app.public-base-url:}")
+    private String publicBaseUrl;
+
+    @Override
+    public String buildTraceQrCode(String batchNo) {
+        try {
+            String traceUrl = buildTraceUrl(batchNo);
+            BitMatrix bitMatrix = new QRCodeWriter().encode(traceUrl, BarcodeFormat.QR_CODE, 260, 260);
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            MatrixToImageWriter.writeToStream(bitMatrix, "PNG", outputStream);
+            return "data:image/png;base64," + Base64.getEncoder().encodeToString(outputStream.toByteArray());
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     @Override
     public Map<String, Object> getTraceByProductId(Long productId) {
         ProductBatch batch = productBatchMapper.selectByProductId(productId);
@@ -43,6 +66,8 @@ public class TraceServiceImpl implements TraceService {
         Map<String, Object> result = new HashMap<>();
         result.put("batch", toBatchDTO(batch));
         result.put("records", records.stream().map(this::toDTO).collect(Collectors.toList()));
+        result.put("traceUrl", buildTraceUrl(batch.getBatchNo()));
+        result.put("qrCodeDataUrl", buildTraceQrCode(batch.getBatchNo()));
         return result;
     }
 
@@ -56,6 +81,8 @@ public class TraceServiceImpl implements TraceService {
         Map<String, Object> result = new HashMap<>();
         result.put("batch", toBatchDTO(batch));
         result.put("records", records.stream().map(this::toDTO).collect(Collectors.toList()));
+        result.put("traceUrl", buildTraceUrl(batch.getBatchNo()));
+        result.put("qrCodeDataUrl", buildTraceQrCode(batch.getBatchNo()));
         return result;
     }
 
@@ -215,5 +242,13 @@ public class TraceServiceImpl implements TraceService {
         } catch (JsonProcessingException e) {
             return "[]";
         }
+    }
+
+    private String buildTraceUrl(String batchNo) {
+        String path = "/trace/" + batchNo;
+        if (publicBaseUrl == null || publicBaseUrl.isBlank()) {
+            return path;
+        }
+        return publicBaseUrl.endsWith("/") ? publicBaseUrl.substring(0, publicBaseUrl.length() - 1) + path : publicBaseUrl + path;
     }
 }

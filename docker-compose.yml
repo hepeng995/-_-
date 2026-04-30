@@ -1,6 +1,29 @@
-version: "3.8"
-
 services:
+  mysql:
+    image: mysql:8.0
+    container_name: village-mysql
+    environment:
+      MYSQL_DATABASE: ${DB_NAME:-village}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-change-me}
+      TZ: Asia/Shanghai
+    ports:
+      - "3306:3306"
+    command:
+      - --default-authentication-plugin=mysql_native_password
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./village.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -p$$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+    networks:
+      - village-net
+
   backend:
     build:
       context: ./back
@@ -11,15 +34,58 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - TZ=Asia/Shanghai
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_NAME=${DB_NAME:-village}
+      - DB_USERNAME=root
+      - DB_PASSWORD=${DB_PASSWORD:-change-me}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - QDRANT_HOST=qdrant
+      - QDRANT_HTTP_PORT=6333
+      - QDRANT_GRPC_PORT=6334
+      - FILE_UPLOAD_PATH=/data/uploads
+      - APP_PUBLIC_BASE_URL=${APP_PUBLIC_BASE_URL:-http://localhost:3000}
     volumes:
       - uploads:/data/uploads
     depends_on:
+      mysql:
+        condition: service_healthy
       redis:
         condition: service_healthy
+      qdrant:
+        condition: service_started
     restart: unless-stopped
     networks:
       - village-net
-      - 1panel-network
+
+  front:
+    build:
+      context: ./front
+      dockerfile: Dockerfile
+    container_name: village-front
+    ports:
+      - "3000:80"
+    depends_on:
+      backend:
+        condition: service_started
+    restart: unless-stopped
+    networks:
+      - village-net
+
+  front-admin:
+    build:
+      context: ./front-admin
+      dockerfile: Dockerfile
+    container_name: village-front-admin
+    ports:
+      - "3001:80"
+    depends_on:
+      backend:
+        condition: service_started
+    restart: unless-stopped
+    networks:
+      - village-net
 
   redis:
     image: redis:7-alpine
@@ -51,6 +117,7 @@ services:
       - village-net
 
 volumes:
+  mysql-data:
   uploads:
   redis-data:
   qdrant-data:
@@ -58,5 +125,3 @@ volumes:
 networks:
   village-net:
     driver: bridge
-  1panel-network:
-    external: true

@@ -209,17 +209,19 @@ const handleRegister = () => {
 <style scoped>
 .register-container {
   min-height: 100vh;
+  min-height: var(--app-height);
+  min-height: var(--app-dvh);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   background: linear-gradient(135deg, var(--color-bg-body) 0%, #e4e8f1 100%);
-  padding: 40px 0;
+  padding: max(24px, var(--safe-area-top)) 16px max(24px, var(--safe-area-bottom));
   position: relative;
 }
 
 .register-card {
-  width: 450px;
+  width: min(100%, 450px);
   padding: 40px;
   background-color: var(--color-bg-surface);
   border-radius: var(--radius-lg);
@@ -280,10 +282,10 @@ h3 {
 }
 
 .footer {
-  position: absolute;
-  bottom: 20px;
+  margin-top: 24px;
   color: var(--color-text-placeholder);
   font-size: 13px;
+  text-align: center;
 }
 
 :deep(.el-form-item) {
@@ -307,5 +309,30 @@ h3 {
 :deep(.el-form-item__label) {
   padding-bottom: 5px;
   font-weight: 500;
+}
+
+@media (max-width: 767px) {
+  .register-container {
+    justify-content: flex-start;
+    padding-top: clamp(40px, 10vh, 96px);
+  }
+
+  .register-card {
+    padding: 28px 20px;
+  }
+
+  h1 {
+    font-size: 20px;
+  }
+
+  h3 {
+    font-size: 16px;
+    margin-bottom: 24px;
+  }
+
+  .register-btn,
+  :deep(.el-input__wrapper) {
+    height: 46px;
+  }
 }
 </style>

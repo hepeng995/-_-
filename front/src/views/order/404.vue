@@ -38,11 +38,13 @@ const goBack = () => {
 
 <style scoped>
 .error-container {
-  height: 100vh;
+  min-height: var(--app-height);
+  min-height: var(--app-dvh);
   display: flex;
   justify-content: center;
   align-items: center;
   background-color: var(--color-bg-body);
+  padding: max(20px, var(--safe-area-top)) 16px max(20px, var(--safe-area-bottom));
 }
 
 .error-box {
@@ -79,5 +81,29 @@ const goBack = () => {
   display: flex;
   justify-content: center;
   gap: 20px;
+}
+
+@media (max-width: 767px) {
+  .error-box {
+    padding: 28px 20px;
+  }
+
+  .error-code {
+    font-size: 84px;
+  }
+
+  .error-title {
+    font-size: 24px;
+    margin-bottom: 16px;
+  }
+
+  .error-message {
+    font-size: 14px;
+    margin-bottom: 24px;
+  }
+
+  .error-actions {
+    flex-direction: column;
+  }
 }
 </style>

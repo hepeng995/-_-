@@ -31,7 +31,7 @@
     >
       <div class="mobile-drawer__content">
         <div class="mobile-drawer__header">
-          <img src="@/assets/image/logo.jpg" alt="Logo" class="mobile-drawer__logo" />
+          <img :src="mobileDrawerLogo" alt="Logo" class="mobile-drawer__logo" />
           <span class="mobile-drawer__title">{{ systemName }}</span>
           <el-icon class="mobile-drawer__close" @click="closeDrawer"><Close /></el-icon>
         </div>
@@ -83,14 +83,12 @@
         </button>
         <span class="mobile-header__title">{{ systemName }}</span>
         <div class="mobile-header__actions">
-          <el-badge :value="cartCount" :hidden="cartCount === 0" :offset="[4, -4]">
-            <el-icon :size="22" class="mobile-header__icon" @click="goToCart" role="button" tabindex="0" aria-label="购物车"><ShoppingCart /></el-icon>
-          </el-badge>
+          <el-icon :size="38" class="mobile-header__icon" @click="goToCart" role="button" tabindex="0" aria-label="购物车"><ShoppingCart /></el-icon>
         </div>
       </div>
 
       <!-- 内容滚动区 (footer在内部，跟随内容滚动) -->
-      <div class="app-content" :class="contentClass" id="main-content" tabindex="-1">
+      <div ref="appContentRef" class="app-content" :class="contentClass" id="main-content" tabindex="-1">
         <div class="app-content__page">
           <router-view v-slot="{ Component }">
             <transition name="page" mode="out-in">
@@ -143,9 +141,9 @@
     <el-dialog
       v-model="searchVisible"
       :show-close="false"
-      width="500px"
+      width="min(500px, calc(100vw - 24px))"
       top="15vh"
-      class="search-dialog"
+      class="search-dialog mobile-dialog"
       @opened="onSearchOpened"
     >
       <el-input
@@ -161,13 +159,13 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch, nextTick } from 'vue'
+import { ref, computed, onMounted, watch, nextTick, defineAsyncComponent } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { useCartStore } from '@/stores/cart'
 import { useLayout } from '@/composables/useLayout'
 import { getConfigByKey } from '@/api/system-config'
-import AiChatAssistant from '@/components/AiChatAssistant.vue'
+const AiChatAssistant = defineAsyncComponent(() => import('@/components/AiChatAssistant.vue'))
 import Sidebar from '@/components/Sidebar.vue'
 import {
   House, MapLocation, ShoppingBag, ShoppingCart, ChatRound, ChatDotRound,
@@ -176,8 +174,10 @@ import {
 } from '@element-plus/icons-vue'
 import { useAiChatStore } from '@/stores/ai-chat'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { scrollToTop } from '@/utils/scroll'
 
 const router = useRouter()
+const mobileDrawerLogo = '/api/file/download/IP3.png'
 const route = useRoute()
 const userStore = useUserStore()
 const cartStore = useCartStore()
@@ -195,6 +195,7 @@ const systemName = ref('智兴乡村平台')
 const searchVisible = ref(false)
 const searchQuery = ref('')
 const searchInputRef = ref(null)
+const appContentRef = ref(null)
 
 const userInfo = computed(() => userStore.userInfo)
 const cartCount = computed(() => cartStore.cartCount)
@@ -276,6 +277,10 @@ function doSearch() {
   }
 }
 
+function scrollLayoutContentToTop() {
+  scrollToTop(appContentRef.value)
+}
+
 async function handleMobileLogout() {
   try {
     await ElMessageBox.confirm('确认退出登录吗？', '提示', {
@@ -310,6 +315,15 @@ onMounted(() => {
 watch(() => userInfo.value, (val) => {
   if (val) cartStore.getCartCount()
 })
+
+watch(
+  () => route.fullPath,
+  async () => {
+    await nextTick()
+    scrollLayoutContentToTop()
+  },
+  { immediate: true }
+)
 </script>
 
 <style scoped>
@@ -336,17 +350,23 @@ watch(() => userInfo.value, (val) => {
 
 .app-layout {
   display: flex;
-  height: 100vh;
+  height: var(--app-height);
+  height: var(--app-dvh);
+  min-height: var(--app-height);
+  min-height: var(--app-dvh);
   overflow: hidden;
 }
 
 /* 移动端顶栏 */
 .mobile-header {
-  height: var(--mobile-header-height, 48px);
+  position: sticky;
+  top: 0;
+  z-index: var(--z-toolbar);
+  height: calc(var(--mobile-header-height, 48px) + var(--safe-area-top));
   background-color: var(--color-primary-800);
   display: flex;
   align-items: center;
-  padding: 0 var(--space-4);
+  padding: var(--safe-area-top) var(--space-4) 0;
   gap: var(--space-3);
   flex-shrink: 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
@@ -378,21 +398,27 @@ watch(() => userInfo.value, (val) => {
 
 .mobile-header__title {
   flex: 1;
+  min-width: 0;
   color: #fff;
   font-size: var(--text-md);
   font-weight: var(--font-semibold);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .mobile-header__actions {
   display: flex;
   align-items: center;
   gap: var(--space-3);
+  flex-shrink: 0;
+  overflow: hidden;
 }
 
 .mobile-header__icon {
   color: rgba(255, 255, 255, 0.9);
   cursor: pointer;
-  padding: 8px;
+  padding: 4px;
   border-radius: var(--radius-md);
   transition: color 0.2s, transform 0.15s;
 }
@@ -411,7 +437,8 @@ watch(() => userInfo.value, (val) => {
   display: flex;
   flex-direction: column;
   margin-left: 240px;
-  min-height: 100vh;
+  min-height: var(--app-height);
+  min-height: var(--app-dvh);
   background-color: var(--color-bg-body);
   transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
@@ -432,8 +459,9 @@ watch(() => userInfo.value, (val) => {
 }
 
 .app-content__page {
-  padding: var(--space-6);
-  min-height: calc(100vh - var(--toolbar-height) - 200px);
+  padding: var(--content-padding);
+  min-height: calc(var(--app-height) - var(--toolbar-height) - 200px);
+  min-height: calc(var(--app-dvh) - var(--toolbar-height) - 200px);
 }
 
 .app-content--full .app-content__page {
@@ -485,6 +513,7 @@ watch(() => userInfo.value, (val) => {
 
 .mobile-drawer__content {
   height: 100%;
+  padding-bottom: var(--safe-area-bottom);
   display: flex;
   flex-direction: column;
   color: var(--color-text-primary);
@@ -593,7 +622,7 @@ watch(() => userInfo.value, (val) => {
   }
 
   .app-content {
-    padding: var(--space-4);
+    padding: 0;
   }
 }
 </style>

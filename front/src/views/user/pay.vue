@@ -29,7 +29,7 @@
                     <span>支付宝</span>
                   </div>
                 </el-radio>
-                <el-radio label="wechat" class="payment-option" style="margin-left:-25px">
+                <el-radio label="wechat" class="payment-option">
                   <div class="payment-option-info">
                     <el-icon class="payment-icon"><Wallet /></el-icon>
                     <span>微信支付</span>
@@ -244,7 +244,8 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .payment-page {
-  min-height: 100vh;
+  min-height: var(--app-height);
+  min-height: var(--app-dvh);
   background: var(--color-bg-body);
   padding: 40px 0;
 }
@@ -363,6 +364,7 @@ onBeforeUnmount(() => {
   margin-top: 30px;
   display: flex;
   gap: 16px;
+  flex-wrap: wrap;
 }
 
 .payment-tips {
@@ -394,8 +396,9 @@ onBeforeUnmount(() => {
 }
 
 .qr-image {
-  width: 200px;
-  height: 200px;
+  width: min(200px, 100%);
+  height: auto;
+  aspect-ratio: 1;
 }
 
 .qr-tips {
@@ -430,6 +433,15 @@ onBeforeUnmount(() => {
 
   .payment-actions {
     flex-direction: column;
+  }
+
+  .payment-info,
+  .payment-qr {
+    padding: 20px;
+  }
+
+  .payment-option :deep(.el-radio__label) {
+    width: 100%;
   }
 }
 </style>

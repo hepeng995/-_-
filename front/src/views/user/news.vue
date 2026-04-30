@@ -14,6 +14,7 @@
       <div class="container">
         <div class="search-form">
           <el-input
+            class="search-form__keyword"
             v-model="searchParams.keyword"
             placeholder="搜索资讯标题或内容..."
             size="large"
@@ -24,21 +25,23 @@
               <el-icon><Search /></el-icon>
             </template>
           </el-input>
-          <el-select
-            v-model="searchParams.category"
-            placeholder="选择分类"
-            size="large"
-            clearable
-            style="width: 200px"
-          >
-            <el-option label="政策通知" value="policy" />
-            <el-option label="乡村新闻" value="news" />
-            <el-option label="活动预告" value="activity" />
-          </el-select>
-          <el-button type="primary" size="large" @click="handleSearch">
-            <el-icon><Search /></el-icon>
-            搜索
-          </el-button>
+          <div class="search-form__actions">
+            <el-select
+              class="search-form__select"
+              v-model="searchParams.category"
+              placeholder="选择分类"
+              size="large"
+              clearable
+            >
+              <el-option label="政策通知" value="policy" />
+              <el-option label="乡村新闻" value="news" />
+              <el-option label="活动预告" value="activity" />
+            </el-select>
+            <el-button class="search-form__button" type="primary" size="large" @click="handleSearch">
+              <el-icon><Search /></el-icon>
+              搜索
+            </el-button>
+          </div>
         </div>
       </div>
     </div>
@@ -258,7 +261,8 @@ import {
   ArrowRight
 } from '@element-plus/icons-vue'
 import newsApi from '@/api/news'
-import headerBg from '@/assets/image/动态资讯背景.png'
+import headerBg from '@/assets/image/动态资讯背景.webp'
+import { scrollMainContentToTop } from '@/utils/scroll'
 
 const router = useRouter()
 const route = useRoute()
@@ -409,8 +413,7 @@ const handleSizeChange = (size) => {
 const handleCurrentChange = (page) => {
   searchParams.pageNum = page
   getNewsList()
-  // 滚动到顶部
-  window.scrollTo({ top: 0, behavior: 'smooth' })
+  scrollMainContentToTop()
 }
 
 // 跳转到详情页
@@ -521,9 +524,23 @@ onMounted(() => {
   flex-wrap: wrap;
 }
 
-.search-form .el-input {
+.search-form__keyword {
   width: 400px;
   max-width: 100%;
+}
+
+.search-form__actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.search-form__select {
+  width: 200px;
+}
+
+.search-form__button {
+  min-width: 104px;
 }
 
 /* 分类标签 */
@@ -943,11 +960,29 @@ onMounted(() => {
   .search-form {
     flex-direction: column;
     align-items: stretch;
-    gap: 8px;
+    gap: 10px;
   }
 
-  .search-form .el-input {
+  .search-form__keyword {
     width: 100%;
+  }
+
+  .search-form__actions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: stretch;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .search-form__select {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .search-form__button {
+    min-width: 92px;
+    padding-inline: 16px;
   }
 
   .category-tabs {
@@ -1015,6 +1050,19 @@ onMounted(() => {
 }
 
 @media (max-width: 480px) {
+  .search-form {
+    gap: 8px;
+  }
+
+  .search-form__actions {
+    gap: 6px;
+  }
+
+  .search-form__button {
+    min-width: 84px;
+    padding-inline: 14px;
+  }
+
   .news-image {
     width: 90px;
     height: 70px;

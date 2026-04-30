@@ -10,6 +10,7 @@ import com.cinema.booking.entity.Product;
 import com.cinema.booking.entity.ProductCategory;
 import com.cinema.booking.mapper.ProductCategoryMapper;
 import com.cinema.booking.mapper.ProductMapper;
+import com.cinema.booking.mapper.OrderMapper;
 import com.cinema.booking.security.SecurityService;
 import com.cinema.booking.service.ProductService;
 import com.cinema.booking.service.ProductReviewService;
@@ -42,6 +43,7 @@ public class ProductController {
     private final SecurityService securityService;
     private final ProductMapper productMapper;
     private final ProductCategoryMapper productCategoryMapper;
+    private final OrderMapper orderMapper;
     
     @Operation(summary = "分页查询商品列表")
     @GetMapping("/page")
@@ -136,6 +138,16 @@ public class ProductController {
     public Result<List<ProductDTO>> getProductsByCategory(@PathVariable Long categoryId) {
         List<ProductDTO> products = productService.getProductsByCategory(categoryId);
         return Result.ok(products);
+    }
+
+    @Operation(summary = "搜索商品")
+    @GetMapping("/search")
+    public Result<IPage<ProductDTO>> searchProducts(
+            @RequestParam String keyword,
+            @RequestParam(defaultValue = "1") Integer pageNum,
+            @RequestParam(defaultValue = "10") Integer pageSize) {
+        PageRequest pageRequest = new PageRequest(pageNum, pageSize);
+        return Result.ok(productService.getProductPage(pageRequest, null, keyword, 1, null));
     }
     
     @Operation(summary = "获取商品分类列表")
@@ -269,12 +281,34 @@ public class ProductController {
         if (currentUserId == null) {
             return Result.ok(Map.of("canReview", false, "reason", "请先登录"));
         }
-        
-        // 允许用户对同一商品进行多次评价
+
+        Long resolvedOrderId = orderId;
+        if (resolvedOrderId != null) {
+            Integer eligibleCount = orderMapper.countCompletedOrderItemsForReview(currentUserId, id, resolvedOrderId);
+            if (eligibleCount == null || eligibleCount <= 0) {
+                return Result.ok(Map.of(
+                        "canReview", false,
+                        "hasReviewed", false,
+                        "reason", "该订单中的商品不可评价，请确认订单已完成"
+                ));
+            }
+        } else {
+            resolvedOrderId = orderMapper.selectLatestReviewableOrderId(currentUserId, id);
+            if (resolvedOrderId == null) {
+                return Result.ok(Map.of(
+                        "canReview", false,
+                        "hasReviewed", false,
+                        "reason", "暂无可评价的已完成订单"
+                ));
+            }
+        }
+
+        boolean hasReviewed = productReviewService.hasUserReviewed(currentUserId, id, resolvedOrderId);
         Map<String, Object> result = new HashMap<>();
-        result.put("canReview", true);
-        result.put("hasReviewed", false);
-        result.put("reason", null);
+        result.put("canReview", !hasReviewed);
+        result.put("hasReviewed", hasReviewed);
+        result.put("orderId", resolvedOrderId);
+        result.put("reason", hasReviewed ? "该订单中的商品已经评价过了" : null);
         return Result.ok(result);
     }
 }

@@ -4,7 +4,7 @@
       v-model="keyword"
       :placeholder="placeholder"
       clearable
-      style="max-width: 400px"
+      class="search-filter__keyword"
       @keyup.enter="$emit('search', keyword)"
     >
       <template #prefix>
@@ -17,7 +17,7 @@
       v-model="selectedCategory"
       :placeholder="categoryPlaceholder"
       clearable
-      style="width: 160px"
+      class="search-filter__select"
       @change="$emit('category-change', selectedCategory)"
     >
       <el-option
@@ -63,6 +63,14 @@ const selectedCategory = ref(null)
   margin-bottom: var(--space-4);
 }
 
+.search-filter__keyword {
+  width: min(400px, 100%);
+}
+
+.search-filter__select {
+  width: 160px;
+}
+
 @media screen and (max-width: 767px) {
   .search-filter {
     flex-direction: column;
@@ -72,6 +80,10 @@ const selectedCategory = ref(null)
   .search-filter .el-select {
     width: 100% !important;
     max-width: none !important;
+  }
+
+  .search-filter .el-button {
+    width: 100%;
   }
 }
 </style>

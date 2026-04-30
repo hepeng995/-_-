@@ -177,13 +177,13 @@
 </template>
 
 <script setup>
-import { ref, nextTick, watch, onMounted } from 'vue'
+import { ref, nextTick, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAiChatStore } from '@/stores/ai-chat'
 import { useUserStore } from '@/stores/user'
 import { Delete, Close, User, Promotion, Goods, MapLocation, Picture } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
-import ipMascot from '@/assets/image/ip-mascot.png'
+import ipMascot from '@/assets/image/ip-mascot.webp'
 
 const router = useRouter()
 const chatStore = useAiChatStore()
@@ -281,26 +281,58 @@ watch(
   }
 )
 
-/**
- * 卡片点击跳转
- */
-const handleCardClick = (card, moduleType) => {
-  // 优先使用后端返回的 detailUrl
-  if (card.detailUrl) {
-    router.push(card.detailUrl)
-    return
-  }
+const isMobileViewport = () => {
+  return typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches
+}
 
-  // 根据 moduleType 构造跳转路径
+const resolveCardTarget = (card, moduleType) => {
+  const detailUrl = typeof card?.detailUrl === 'string' ? card.detailUrl.trim() : ''
+  if (detailUrl) return detailUrl
+  if (!card?.id) return ''
+
   const routeMap = {
     PRODUCT: `/products/${card.id}`,
     SCENIC: `/attractions/${card.id}`,
     NEWS: `/news/${card.id}`,
     ADVICE: `/forum/detail/${card.id}`
   }
-  const path = routeMap[moduleType]
-  if (path && card.id) {
-    router.push(path)
+  return routeMap[moduleType] || ''
+}
+
+const closeChatOnMobileIfNeeded = () => {
+  if (isMobileViewport()) {
+    chatStore.closeChat()
+  }
+}
+
+/**
+ * 卡片点击跳转
+ */
+const handleCardClick = async (card, moduleType) => {
+  const target = resolveCardTarget(card, moduleType)
+  if (!target) {
+    console.warn('AI推荐卡片缺少可跳转目标', { card, moduleType })
+    return
+  }
+
+  if (/^https?:\/\//i.test(target)) {
+    closeChatOnMobileIfNeeded()
+    window.location.href = target
+    return
+  }
+
+  const resolved = router.resolve(target)
+  if (!resolved.matched.length) {
+    console.warn('AI推荐卡片跳转目标无效', { target, card, moduleType })
+    return
+  }
+
+  closeChatOnMobileIfNeeded()
+
+  try {
+    await router.push(target)
+  } catch (error) {
+    console.error('AI推荐卡片跳转失败:', error)
   }
 }
 
@@ -1108,7 +1140,8 @@ const getModuleAccentClass = (type) => {
     right: 0;
     bottom: 0;
     width: 100vw;
-    height: 100vh;
+    height: var(--app-height);
+    height: var(--app-dvh);
     border-radius: 0;
   }
 

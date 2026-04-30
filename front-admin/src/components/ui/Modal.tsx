@@ -19,10 +19,14 @@ export function Modal({ isOpen, onClose, title, children, className }: ModalProp
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-title"
-        className={cn("bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200", className)}
+        className={cn(
+          "flex w-full flex-col overflow-hidden rounded-[1.75rem] bg-white shadow-2xl animate-in fade-in zoom-in-95 duration-200",
+          "max-h-[calc(100dvh-2rem)] max-w-md sm:max-h-[min(90vh,44rem)]",
+          className,
+        )}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+        <div className="flex items-center justify-between border-b border-gray-100 px-4 py-4 sm:px-6">
           <h3 id="modal-title" className="text-lg font-bold text-gray-900">{title}</h3>
           <button 
             onClick={onClose} 
@@ -31,7 +35,7 @@ export function Modal({ isOpen, onClose, title, children, className }: ModalProp
             <X size={20} />
           </button>
         </div>
-        <div className="p-6">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6">
           {children}
         </div>
       </div>

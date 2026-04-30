@@ -66,4 +66,17 @@ public interface OrderMapper extends BaseMapper<Order> {
      * @return 超时订单列表
      */
     List<Order> selectTimeoutOrders(@Param("timeoutMinutes") Integer timeoutMinutes);
+
+    /**
+     * 查询指定订单中是否存在可评价商品
+     */
+    Integer countCompletedOrderItemsForReview(@Param("userId") Long userId,
+                                              @Param("productId") Long productId,
+                                              @Param("orderId") Long orderId);
+
+    /**
+     * 查询当前用户最近一个可评价该商品的订单
+     */
+    Long selectLatestReviewableOrderId(@Param("userId") Long userId,
+                                       @Param("productId") Long productId);
 }
