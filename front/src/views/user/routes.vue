@@ -75,7 +75,7 @@
           >
             <!-- 封面图 -->
             <div class="card-cover">
-              <img :src="route.coverImage" :alt="route.name" />
+              <img :src="route.coverImage" :alt="route.name"  loading="lazy" decoding="async"/>
               <!-- 官方推荐徽章 -->
               <div v-if="route.isOfficial" class="official-badge">
                 <el-icon><Star /></el-icon>
@@ -762,6 +762,35 @@ onMounted(() => {
   :deep(.route-tag.el-tag) {
     padding: 0 6px;
     font-size: 10px;
+  }
+}
+
+/* C14 - 360px 兜底（iPhone SE / 折叠屏） */
+@media (max-width: 360px) {
+  .container,
+  .page-container,
+  .content-container {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  .page-header {
+    padding: 28px 0 !important;
+  }
+  .page-header h1 {
+    font-size: 18px !important;
+  }
+  .page-header p {
+    font-size: 12px !important;
+  }
+  .products-grid,
+  .attractions-grid,
+  .news-grid,
+  .routes-grid,
+  .activities-grid {
+    gap: 8px !important;
+  }
+  .el-button:not(.is-circle):not(.is-text) {
+    min-height: 36px;
   }
 }
 </style>

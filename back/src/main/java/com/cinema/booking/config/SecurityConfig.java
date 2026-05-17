@@ -1,5 +1,6 @@
 package com.cinema.booking.config;
 
+import com.cinema.booking.security.HybridPasswordEncoder;
 import com.cinema.booking.security.JwtAuthenticationFilter;
 import com.cinema.booking.security.JwtAuthenticationEntryPoint;
 import com.cinema.booking.security.JwtAccessDeniedHandler;
@@ -41,16 +42,14 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .csrf(AbstractHttpConfigurer::disable)
-            // 实际上这里不需要禁用CORS，我们通过添加自己的CorsFilter来处理
             .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(authorize -> authorize
-                // 公开接口
                 .requestMatchers("/auth/**").permitAll()
                 .requestMatchers("/test").permitAll()
                 .requestMatchers("/file/**").permitAll()
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                .requestMatchers("/actuator/health/**", "/actuator/info").permitAll()
                 .requestMatchers("/ai/health").permitAll()
-                // 公开浏览接口（首页、景点、商品、新闻等）
                 .requestMatchers("/home/**").permitAll()
                 .requestMatchers("/attractions/**").permitAll()
                 .requestMatchers("/products/**").permitAll()
@@ -59,7 +58,6 @@ public class SecurityConfig {
                 .requestMatchers("/trace/**").permitAll()
                 .requestMatchers("/tour-routes/**").permitAll()
                 .requestMatchers("/activities/**").permitAll()
-                // 其他所有请求需要认证
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session
@@ -79,19 +77,12 @@ public class SecurityConfig {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
+    /**
+     * 混合密码编码器：BCrypt 优先 + 历史明文兜底（仅过渡期）。
+     * 后续接口注册/改密均使用 BCrypt；存量明文密码在登录时由 Service 层异步升级。
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
-        // 使用一个不加密的密码编码器，直接返回原始密码
-        return new PasswordEncoder() {
-            @Override
-            public String encode(CharSequence rawPassword) {
-                return rawPassword.toString();
-            }
-
-            @Override
-            public boolean matches(CharSequence rawPassword, String encodedPassword) {
-                return rawPassword.toString().equals(encodedPassword);
-            }
-        };
+        return new HybridPasswordEncoder();
     }
-} 
+}

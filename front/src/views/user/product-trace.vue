@@ -93,7 +93,7 @@
                 class="image-thumb"
                 @click="previewImage(record.images, imgIdx)"
               >
-                <img :src="img" :alt="`${record.title} - 图片${imgIdx + 1}`" />
+                <img :src="img" :alt="`${record.title} - 图片${imgIdx + 1}`"  loading="lazy" decoding="async"/>
               </div>
             </div>
 
@@ -554,6 +554,27 @@ onMounted(() => {
   .card-meta {
     flex-direction: column;
     gap: 8px;
+  }
+}
+
+/* MB-3 三档断点 */
+@media (max-width: 480px) {
+  .container,
+  .trace-container,
+  .product-trace,
+  .trace-view {
+    padding: 10px !important;
+  }
+  .timeline-item :deep(.el-card__body) {
+    padding: 12px !important;
+  }
+}
+@media (max-width: 360px) {
+  .container,
+  .trace-container,
+  .product-trace,
+  .trace-view {
+    padding: 6px !important;
   }
 }
 </style>

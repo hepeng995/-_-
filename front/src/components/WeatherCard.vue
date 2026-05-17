@@ -412,4 +412,38 @@ watch(() => props.attractionId, (newId) => {
   text-align: right;
   margin-top: 12px;
 }
+
+/* C9 - WeatherCard 移动端 480/360 段 */
+@media (max-width: 480px) {
+  .forecast-col {
+    padding: 8px 6px;
+    gap: 4px;
+  }
+  .forecast-col-emoji {
+    font-size: 22px;
+  }
+  .forecast-col-label {
+    font-size: 11px;
+  }
+  .forecast-col-text {
+    font-size: 11px;
+    white-space: normal;
+    text-align: center;
+    line-height: 1.3;
+  }
+  .forecast-col-temps {
+    font-size: 11px;
+  }
+}
+@media (max-width: 360px) {
+  .forecast-col {
+    padding: 6px 4px;
+  }
+  .forecast-col-emoji {
+    font-size: 20px;
+  }
+  .forecast-col-text {
+    font-size: 10px;
+  }
+}
 </style>

@@ -82,7 +82,7 @@
             @click="goToDetail(product.id)"
           >
             <div class="product-image">
-              <img :src="product.coverImage || '/images/default-product.jpg'" :alt="product.name" />
+              <img :src="product.coverImage || '/images/default-product.jpg'" :alt="product.name"  loading="lazy" decoding="async"/>
               <div class="product-overlay">
                 <el-button type="primary" size="small">查看详情</el-button>
               </div>
@@ -780,9 +780,9 @@ onMounted(() => {
 
   .product-actions .el-button {
     min-width: 0;
-    min-height: 34px;
+    min-height: 40px;
     padding-inline: 8px;
-    font-size: 12px;
+    font-size: 13px;
     margin-left: 0;
   }
 
@@ -808,8 +808,8 @@ onMounted(() => {
   }
 
   .cart-float {
-    bottom: 20px;
-    right: 20px;
+    bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+    right: 80px;
   }
 
   .pagination-wrapper :deep(.el-pagination) {
@@ -836,9 +836,9 @@ onMounted(() => {
   }
 
   .product-actions .el-button {
-    min-height: 32px;
+    min-height: 40px;
     padding-inline: 6px;
-    font-size: 11px;
+    font-size: 13px;
   }
 
   .product-actions :deep(.el-button > span) {
@@ -847,6 +847,35 @@ onMounted(() => {
 
   .product-actions :deep(.el-button .el-icon) {
     font-size: 12px;
+  }
+}
+
+/* C14 - 360px 兜底（iPhone SE / 折叠屏） */
+@media (max-width: 360px) {
+  .container,
+  .page-container,
+  .content-container {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  .page-header {
+    padding: 28px 0 !important;
+  }
+  .page-header h1 {
+    font-size: 18px !important;
+  }
+  .page-header p {
+    font-size: 12px !important;
+  }
+  .products-grid,
+  .attractions-grid,
+  .news-grid,
+  .routes-grid,
+  .activities-grid {
+    gap: 8px !important;
+  }
+  .el-button:not(.is-circle):not(.is-text) {
+    min-height: 36px;
   }
 }
 </style>

@@ -29,4 +29,10 @@ public interface TraceService {
     List<ProductBatchDTO> getBatches();
 
     ProductBatchDTO createBatch(ProductBatchDTO dto);
+
+    ProductBatchDTO updateBatch(Long id, ProductBatchDTO dto);
+
+    void deleteBatch(Long id);
+
+    ProductBatchDTO toggleBatchStatus(Long id, Integer status);
 }

@@ -3,6 +3,13 @@
 // 乡村振兴·智兴乡村平台 用户端前端
 // ============================================================
 
+// ---- 响应式断点 SCSS 变量（保持与 _mixins.scss 一致） ----
+$breakpoint-xs: 360px;
+$breakpoint-sm: 480px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 1024px;
+$breakpoint-xl: 1280px;
+
 // Noto Serif SC 已移除 Google Fonts CDN 引用（国内被墙导致 30s+ 白屏）
 // 回退字体栈：Source Han Serif SC > STSong > SimSun > serif，覆盖主流中文设备
 :root {
@@ -102,10 +109,11 @@
   --text-md:   16px;
   --text-lg:   18px;
   --text-xl:   20px;
-  --text-2xl:  24px;
-  --text-3xl:  30px;
-  --text-4xl:  36px;
-  --text-5xl:  48px;
+  // 大字号桌面 -> H5 自然过渡（min vw max）
+  --text-2xl:  clamp(20px, 3.4vw, 24px);
+  --text-3xl:  clamp(22px, 4.4vw, 30px);
+  --text-4xl:  clamp(26px, 5.5vw, 36px);
+  --text-5xl:  clamp(30px, 7vw, 48px);
   --leading-tight:   1.25;
   --leading-normal:  1.6;
   --leading-relaxed: 1.8;
@@ -188,5 +196,42 @@
 @media screen and (max-width: 480px) {
   :root {
     --content-padding: var(--space-2);
+  }
+}
+
+
+// ============================================================
+// A4 - prefers-color-scheme: dark
+// 仅覆盖根 token，硬编码 hex 的页面后续 M-7 专项替换
+// ============================================================
+@media (prefers-color-scheme: dark) {
+  :root {
+    // 文字色（提升对比度）
+    --color-text-primary:    #e8f0e8;
+    --color-text-secondary:  #b8c8b8;
+    --color-text-tertiary:   #94a894;
+    --color-text-placeholder:#6f8470;
+    --color-text-inverse:    #052e16;
+    --color-text-link:       #4ade80;
+
+    // 背景/表面色
+    --color-bg-body:     #0f1612;
+    --color-bg-surface:  #1a2420;
+    --color-bg-muted:    #232e29;
+    --color-bg-sidebar:  #182320;
+    --color-bg-sidebar-hover:  rgba(74, 222, 128, 0.08);
+    --color-bg-sidebar-active: rgba(74, 222, 128, 0.16);
+    --color-bg-overlay:  rgba(0, 0, 0, 0.65);
+
+    // 边框
+    --color-border:       #2a3832;
+    --color-border-light: #1f2b27;
+
+    // 阴影（暗色下减弱）
+    --shadow-sm:          0 1px 3px rgba(0, 0, 0, 0.35);
+    --shadow-md:          0 4px 8px rgba(0, 0, 0, 0.4);
+    --shadow-lg:          0 8px 20px rgba(0, 0, 0, 0.45);
+    --shadow-card:        0 1px 4px rgba(0, 0, 0, 0.4), 0 4px 12px rgba(0, 0, 0, 0.25);
+    --shadow-card-hover:  0 8px 24px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.3);
   }
 }

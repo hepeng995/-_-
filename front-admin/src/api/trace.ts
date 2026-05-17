@@ -42,3 +42,20 @@ export async function deleteTraceRecord(id: number): Promise<ApiResponse<null>> 
 export async function getBatches(): Promise<ApiResponse<ProductBatch[]>> {
   return request.get('/admin/trace/batches');
 }
+
+export async function createBatch(data: Partial<ProductBatch>): Promise<ApiResponse<ProductBatch>> {
+  return request.post('/admin/trace/batches', data);
+}
+
+export async function updateBatch(id: number, data: Partial<ProductBatch>): Promise<ApiResponse<ProductBatch>> {
+  return request.put(`/admin/trace/batches/${id}`, data);
+}
+
+export async function deleteBatch(id: number): Promise<ApiResponse<null>> {
+  return request.delete(`/admin/trace/batches/${id}`);
+}
+
+export async function toggleBatchStatus(id: number, status?: number): Promise<ApiResponse<ProductBatch>> {
+  const url = status !== undefined ? `/admin/trace/batches/${id}/status?status=${status}` : `/admin/trace/batches/${id}/status`;
+  return request.put(url);
+}

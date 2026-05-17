@@ -1,5 +1,7 @@
 package com.cinema.booking.service.impl;
 
+
+import com.cinema.booking.utils.HtmlSanitizer;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -53,7 +55,7 @@ public class ProductReviewServiceImpl implements ProductReviewService {
                 .userId(reviewDTO.getUserId())
                 .orderId(orderId)
                 .rating(reviewDTO.getRating())
-                .content(reviewDTO.getContent())
+                .content(HtmlSanitizer.cleanRich(reviewDTO.getContent()))
                 .images(reviewDTO.getImages())
                 .isAnonymous(reviewDTO.getIsAnonymous() != null ? reviewDTO.getIsAnonymous() : false)
                 .status(1) // 默认通过审核

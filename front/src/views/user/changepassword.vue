@@ -336,4 +336,37 @@ const changePassword = async () => {
     margin-left: 0;
   }
 }
+
+/* MB-3 三档断点：changepassword.vue */
+@media (max-width: 480px) {
+  .change-password-container {
+    padding: 12px;
+  }
+  .password-form-card,
+  .password-form-card :deep(.el-card__body) {
+    padding: 14px !important;
+  }
+  .password-form :deep(.el-form-item__label) {
+    float: none !important;
+    text-align: left !important;
+    width: auto !important;
+    padding: 0 0 6px !important;
+  }
+  .password-form :deep(.el-form-item__content) {
+    margin-left: 0 !important;
+  }
+  .password-actions {
+    flex-direction: column;
+  }
+  .password-actions .el-button {
+    width: 100%;
+    min-height: 44px;
+  }
+}
+
+@media (max-width: 360px) {
+  .change-password-container {
+    padding: 8px;
+  }
+}
 </style>

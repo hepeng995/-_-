@@ -6,7 +6,7 @@
         <!-- 窗口头部 -->
         <div class="chat-header">
           <div class="chat-header-left">
-            <img :src="ipMascot" alt="AI助手" class="header-avatar" />
+            <img :src="ipMascot" alt="AI助手" class="header-avatar"  loading="lazy" decoding="async"/>
             <div class="header-info">
               <h3>智兴乡村AI助手</h3>
               <div class="status-line">
@@ -33,7 +33,7 @@
         <div class="chat-messages" ref="messagesContainer">
           <!-- 欢迎消息（无历史消息时显示） -->
           <div v-if="chatStore.messages.length === 0" class="welcome-message">
-            <img :src="ipMascot" alt="AI助手" class="welcome-avatar" />
+            <img :src="ipMascot" alt="AI助手" class="welcome-avatar"  loading="lazy" decoding="async"/>
             <h3>你好，我是智兴乡村，数创未来AI助手</h3>
             <p>我可以帮你推荐景点、特产、资讯，为你规划乡村之旅。</p>
             <div class="quick-questions">
@@ -55,7 +55,7 @@
             :class="['message-wrapper', msg.role === 'user' ? 'message-user' : 'message-ai']"
           >
             <!-- AI头像 -->
-            <img v-if="msg.role === 'ai'" :src="ipMascot" class="message-avatar" />
+            <img v-if="msg.role === 'ai'" :src="ipMascot" class="message-avatar"  loading="lazy" decoding="async"/>
 
             <div class="message-content">
               <!-- 文本气泡 -->
@@ -93,7 +93,7 @@
                 >
                   <!-- 卡片图片 -->
                   <div v-if="getCardImage(card)" class="card-image">
-                    <img :src="getCardImage(card)" :alt="card.title" />
+                    <img :src="getCardImage(card)" :alt="card.title"  loading="lazy" decoding="async"/>
                   </div>
                   <div v-else class="card-image card-image-placeholder">
                     <el-icon :size="24"><Picture /></el-icon>
@@ -167,7 +167,7 @@
     <div class="floating-button" @click="chatStore.toggleChat">
       <el-badge :value="chatStore.unreadCount" :hidden="chatStore.unreadCount === 0" :max="99">
         <div class="button-inner">
-          <img :src="ipMascot" alt="AI助手" class="mascot-image" />
+          <img :src="ipMascot" alt="AI助手" class="mascot-image"  loading="lazy" decoding="async"/>
           <div class="pulse-ring"></div>
           <div class="pulse-ring delay"></div>
         </div>
@@ -1104,7 +1104,8 @@ const getModuleAccentClass = (type) => {
   /* 悬浮按钮缩小 */
   .floating-button {
     right: 16px;
-    bottom: 20px;
+    /* MB-8: 让 AI 浮窗按钮避让底部 Tab Bar + 刘海屏 home indicator */
+    bottom: calc(72px + env(safe-area-inset-bottom, 0px));
   }
 
   .button-inner {

@@ -100,9 +100,7 @@ const handleLogin = () => {
               redirectPath = '/home'
             }
           }
-          
-          console.log('登录成功，准备跳转到:', redirectPath)
-          console.log('当前用户角色:', userData.role)
+
 
           // 使用nextTick确保DOM更新后再跳转
           await router.push(redirectPath)

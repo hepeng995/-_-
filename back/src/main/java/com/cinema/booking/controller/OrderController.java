@@ -1,13 +1,10 @@
 package com.cinema.booking.controller;
 
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.cinema.booking.annotation.SystemOperation;
 import com.cinema.booking.dto.OrderDTO;
 import com.cinema.booking.dto.OrderItemDTO;
 import com.cinema.booking.dto.PageRequest;
-import com.cinema.booking.entity.Order;
-import com.cinema.booking.mapper.OrderMapper;
 import com.cinema.booking.security.SecurityService;
 import com.cinema.booking.service.OrderService;
 import com.cinema.booking.utils.Result;
@@ -28,7 +25,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
-import java.util.List;
 
 /**
  * 订单控制器
@@ -42,7 +38,6 @@ public class OrderController {
     
     private final OrderService orderService;
     private final SecurityService securityService;
-    private final OrderMapper orderMapper;
     
     @Operation(summary = "分页查询订单列表")
     @GetMapping("/page")
@@ -151,30 +146,40 @@ public class OrderController {
     @PutMapping("/batch/status")
     @PreAuthorize("hasRole('ADMIN')")
     @SystemOperation(module = "订单管理", operation = "批量更新订单状态", description = "管理员批量更新订单状态")
-    public Result<Void> batchUpdateOrderStatus(@RequestBody Map<String, Object> params) {
+    public Result<Map<String, Object>> batchUpdateOrderStatus(@RequestBody Map<String, Object> params) {
         @SuppressWarnings("unchecked")
-        List<Long> ids = (List<Long>) params.get("ids");
-        Integer orderStatus = (Integer) params.get("orderStatus");
-        LambdaUpdateWrapper<Order> wrapper = new LambdaUpdateWrapper<>();
-        wrapper.in(Order::getId, ids).set(Order::getOrderStatus, orderStatus);
-        orderMapper.update(null, wrapper);
-        return Result.ok();
+        List<Object> rawIds = (List<Object>) params.get("ids");
+        Integer orderStatus = params.get("orderStatus") != null ? Integer.valueOf(params.get("orderStatus").toString()) : null;
+        if (rawIds == null || rawIds.isEmpty() || orderStatus == null) {
+            return Result.error("参数缺失");
+        }
+        List<Long> ids = rawIds.stream().map(o -> Long.valueOf(o.toString())).toList();
+        int success = orderService.batchUpdateOrderStatus(ids, orderStatus);
+        Map<String, Object> data = new java.util.HashMap<>();
+        data.put("success", success);
+        data.put("failed", ids.size() - success);
+        data.put("total", ids.size());
+        return Result.ok(data);
     }
 
     @Operation(summary = "批量取消订单")
     @PutMapping("/batch/cancel")
     @PreAuthorize("hasRole('ADMIN')")
     @SystemOperation(module = "订单管理", operation = "批量取消订单", description = "管理员批量取消订单")
-    public Result<Void> batchCancelOrders(@RequestBody Map<String, Object> params) {
+    public Result<Map<String, Object>> batchCancelOrders(@RequestBody Map<String, Object> params) {
         @SuppressWarnings("unchecked")
-        List<Long> ids = (List<Long>) params.get("ids");
+        List<Object> rawIds = (List<Object>) params.get("ids");
         String cancelReason = (String) params.getOrDefault("cancelReason", "管理员批量取消");
-        LambdaUpdateWrapper<Order> wrapper = new LambdaUpdateWrapper<>();
-        wrapper.in(Order::getId, ids)
-                .set(Order::getOrderStatus, 5)
-                .set(Order::getCancelReason, cancelReason);
-        orderMapper.update(null, wrapper);
-        return Result.ok();
+        if (rawIds == null || rawIds.isEmpty()) {
+            return Result.error("参数缺失");
+        }
+        List<Long> ids = rawIds.stream().map(o -> Long.valueOf(o.toString())).toList();
+        int success = orderService.batchCancelOrders(ids, cancelReason);
+        Map<String, Object> data = new java.util.HashMap<>();
+        data.put("success", success);
+        data.put("failed", ids.size() - success);
+        data.put("total", ids.size());
+        return Result.ok(data);
     }
     
     @Operation(summary = "取消订单")
@@ -200,15 +205,35 @@ public class OrderController {
     @SystemOperation(module = "订单管理", operation = "确认收货", description = "确认收货")
     public Result<OrderDTO> confirmReceived(@PathVariable Long id) {
         OrderDTO order = orderService.getOrderById(id);
-        
+
         // 只能确认自己的订单
         Long currentUserId = securityService.getCurrentUserId();
         if (!order.getUserId().equals(currentUserId)) {
             return Result.error("无权操作该订单");
         }
-        
+
         OrderDTO confirmed = orderService.confirmReceived(id);
         return Result.ok(confirmed);
+    }
+
+    @Operation(summary = "订单退款（管理员）")
+    @PostMapping("/{id}/refund")
+    @PreAuthorize("hasRole('ADMIN')")
+    @SystemOperation(module = "订单管理", operation = "订单退款", description = "管理员对已支付订单执行退款")
+    public Result<OrderDTO> refundOrder(@PathVariable Long id,
+                                        @RequestBody(required = false) Map<String, String> body) {
+        String reason = body != null ? body.getOrDefault("reason", null) : null;
+        return Result.ok(orderService.refundOrder(id, reason));
+    }
+
+    @Operation(summary = "订单发货（管理员）")
+    @PostMapping("/{id}/ship")
+    @PreAuthorize("hasRole('ADMIN')")
+    @SystemOperation(module = "订单管理", operation = "订单发货", description = "管理员将待发货订单标记为已发货并写入发货时间")
+    public Result<OrderDTO> shipOrder(@PathVariable Long id,
+                                      @RequestBody(required = false) Map<String, String> body) {
+        String tracking = body != null ? body.getOrDefault("trackingInfo", null) : null;
+        return Result.ok(orderService.shipOrder(id, tracking));
     }
 
     @Operation(summary = "删除订单")
@@ -216,15 +241,7 @@ public class OrderController {
     @PreAuthorize("hasRole('ADMIN')")
     @SystemOperation(module = "订单管理", operation = "删除订单", description = "管理员逻辑删除订单")
     public Result<Void> deleteOrder(@PathVariable Long id) {
-        Order order = orderMapper.selectById(id);
-        if (order == null || order.getDeleted()) {
-            return Result.error("订单不存在");
-        }
-        Order updateOrder = new Order();
-        updateOrder.setId(id);
-        updateOrder.setDeleted(true);
-        updateOrder.setUpdatedAt(java.time.LocalDateTime.now());
-        orderMapper.updateById(updateOrder);
+        orderService.deleteOrder(id);
         return Result.ok();
     }
     

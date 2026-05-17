@@ -81,4 +81,31 @@ public class AdminTraceController {
         ProductBatchDTO created = traceService.createBatch(dto);
         return Result.ok(created);
     }
+
+    @Operation(summary = "更新产品批次")
+    @PutMapping("/batches/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Result<ProductBatchDTO> updateBatch(
+            @Parameter(description = "批次ID") @PathVariable Long id,
+            @RequestBody ProductBatchDTO dto) {
+        return Result.ok(traceService.updateBatch(id, dto));
+    }
+
+    @Operation(summary = "删除产品批次")
+    @DeleteMapping("/batches/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Result<Void> deleteBatch(
+            @Parameter(description = "批次ID") @PathVariable Long id) {
+        traceService.deleteBatch(id);
+        return Result.ok();
+    }
+
+    @Operation(summary = "上下架产品批次")
+    @PutMapping("/batches/{id}/status")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Result<ProductBatchDTO> toggleBatchStatus(
+            @Parameter(description = "批次ID") @PathVariable Long id,
+            @RequestParam(required = false) Integer status) {
+        return Result.ok(traceService.toggleBatchStatus(id, status));
+    }
 }

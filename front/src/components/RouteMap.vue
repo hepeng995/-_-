@@ -161,11 +161,30 @@ watch(() => props.items, () => {
     mapInstance.destroy()
     mapInstance = null
   }
-  loadAMapScript()
+  if (mapVisible.value) loadAMapScript()
 }, { deep: true })
 
+// B6 - IntersectionObserver 懒加载：容器进入视口才注入高德 SDK
+const mapVisible = ref(false)
+let _io = null
+
 onMounted(() => {
-  loadAMapScript()
+  if (!mapContainer.value) return
+  if (typeof IntersectionObserver !== 'undefined') {
+    _io = new IntersectionObserver((entries) => {
+      const e = entries[0]
+      if (e && e.isIntersecting) {
+        mapVisible.value = true
+        loadAMapScript()
+        if (_io) { _io.disconnect(); _io = null }
+      }
+    }, { rootMargin: '200px 0px' })
+    _io.observe(mapContainer.value)
+  } else {
+    // 降级：浏览器无 IO 时直接加载
+    mapVisible.value = true
+    loadAMapScript()
+  }
 })
 </script>
 
@@ -227,6 +246,20 @@ onMounted(() => {
 
   .section-card {
     padding: 20px;
+  }
+}
+
+/* C8 - RouteMap 移动端 480/360 段 */
+@media (max-width: 480px) {
+  .map-container {
+    height: 60dvh;
+    min-height: 320px;
+  }
+}
+@media (max-width: 360px) {
+  .map-container {
+    height: 58dvh;
+    min-height: 280px;
   }
 }
 </style>

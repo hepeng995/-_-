@@ -1,0 +1,20 @@
+{
+  "name": "智兴乡村·新桃源",
+  "short_name": "智兴乡村",
+  "description": "乡村振兴数字化平台 - 展示乡村美景，推广特色产品",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#10b981",
+  "lang": "zh-CN",
+  "icons": [
+    {
+      "src": "/api/file/download/IP3.png",
+      "sizes": "64x64 128x128 256x256 512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

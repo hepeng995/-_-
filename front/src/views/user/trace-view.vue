@@ -40,7 +40,7 @@
               </div>
             </div>
             <div class="header-qr">
-              <img v-if="traceData.qrCodeDataUrl" :src="traceData.qrCodeDataUrl" alt="溯源二维码" class="qr-image" />
+              <img v-if="traceData.qrCodeDataUrl" :src="traceData.qrCodeDataUrl" alt="溯源二维码" class="qr-image"  loading="lazy" decoding="async"/>
               <div v-else class="qr-placeholder">
                 <span>二维码生成中</span>
               </div>
@@ -239,6 +239,27 @@ onMounted(async () => {
   .qr-image {
     width: 72px;
     height: 72px;
+  }
+}
+
+/* MB-3 三档断点 */
+@media (max-width: 480px) {
+  .container,
+  .trace-container,
+  .product-trace,
+  .trace-view {
+    padding: 10px !important;
+  }
+  .timeline-item :deep(.el-card__body) {
+    padding: 12px !important;
+  }
+}
+@media (max-width: 360px) {
+  .container,
+  .trace-container,
+  .product-trace,
+  .trace-view {
+    padding: 6px !important;
   }
 }
 </style>

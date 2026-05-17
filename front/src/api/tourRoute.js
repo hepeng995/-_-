@@ -32,5 +32,35 @@ export default {
       method: 'get',
       params: { limit }
     })
+  },
+
+  /**
+   * 切换路线收藏状态
+   */
+  async toggleFavorite(id) {
+    return request({
+      url: `/tour-routes/${id}/favorite`,
+      method: 'post'
+    })
+  },
+
+  /**
+   * 获取当前用户对路线的收藏状态
+   */
+  async getFavoriteInfo(id) {
+    return request({
+      url: `/tour-routes/${id}/favorite-info`,
+      method: 'get'
+    })
+  },
+
+  /**
+   * 获取当前用户收藏的路线ID列表
+   */
+  async getMyFavoriteRouteIds() {
+    return request({
+      url: '/tour-routes/favorites/my',
+      method: 'get'
+    })
   }
 }

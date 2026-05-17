@@ -446,4 +446,34 @@ onUnmounted(() => {
 :deep(.amap-copyright) {
   display: none !important;
 }
+
+/* C8 - LocationMap 移动端 480/360 段 */
+@media (max-width: 480px) {
+  .map-container {
+    padding: 12px;
+  }
+  .amap-container {
+    height: 60dvh;
+    min-height: 320px;
+  }
+  .map-header h3 {
+    font-size: 16px;
+  }
+  .legend {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+}
+@media (max-width: 360px) {
+  .map-container {
+    padding: 8px;
+  }
+  .amap-container {
+    height: 58dvh;
+    min-height: 280px;
+  }
+  .map-header h3 {
+    font-size: 15px;
+  }
+}
 </style>

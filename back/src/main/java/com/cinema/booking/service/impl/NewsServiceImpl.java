@@ -11,6 +11,9 @@ import com.cinema.booking.mapper.NewsMapper;
 import com.cinema.booking.service.NewsService;
 import com.cinema.booking.utils.BeanCopyUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,6 +46,7 @@ public class NewsServiceImpl implements NewsService {
     }
 
     @Override
+    @Cacheable(value = "news", key = "'page:' + #pageRequest.pageNum + ':' + #pageRequest.pageSize + ':' + (#category == null ? '' : #category) + ':' + (#keyword == null ? '' : #keyword) + ':' + (#status == null ? 'all' : #status) + ':' + (#isTop == null ? 'all' : #isTop) + ':' + (#isFeatured == null ? 'all' : #isFeatured)")
     public IPage<NewsDTO> getNewsPage(PageRequest pageRequest, String category, String keyword, Integer status, Boolean isTop, Boolean isFeatured) {
         Page<News> page = new Page<>(pageRequest.getPageNum(), pageRequest.getPageSize());
         IPage<News> newsPage = newsMapper.selectNewsPage(page, category, keyword, status, isTop, isFeatured);
@@ -72,6 +76,7 @@ public class NewsServiceImpl implements NewsService {
     }
 
     @Override
+    @Cacheable(value = "news", key = "'detail:' + #id")
     public NewsDTO getNewsById(Long id) {
         News news = newsMapper.selectById(id);
         if (news == null || news.getDeleted()) {
@@ -83,6 +88,10 @@ public class NewsServiceImpl implements NewsService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "news", allEntries = true),
+            @CacheEvict(value = "homeRecommend", allEntries = true)
+    })
     public NewsDTO createNews(NewsDTO newsDTO) {
         News news = BeanCopyUtils.copyBean(newsDTO, News.class);
         news.setCreatedAt(LocalDateTime.now());
@@ -104,6 +113,10 @@ public class NewsServiceImpl implements NewsService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "news", allEntries = true),
+            @CacheEvict(value = "homeRecommend", allEntries = true)
+    })
     public NewsDTO updateNews(Long id, NewsDTO newsDTO) {
         News existingNews = newsMapper.selectById(id);
         if (existingNews == null || existingNews.getDeleted()) {
@@ -120,6 +133,10 @@ public class NewsServiceImpl implements NewsService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "news", allEntries = true),
+            @CacheEvict(value = "homeRecommend", allEntries = true)
+    })
     public void deleteNews(Long id) {
         News news = newsMapper.selectById(id);
         if (news == null || news.getDeleted()) {
@@ -131,6 +148,7 @@ public class NewsServiceImpl implements NewsService {
     }
 
     @Override
+    @Cacheable(value = "homeRecommend", key = "'news:top:' + #limit")
     public List<NewsDTO> getTopNews(Integer limit) {
         List<News> newsList = newsMapper.selectTopNews(limit);
         return newsList.stream()
@@ -139,6 +157,7 @@ public class NewsServiceImpl implements NewsService {
     }
 
     @Override
+    @Cacheable(value = "homeRecommend", key = "'news:featured:' + #limit")
     public List<NewsDTO> getFeaturedNews(Integer limit) {
         List<News> newsList = newsMapper.selectFeaturedNews(limit);
         return newsList.stream()
@@ -147,6 +166,7 @@ public class NewsServiceImpl implements NewsService {
     }
 
     @Override
+    @Cacheable(value = "homeRecommend", key = "'news:latest:' + #limit")
     public List<NewsDTO> getLatestNews(Integer limit) {
         List<News> newsList = newsMapper.selectLatestNews(limit);
         return newsList.stream()
@@ -155,6 +175,7 @@ public class NewsServiceImpl implements NewsService {
     }
 
     @Override
+    @Cacheable(value = "homeRecommend", key = "'news:hot:' + #limit")
     public List<NewsDTO> getHotNews(Integer limit) {
         List<News> newsList = newsMapper.selectHotNews(limit);
         return newsList.stream()
@@ -163,6 +184,7 @@ public class NewsServiceImpl implements NewsService {
     }
 
     @Override
+    @Cacheable(value = "news", key = "'byCategory:' + (#category == null ? '' : #category) + ':' + #limit")
     public List<NewsDTO> getNewsByCategory(String category, Integer limit) {
         List<News> newsList = newsMapper.selectByCategory(category, limit);
         return newsList.stream()
@@ -177,6 +199,10 @@ public class NewsServiceImpl implements NewsService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "news", allEntries = true),
+            @CacheEvict(value = "homeRecommend", allEntries = true)
+    })
     public NewsDTO publishNews(Long id) {
         News news = newsMapper.selectById(id);
         if (news == null || news.getDeleted()) {
@@ -193,6 +219,10 @@ public class NewsServiceImpl implements NewsService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "news", allEntries = true),
+            @CacheEvict(value = "homeRecommend", allEntries = true)
+    })
     public NewsDTO unpublishNews(Long id) {
         News news = newsMapper.selectById(id);
         if (news == null || news.getDeleted()) {

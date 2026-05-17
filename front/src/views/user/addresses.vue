@@ -587,4 +587,33 @@ onMounted(() => {
     padding: 30px 20px;
   }
 }
+
+/* C14 - 360px 兜底（iPhone SE / 折叠屏） */
+@media (max-width: 360px) {
+  .container,
+  .page-container,
+  .content-container {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  .page-header {
+    padding: 28px 0 !important;
+  }
+  .page-header h1 {
+    font-size: 18px !important;
+  }
+  .page-header p {
+    font-size: 12px !important;
+  }
+  .products-grid,
+  .attractions-grid,
+  .news-grid,
+  .routes-grid,
+  .activities-grid {
+    gap: 8px !important;
+  }
+  .el-button:not(.is-circle):not(.is-text) {
+    min-height: 36px;
+  }
+}
 </style>

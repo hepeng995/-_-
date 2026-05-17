@@ -81,7 +81,7 @@ export function Header({ onOpenSidebar }: HeaderProps) {
           </button>
 
           {isNotifOpen && (
-            <div className="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-50">
+            <div className="absolute right-0 mt-2 w-80 max-w-[calc(100vw-1rem)] bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-50">
               <div className="px-4 py-3 border-b border-gray-50 flex justify-between items-center">
                 <h3 className="font-bold text-gray-900">通知</h3>
                 <span className="text-xs text-bamboo-500 bg-bamboo-50 px-2 py-1 rounded-full font-medium">暂无新通知</span>
@@ -115,7 +115,7 @@ export function Header({ onOpenSidebar }: HeaderProps) {
           )}
 
           {isProfileOpen && (
-            <div className="absolute right-0 top-12 mt-2 w-48 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-50">
+            <div className="absolute right-0 top-12 mt-2 w-48 max-w-[calc(100vw-1rem)] bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-50">
               <div className="px-4 py-3 border-b border-gray-50 md:hidden">
                 <p className="text-sm font-bold text-gray-900">{displayName}</p>
                 <p className="text-xs text-gray-500">{displayRole}</p>

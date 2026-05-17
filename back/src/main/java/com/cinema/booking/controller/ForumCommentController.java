@@ -109,6 +109,40 @@ public class ForumCommentController {
         forumCommentService.auditComment(id, status);
         return Result.success();
     }
+
+    /**
+     * 批量审核评论
+     */
+    @Operation(summary = "批量审核评论")
+    @PostMapping("/batch-audit")
+    @PreAuthorize("hasRole('ADMIN')")
+    @SystemOperation(module = "论坛管理", operation = "批量审核评论", description = "管理员批量审核论坛评论")
+    public Result<java.util.Map<String, Object>> batchAuditComments(@RequestBody java.util.Map<String, Object> params) {
+        @SuppressWarnings("unchecked")
+        java.util.List<Object> rawIds = (java.util.List<Object>) params.get("ids");
+        Integer status = params.get("status") != null ? Integer.valueOf(params.get("status").toString()) : null;
+        if (rawIds == null || rawIds.isEmpty() || status == null) {
+            return Result.fail("参数缺失");
+        }
+        java.util.List<Long> ids = rawIds.stream()
+                .map(o -> Long.valueOf(o.toString()))
+                .collect(java.util.stream.Collectors.toList());
+        int success = 0;
+        int failed = 0;
+        for (Long id : ids) {
+            try {
+                forumCommentService.auditComment(id, status);
+                success++;
+            } catch (Exception e) {
+                failed++;
+            }
+        }
+        java.util.Map<String, Object> data = new java.util.HashMap<>();
+        data.put("success", success);
+        data.put("failed", failed);
+        data.put("total", ids.size());
+        return Result.ok(data);
+    }
     
     /**
      * 点赞/取消点赞评论
@@ -123,10 +157,12 @@ public class ForumCommentController {
     
     /**
      * 取消点赞评论
+     * @deprecated 已统一为 {@link #toggleCommentLike(Long)} (POST /forum/comments/{id}/like)，保留此接口仅为兼容旧前端
      */
-    @Operation(summary = "取消点赞评论")
+    @Deprecated
+    @Operation(summary = "[已废弃] 取消点赞评论（请使用 /like 切换接口）")
     @PostMapping("/{id}/unlike")
-    @SystemOperation(module = "论坛管理", operation = "取消点赞评论", description = "用户取消点赞论坛评论")
+    @SystemOperation(module = "论坛管理", operation = "取消点赞评论", description = "用户取消点赞论坛评论（兼容旧接口）")
     public Result<Boolean> unlikeComment(@Parameter(description = "评论ID") @PathVariable Long id) {
         boolean isLiked = forumCommentService.unlikeComment(id);
         return Result.success(isLiked);

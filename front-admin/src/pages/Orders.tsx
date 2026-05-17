@@ -68,6 +68,27 @@ export default function Orders() {
     catch (e: any) { toast.error(e?.response?.data?.message || '取消失败'); }
   };
 
+  const handleShip = async (id: number) => {
+    const tracking = await prompt({ message: '请填写发货备注（物流单号等，可留空）：', placeholder: '物流单号 / 备注', required: false });
+    if (tracking === null) return;
+    try {
+      await orderApi.shipOrder(id, tracking || '');
+      toast.success('发货成功');
+      fetchData();
+    } catch (e: any) { toast.error(e?.response?.data?.message || '发货失败'); }
+  };
+
+  const handleRefund = async (id: number) => {
+    const reason = await prompt({ message: '请输入退款原因：', placeholder: '例如：用户申请整单退款', required: true });
+    if (!reason) return;
+    if (!await confirm({ message: '退款将恢复商品库存并销量，订单状态置为已退款，是否确认？', type: 'danger' })) return;
+    try {
+      await orderApi.refundOrder(id, reason);
+      toast.success('退款成功');
+      fetchData();
+    } catch (e: any) { toast.error(e?.response?.data?.message || '退款失败'); }
+  };
+
   const handleBatchShip = async () => {
     if (selectedIds.length === 0) return;
     if (!await confirm({ message: `确定要将选中的 ${selectedIds.length} 个订单设为已发货吗？`, type: 'warning' })) return;
@@ -88,8 +109,12 @@ export default function Orders() {
   const getActions = (order: Order) => {
     const actions: { label: string; color: string; action: () => void }[] = [];
     if (order.orderStatus === 1) actions.push({ label: '取消', color: 'bg-terracotta-500', action: () => handleCancel(order.id) });
-    if (order.orderStatus === 2) actions.push({ label: '发货', color: 'bg-bamboo-500', action: () => handleUpdateStatus(order.id, 3) });
+    if (order.orderStatus === 2) actions.push({ label: '发货', color: 'bg-bamboo-500', action: () => handleShip(order.id) });
     if (order.orderStatus === 3) actions.push({ label: '确认收货', color: 'bg-sprout-500', action: () => handleUpdateStatus(order.id, 4) });
+    // 已支付订单（待发货/已发货/已收货）允许管理员退款
+    if (order.orderStatus === 2 || order.orderStatus === 3 || order.orderStatus === 4) {
+      actions.push({ label: '退款', color: 'bg-terracotta-500', action: () => handleRefund(order.id) });
+    }
     return actions;
   };
 

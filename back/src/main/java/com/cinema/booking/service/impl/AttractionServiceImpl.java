@@ -15,6 +15,9 @@ import com.cinema.booking.mapper.AttractionMapper;
 import com.cinema.booking.service.AttractionService;
 import com.cinema.booking.utils.BeanCopyUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +36,7 @@ public class AttractionServiceImpl implements AttractionService {
     private final AttractionCategoryMapper categoryMapper;
 
     @Override
+    @Cacheable(value = "attractions", key = "'page:' + #pageRequest.pageNum + ':' + #pageRequest.pageSize + ':' + (#categoryId == null ? '0' : #categoryId) + ':' + (#keyword == null ? '' : #keyword) + ':' + (#status == null ? 'all' : #status)")
     public IPage<AttractionDTO> getAttractionPage(PageRequest pageRequest, Long categoryId, String keyword, Integer status) {
         Page<Attraction> page = new Page<>(pageRequest.getPageNum(), pageRequest.getPageSize());
         IPage<Attraction> attractionPage = attractionMapper.selectAttractionPage(page, categoryId, keyword, status);
@@ -51,6 +55,7 @@ public class AttractionServiceImpl implements AttractionService {
     }
 
     @Override
+    @Cacheable(value = "attractions", key = "'detail:' + #id")
     public AttractionDTO getAttractionById(Long id) {
         Attraction attraction = attractionMapper.selectById(id);
         if (attraction == null || attraction.getDeleted()) {
@@ -70,6 +75,10 @@ public class AttractionServiceImpl implements AttractionService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "attractions", allEntries = true),
+            @CacheEvict(value = "homeRecommend", allEntries = true)
+    })
     public AttractionDTO createAttraction(AttractionDTO attractionDTO) {
         // 验证分类是否存在
         if (attractionDTO.getCategoryId() != null) {
@@ -92,6 +101,10 @@ public class AttractionServiceImpl implements AttractionService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "attractions", allEntries = true),
+            @CacheEvict(value = "homeRecommend", allEntries = true)
+    })
     public AttractionDTO updateAttraction(Long id, AttractionDTO attractionDTO) {
         Attraction existingAttraction = attractionMapper.selectById(id);
         if (existingAttraction == null || existingAttraction.getDeleted()) {
@@ -116,6 +129,10 @@ public class AttractionServiceImpl implements AttractionService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "attractions", allEntries = true),
+            @CacheEvict(value = "homeRecommend", allEntries = true)
+    })
     public void deleteAttraction(Long id) {
         Attraction attraction = attractionMapper.selectById(id);
         if (attraction == null || attraction.getDeleted()) {
@@ -128,6 +145,7 @@ public class AttractionServiceImpl implements AttractionService {
     }
 
     @Override
+    @Cacheable(value = "homeRecommend", key = "'attractions:recommend:' + #limit")
     public List<AttractionDTO> getRecommendAttractions(Integer limit) {
         List<Attraction> attractions = attractionMapper.selectRecommendAttractions(limit);
         return attractions.stream()
@@ -136,6 +154,7 @@ public class AttractionServiceImpl implements AttractionService {
     }
 
     @Override
+    @Cacheable(value = "homeRecommend", key = "'attractions:hot:' + #limit")
     public List<AttractionDTO> getHotAttractions(Integer limit) {
         List<Attraction> attractions = attractionMapper.selectHotAttractions(limit);
         return attractions.stream()
@@ -144,6 +163,7 @@ public class AttractionServiceImpl implements AttractionService {
     }
 
     @Override
+    @Cacheable(value = "attractions", key = "'byCategory:' + #categoryId")
     public List<AttractionDTO> getAttractionsByCategory(Long categoryId) {
         List<Attraction> attractions = attractionMapper.selectByCategoryId(categoryId);
         return attractions.stream()
@@ -157,6 +177,7 @@ public class AttractionServiceImpl implements AttractionService {
     }
 
     @Override
+    @Cacheable(value = "attractionCategories", key = "'enabled'")
     public List<CategoryDTO> getAttractionCategories() {
         List<AttractionCategory> categories = categoryMapper.selectEnabledCategories();
         return categories.stream()
@@ -166,6 +187,7 @@ public class AttractionServiceImpl implements AttractionService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "attractionCategories", allEntries = true)
     public CategoryDTO createAttractionCategory(CategoryDTO categoryDTO) {
         AttractionCategory category = BeanCopyUtils.copyBean(categoryDTO, AttractionCategory.class);
         category.setCreatedAt(LocalDateTime.now());
@@ -178,6 +200,7 @@ public class AttractionServiceImpl implements AttractionService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "attractionCategories", allEntries = true)
     public CategoryDTO updateAttractionCategory(Long id, CategoryDTO categoryDTO) {
         AttractionCategory existingCategory = categoryMapper.selectById(id);
         if (existingCategory == null) {
@@ -194,6 +217,7 @@ public class AttractionServiceImpl implements AttractionService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "attractionCategories", allEntries = true)
     public void deleteAttractionCategory(Long id) {
         AttractionCategory category = categoryMapper.selectById(id);
         if (category == null) {

@@ -34,7 +34,7 @@
 
         <!-- 帖子内容 -->
         <div class="post-content">
-          <div class="content-text" v-html="postDetail.content"></div>
+          <div class="content-text" v-html="sanitizeHtml(postDetail.content)"></div>
           
           <!-- 图片展示 -->
           <div class="post-images" v-if="postDetail.images && postDetail.images.length > 0">
@@ -44,7 +44,7 @@
               :src="getImageUrl(image)"
               class="post-image"
               @click="previewImage(postDetail.images, index)"
-            >
+             loading="lazy" decoding="async">
           </div>
         </div>
 
@@ -254,6 +254,7 @@
 </template>
 
 <script setup>
+import { sanitizeHtml } from '@/utils/sanitize'
 import { ref, reactive, onMounted, nextTick, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useUserStore } from '@/stores/user'
@@ -1106,6 +1107,52 @@ watch(
   .replies-list {
     margin-left: 8px;
     padding-left: 8px;
+  }
+}
+
+/* C10 - 评论按钮在 480 以下堆叠 */
+@media (max-width: 480px) {
+  .comment-form .form-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  .comment-form .form-actions .el-button {
+    width: 100%;
+    min-height: 44px;
+    margin-left: 0;
+  }
+  .comment-form .form-actions .el-button + .el-button {
+    margin-left: 0;
+  }
+}
+
+/* C14 - 360px 兜底（iPhone SE / 折叠屏） */
+@media (max-width: 360px) {
+  .container,
+  .page-container,
+  .content-container {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  .page-header {
+    padding: 28px 0 !important;
+  }
+  .page-header h1 {
+    font-size: 18px !important;
+  }
+  .page-header p {
+    font-size: 12px !important;
+  }
+  .products-grid,
+  .attractions-grid,
+  .news-grid,
+  .routes-grid,
+  .activities-grid {
+    gap: 8px !important;
+  }
+  .el-button:not(.is-circle):not(.is-text) {
+    min-height: 36px;
   }
 }
 </style>

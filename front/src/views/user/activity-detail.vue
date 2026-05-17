@@ -25,7 +25,7 @@
           >
             <el-carousel-item v-for="(img, idx) in activity.coverImages" :key="idx">
               <div class="carousel-img-wrapper">
-                <img :src="img" :alt="`${activity.title} - 图${idx + 1}`" />
+                <img :src="img" :alt="`${activity.title} - 图${idx + 1}`"  loading="lazy" decoding="async"/>
                 <div class="carousel-gradient-overlay"></div>
               </div>
             </el-carousel-item>
@@ -178,7 +178,7 @@
                   <img
                     :src="item.coverImages && item.coverImages.length ? item.coverImages[0] : defaultCover"
                     :alt="item.title"
-                  />
+                   loading="lazy" decoding="async"/>
                   <div class="related-image-overlay"></div>
                   <span class="related-badge" :style="{ backgroundColor: getCategoryColor(item.category) }">
                     {{ getCategoryName(item.category) }}
@@ -1188,6 +1188,35 @@ watch(
 
   .related-meta {
     font-size: 11px;
+  }
+}
+
+/* C14 - 360px 兜底（iPhone SE / 折叠屏） */
+@media (max-width: 360px) {
+  .container,
+  .page-container,
+  .content-container {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  .page-header {
+    padding: 28px 0 !important;
+  }
+  .page-header h1 {
+    font-size: 18px !important;
+  }
+  .page-header p {
+    font-size: 12px !important;
+  }
+  .products-grid,
+  .attractions-grid,
+  .news-grid,
+  .routes-grid,
+  .activities-grid {
+    gap: 8px !important;
+  }
+  .el-button:not(.is-circle):not(.is-text) {
+    min-height: 36px;
   }
 }
 </style>

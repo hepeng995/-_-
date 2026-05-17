@@ -42,7 +42,10 @@ export const navItems: NavigationItem[] = [
   {
     name: '订单管理',
     icon: ShoppingCart,
-    children: [{ name: '订单列表', path: '/orders' }],
+    children: [
+      { name: '订单列表', path: '/orders' },
+      { name: '评价审核', path: '/reviews' },
+    ],
   },
   {
     name: '资讯管理',

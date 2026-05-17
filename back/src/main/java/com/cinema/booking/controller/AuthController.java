@@ -1,5 +1,7 @@
 package com.cinema.booking.controller;
 
+
+import com.cinema.booking.annotation.RateLimit;
 import com.cinema.booking.annotation.SystemOperation;
 import com.cinema.booking.dto.LoginRequest;
 import com.cinema.booking.dto.LoginResponse;
@@ -34,6 +36,7 @@ public class AuthController {
      */
     @Operation(summary = "用户登录")
     @SystemOperation(module = "用户认证", operation = "用户登录", description = "用户登录系统")
+    @RateLimit(window = 60, count = 5, key = RateLimit.KeyType.IP, message = "登录尝试过于频繁，请稍后再试")
     @PostMapping("/login")
     public Result<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
         LoginResponse response = userService.login(loginRequest);
@@ -45,6 +48,7 @@ public class AuthController {
      */
     @Operation(summary = "用户注册")
     @SystemOperation(module = "用户认证", operation = "用户注册", description = "新用户注册账号")
+    @RateLimit(window = 60, count = 3, key = RateLimit.KeyType.IP, message = "注册过于频繁，请稍后再试")
     @PostMapping("/register")
     public Result<Long> register(@RequestBody UserRegisterDTO registerDTO) {
         Long userId = userService.register(registerDTO);

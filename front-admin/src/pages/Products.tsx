@@ -5,6 +5,7 @@ import { MobileFilterPanel } from '../components/ui/MobileFilterPanel';
 import { MobileBatchActionBar } from '../components/ui/MobileBatchActionBar';
 import { MobileDataCard } from '../components/ui/MobileDataCard';
 import * as productApi from '../api/product';
+import * as fileApi from '../api/file';
 import type { Product, ProductCategory } from '../types';
 import { useToast } from '../contexts/ToastContext';
 import { useConfirm } from '../hooks/useConfirm';
@@ -70,6 +71,28 @@ export default function Products() {
   const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => { setSelectedIds(e.target.checked ? products.map(p => p.id) : []); };
   const handleSelectOne = (id: number) => { setSelectedIds(selectedIds.includes(id) ? selectedIds.filter(i => i !== id) : [...selectedIds, id]); };
 
+  const handleCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]; if (!file) return;
+    try {
+      const res: any = await fileApi.uploadFile(file);
+      const url = res?.data?.data?.url || res?.data?.url;
+      if (url) setFormData((f) => ({ ...f, coverImage: url }));
+      else toast.error('上传失败');
+    } catch { toast.error('上传失败'); }
+  };
+
+  const handleQuickStock = async (item: Product) => {
+    const input = window.prompt(`修改"${item.name}"的库存（当前：${item.stock}）：`, String(item.stock));
+    if (input === null) return;
+    const next = Number(input);
+    if (isNaN(next) || next < 0) { toast.error('库存必须为非负数'); return; }
+    try {
+      await productApi.updateProductStock(item.id, next);
+      toast.success('库存已更新');
+      fetchData();
+    } catch (e: any) { toast.error(e?.response?.data?.message || '更新失败'); }
+  };
+
   const totalPages = Math.ceil(total / pageSize);
   const catMap = Object.fromEntries(categories.map(c => [c.id, c.name]));
 
@@ -120,7 +143,7 @@ export default function Products() {
                   <td className="py-3 px-4 text-center border border-gray-300">{item.salesCount}</td>
                   <td className="py-3 px-4 text-center border border-gray-300"><span className={`px-2 py-0.5 rounded text-xs border ${item.status === 1 ? 'text-sprout-500 bg-sprout-50 border-sprout-200' : 'text-terracotta-500 bg-terracotta-50 border-terracotta-200'}`}>{item.status === 1 ? '上架' : '下架'}</span></td>
                   <td className="py-3 px-4 text-center border border-gray-300">{item.createdAt}</td>
-                  <td className="py-3 px-4 text-center border border-gray-300"><div className="flex items-center justify-center gap-2"><button onClick={() => handleOpenEdit(item)} className="bg-bamboo-500 text-white px-3 py-1 rounded text-xs">编辑</button><button onClick={() => handleDelete(item.id)} className="bg-terracotta-500 text-white px-3 py-1 rounded text-xs">删除</button></div></td>
+                  <td className="py-3 px-4 text-center border border-gray-300"><div className="flex items-center justify-center gap-2"><button onClick={() => handleOpenEdit(item)} className="bg-bamboo-500 text-white px-3 py-1 rounded text-xs">编辑</button><button onClick={() => handleQuickStock(item)} className="bg-harvest-500 text-white px-3 py-1 rounded text-xs">改库存</button><button onClick={() => handleDelete(item.id)} className="bg-terracotta-500 text-white px-3 py-1 rounded text-xs">删除</button></div></td>
                 </tr>
               ))}
               {products.length === 0 && !loading && <tr><td colSpan={9} className="py-12 text-center text-gray-500 border border-gray-300">暂无数据</td></tr>}
@@ -165,6 +188,7 @@ export default function Products() {
             ]}
             actions={[
               { label: '编辑', onClick: () => handleOpenEdit(item), tone: 'primary' },
+              { label: '改库存', onClick: () => handleQuickStock(item), tone: 'primary' },
               { label: '删除', onClick: () => handleDelete(item.id), tone: 'danger' },
             ]}
           />
@@ -208,7 +232,31 @@ export default function Products() {
             <div><label className="block text-sm font-medium text-gray-700 mb-1">单位</label><input type="text" value={formData.unit} onChange={(e) => setFormData({...formData, unit: e.target.value})} className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-bamboo-500/40 focus-visible:border-bamboo-500" /></div>
           </div>
           <div><label className="block text-sm font-medium text-gray-700 mb-1">产地</label><input type="text" value={formData.origin} onChange={(e) => setFormData({...formData, origin: e.target.value})} className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-bamboo-500/40 focus-visible:border-bamboo-500" /></div>
-          <div><label className="block text-sm font-medium text-gray-700 mb-1">状态</label><select value={formData.status} onChange={(e) => setFormData({...formData, status: Number(e.target.value)})} className="w-full px-3 py-2 border border-gray-300 rounded bg-white"><option value={1}>上架</option><option value={0}>下架</option></select></div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">封面图片</label>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+              {formData.coverImage && <img src={formData.coverImage} alt="" className="h-20 w-20 rounded object-cover border border-gray-200" />}
+              <label className="cursor-pointer rounded border border-gray-300 bg-white px-4 py-2 text-center text-sm text-gray-600 hover:text-bamboo-500">
+                选择文件上传<input type="file" accept="image/*" onChange={handleCoverUpload} className="hidden" />
+              </label>
+              <input type="text" value={formData.coverImage} onChange={(e) => setFormData({...formData, coverImage: e.target.value})} placeholder="或直接粘贴图片 URL" className="flex-1 rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-bamboo-500/40 focus-visible:border-bamboo-500" />
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">商品描述</label>
+            <textarea value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})} rows={4} placeholder="支持纯文本/HTML 标签（如 <p>、<strong>、<br>）" className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-bamboo-500/40 focus-visible:border-bamboo-500 resize-y" />
+            <div className="mt-1 text-[11px] text-gray-400">提示：富文本内容会按 v-html 直接渲染至商品详情页，请避免不可信来源。</div>
+          </div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">是否精选</label>
+              <label className="inline-flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" checked={formData.isFeatured} onChange={(e) => setFormData({...formData, isFeatured: e.target.checked})} className="h-4 w-4 rounded border-gray-300 text-bamboo-500" />
+                <span className="text-sm text-gray-600">{formData.isFeatured ? '精选 - 在首页推荐位展示' : '普通商品'}</span>
+              </label>
+            </div>
+            <div><label className="block text-sm font-medium text-gray-700 mb-1">状态</label><select value={formData.status} onChange={(e) => setFormData({...formData, status: Number(e.target.value)})} className="w-full px-3 py-2 border border-gray-300 rounded bg-white"><option value={1}>上架</option><option value={0}>下架</option></select></div>
+          </div>
           <div className="flex flex-col-reverse gap-3 pt-4 sm:flex-row sm:justify-end">
             <button onClick={() => setIsModalOpen(false)} className="w-full rounded-2xl border border-gray-300 bg-white px-4 py-2 text-sm text-gray-600 sm:w-auto sm:rounded">取消</button>
             <button onClick={handleSave} disabled={saving} className="w-full rounded-2xl bg-bamboo-500 px-4 py-2 text-sm text-white hover:bg-bamboo-400 disabled:opacity-50 sm:w-auto sm:rounded">{saving ? '保存中...' : '确定'}</button>

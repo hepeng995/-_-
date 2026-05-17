@@ -15,6 +15,9 @@ import com.cinema.booking.service.ProductService;
 import com.cinema.booking.utils.BeanCopyUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -34,6 +37,7 @@ public class ProductServiceImpl implements ProductService {
     private final ProductCategoryMapper categoryMapper;
 
     @Override
+    @Cacheable(value = "products", key = "'page:' + #pageRequest.pageNum + ':' + #pageRequest.pageSize + ':' + (#categoryId == null ? '0' : #categoryId) + ':' + (#keyword == null ? '' : #keyword) + ':' + (#status == null ? 'all' : #status) + ':' + (#isFeatured == null ? 'all' : #isFeatured)")
     public IPage<ProductDTO> getProductPage(PageRequest pageRequest, Long categoryId, String keyword, Integer status, Boolean isFeatured) {
         Page<Product> page = new Page<>(pageRequest.getPageNum(), pageRequest.getPageSize());
         IPage<Product> productPage = productMapper.selectProductPage(page, categoryId, keyword, status, isFeatured);
@@ -84,6 +88,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Cacheable(value = "products", key = "'detail:' + #id")
     public ProductDTO getProductById(Long id) {
         Product product = productMapper.selectById(id);
         if (product == null || product.getDeleted()) {
@@ -103,6 +108,10 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "products", allEntries = true),
+            @CacheEvict(value = "homeRecommend", allEntries = true)
+    })
     public ProductDTO createProduct(ProductDTO productDTO) {
         // 验证分类是否存在
         if (productDTO.getCategoryId() != null) {
@@ -126,6 +135,10 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "products", allEntries = true),
+            @CacheEvict(value = "homeRecommend", allEntries = true)
+    })
     public ProductDTO updateProduct(Long id, ProductDTO productDTO) {
         Product existingProduct = productMapper.selectById(id);
         if (existingProduct == null || existingProduct.getDeleted()) {
@@ -150,6 +163,10 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "products", allEntries = true),
+            @CacheEvict(value = "homeRecommend", allEntries = true)
+    })
     public void deleteProduct(Long id) {
         Product product = productMapper.selectById(id);
         if (product == null || product.getDeleted()) {
@@ -162,6 +179,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Cacheable(value = "homeRecommend", key = "'products:featured:' + #limit")
     public List<ProductDTO> getFeaturedProducts(Integer limit) {
         List<Product> products = productMapper.selectFeaturedProducts(limit);
         return products.stream()
@@ -170,6 +188,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Cacheable(value = "homeRecommend", key = "'products:hot:' + #limit")
     public List<ProductDTO> getHotProducts(Integer limit) {
         List<Product> products = productMapper.selectHotProducts(limit);
         return products.stream()
@@ -178,6 +197,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Cacheable(value = "products", key = "'byCategory:' + #categoryId")
     public List<ProductDTO> getProductsByCategory(Long categoryId) {
         List<Product> products = productMapper.selectByCategoryId(categoryId);
         return products.stream()
@@ -199,6 +219,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Cacheable(value = "productCategories", key = "'enabled'")
     public List<CategoryDTO> getProductCategories() {
         List<ProductCategory> categories = categoryMapper.selectEnabledCategories();
         return categories.stream()
@@ -208,6 +229,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "productCategories", allEntries = true)
     public CategoryDTO createProductCategory(CategoryDTO categoryDTO) {
         ProductCategory category = BeanCopyUtils.copyBean(categoryDTO, ProductCategory.class);
         category.setCreatedAt(LocalDateTime.now());
@@ -220,6 +242,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "productCategories", allEntries = true)
     public CategoryDTO updateProductCategory(Long id, CategoryDTO categoryDTO) {
         ProductCategory existingCategory = categoryMapper.selectById(id);
         if (existingCategory == null) {
@@ -236,6 +259,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "productCategories", allEntries = true)
     public void deleteProductCategory(Long id) {
         ProductCategory category = categoryMapper.selectById(id);
         if (category == null) {
@@ -285,6 +309,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "productCategories", allEntries = true)
     public void updateProductCategoryStatus(Long id, Integer status) {
         ProductCategory category = categoryMapper.selectById(id);
         if (category == null) {

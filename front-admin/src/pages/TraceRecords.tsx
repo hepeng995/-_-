@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Card } from '../components/ui/Card';
 import { Modal } from '../components/ui/Modal';
+import { MobileFilterPanel } from '../components/ui/MobileFilterPanel';
+import { MobileDataCard } from '../components/ui/MobileDataCard';
 import { useConfirm } from '../hooks/useConfirm';
 import { useToast } from '../contexts/ToastContext';
 import { getTracePage, createTraceRecord, updateTraceRecord, deleteTraceRecord, getBatches } from '../api/trace';
@@ -231,7 +233,7 @@ export default function TraceRecords() {
       {confirmDialog}
 
       {/* 筛选区域 */}
-      <Card className="p-6">
+      <MobileFilterPanel title="溯源记录筛选与操作">
         <div className="flex items-center gap-2 mb-4">
           <Package size={18} className="text-bamboo-500" />
           <h2 className="text-base font-bold text-gray-800">溯源记录管理</h2>
@@ -312,10 +314,10 @@ export default function TraceRecords() {
             <Trash2 size={14} />批量删除
           </button>
         </div>
-      </Card>
+      </MobileFilterPanel>
 
       {/* 表格区域 */}
-      <Card className="p-0 overflow-hidden">
+      <Card className="hidden p-0 overflow-hidden md:block">
         {loading && <div className="p-4 text-center text-sm text-gray-400">加载中...</div>}
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse border border-gray-300">
@@ -414,6 +416,46 @@ export default function TraceRecords() {
             >
               &gt;
             </button>
+          </div>
+        </div>
+      </Card>
+
+
+      {/* 移动端卡片列表 */}
+      <div className="space-y-3 md:hidden">
+        {loading && <Card className="p-4 text-center text-sm text-gray-400">加载中...</Card>}
+        {!loading && records.length === 0 && <Card className="p-8 text-center text-sm text-gray-500">暂无数据</Card>}
+        {records.map((item) => {
+          const stage = getStageInfo(item.stage);
+          return (
+            <MobileDataCard
+              key={item.id}
+              title={<div className="flex items-center gap-2"><span className="inline-block rounded-full px-2 py-0.5 text-[11px] text-white" style={{ backgroundColor: stage?.color || '#999' }}>{stage?.name || item.stage}</span><span>{item.title}</span></div>}
+              subtitle={item.operationDate || ''}
+              selected={selectedIds.includes(item.id)}
+              onSelect={() => handleSelectOne(item.id)}
+              fields={[
+                { label: '地点', value: item.location || '-' },
+                { label: '操作人', value: `${item.operator || '-'}（${item.operatorType || '-'}）` },
+              ]}
+              actions={[
+                { label: '编辑', onClick: () => handleOpenEdit(item), tone: 'primary' as const },
+                { label: '删除', onClick: () => handleDelete(item.id), tone: 'danger' as const },
+              ]}
+            />
+          );
+        })}
+      </div>
+
+      <Card className="p-4 md:hidden">
+        <div className="flex flex-col gap-3 text-sm text-gray-600">
+          <div className="flex items-center justify-between"><span>共 {total} 条</span><span>{current}/{totalPages || 1}</span></div>
+          <div className="flex items-center justify-between gap-3">
+            <select value={pageSize} onChange={(e) => { setPageSize(Number(e.target.value)); setCurrent(1); }} className="rounded border border-gray-300 bg-white px-3 py-2"><option value={10}>10条/页</option><option value={20}>20条/页</option><option value={50}>50条/页</option></select>
+            <div className="flex items-center gap-2">
+              <button onClick={() => setCurrent(Math.max(1, current - 1))} disabled={current <= 1} className="rounded border border-gray-300 bg-white px-3 py-2 disabled:opacity-50">&lt;</button>
+              <button onClick={() => setCurrent(Math.min(totalPages, current + 1))} disabled={current >= totalPages} className="rounded border border-gray-300 bg-white px-3 py-2 disabled:opacity-50">&gt;</button>
+            </div>
           </div>
         </div>
       </Card>

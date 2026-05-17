@@ -104,7 +104,7 @@
           :on-success="handleAvatarSuccess"
           :before-upload="beforeAvatarUpload"
         >
-          <img v-if="tempAvatar" :src="tempAvatar" class="avatar-preview" />
+          <img v-if="tempAvatar" :src="tempAvatar" class="avatar-preview"  loading="lazy" decoding="async"/>
           <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
         </el-upload>
         <div class="upload-tips">
@@ -192,8 +192,7 @@ const initFormData = () => {
   formData.realName = userInfo.value.realName || ''
   formData.email = userInfo.value.email || ''
   formData.phoneNumber = userInfo.value.phoneNumber || ''
-  
-  console.log('初始化表单数据:', userInfo.value)
+
 }
 
 // 监听用户信息变化
@@ -587,6 +586,42 @@ onMounted(() => {
     width: min(200px, 100%);
     height: auto;
     aspect-ratio: 1;
+  }
+}
+
+/* MB-3 三档断点：person.vue */
+@media (max-width: 480px) {
+  .person-container {
+    padding: 12px;
+  }
+  .info-section,
+  .password-section {
+    padding: 14px;
+  }
+  .person-form :deep(.el-form-item__label) {
+    float: none !important;
+    text-align: left !important;
+    width: auto !important;
+    padding: 0 0 6px !important;
+    line-height: 1.5 !important;
+  }
+  .person-form :deep(.el-form-item__content) {
+    margin-left: 0 !important;
+  }
+  .avatar-section {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .avatar-uploader :deep(.el-upload) {
+    width: 96px;
+    height: 96px;
+  }
+}
+
+@media (max-width: 360px) {
+  .person-container {
+    padding: 8px;
   }
 }
 </style>

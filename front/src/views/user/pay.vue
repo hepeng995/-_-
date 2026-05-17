@@ -62,8 +62,8 @@
           </div>
           <div class="mock-payment">
             <p>模拟支付结果：</p>
-            <el-button type="success" @click="mockPaymentSuccess">支付成功</el-button>
-            <el-button type="danger" @click="mockPaymentFailed">支付失败</el-button>
+            <el-button type="success" @click="simulatePaymentSuccess">支付成功</el-button>
+            <el-button type="danger" @click="simulatePaymentFailed">支付失败</el-button>
           </div>
         </div>
       </div>
@@ -175,7 +175,7 @@ const startPaymentTimer = () => {
 }
 
 // 模拟支付成功
-const mockPaymentSuccess = async () => {
+const simulatePaymentSuccess = async () => {
   try {
     paying.value = true
     
@@ -217,7 +217,7 @@ const mockPaymentSuccess = async () => {
 }
 
 // 模拟支付失败
-const mockPaymentFailed = () => {
+const simulatePaymentFailed = () => {
   ElMessage.error('支付失败，请重新支付')
   showQRCode.value = false
   
@@ -442,6 +442,52 @@ onBeforeUnmount(() => {
 
   .payment-option :deep(.el-radio__label) {
     width: 100%;
+  }
+}
+
+/* MB-3 三档断点 + safe-area 补丁 */
+@media (max-width: 480px) {
+  .payment-page {
+    padding: 12px;
+    padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+  }
+  .payment-info,
+  .payment-qr {
+    padding: 14px;
+  }
+  .payment-actions {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 95;
+    background: #fff;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.06);
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
+    border-top: 1px solid #f0f0f0;
+    flex-direction: row;
+    gap: 8px;
+  }
+  .payment-actions .el-button {
+    flex: 1;
+  }
+  .qrcode-wrapper,
+  .payment-qr img {
+    max-width: 200px !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .payment-page {
+    padding: 8px;
+  }
+  .payment-info,
+  .payment-qr {
+    padding: 10px;
+  }
+  .qrcode-wrapper,
+  .payment-qr img {
+    max-width: 170px !important;
   }
 }
 </style>

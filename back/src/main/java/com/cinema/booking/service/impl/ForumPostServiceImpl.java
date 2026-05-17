@@ -8,6 +8,7 @@ import com.cinema.booking.dto.ForumStatisticsDTO;
 import com.cinema.booking.entity.ForumPost;
 import com.cinema.booking.entity.ForumPostLike;
 import com.cinema.booking.exception.ServiceException;
+import com.cinema.booking.utils.HtmlSanitizer;
 import com.cinema.booking.mapper.ForumPostLikeMapper;
 import com.cinema.booking.mapper.ForumPostMapper;
 import com.cinema.booking.utils.SecurityUtils;
@@ -44,8 +45,8 @@ public class ForumPostServiceImpl implements ForumPostService {
         
         // 创建帖子实体
         ForumPost post = ForumPost.builder()
-                .title(postDTO.getTitle())
-                .content(postDTO.getContent())
+                .title(HtmlSanitizer.cleanText(postDTO.getTitle()))
+                .content(HtmlSanitizer.cleanRich(postDTO.getContent()))
                 .category(postDTO.getCategory())
                 .images(postDTO.getImages())
                 .userId(userId)
@@ -93,8 +94,8 @@ public class ForumPostServiceImpl implements ForumPostService {
         // 构建更新对象
         ForumPost post = new ForumPost();
         post.setId(id);
-        post.setTitle(postDTO.getTitle());
-        post.setContent(postDTO.getContent());
+        post.setTitle(HtmlSanitizer.cleanText(postDTO.getTitle()));
+        post.setContent(HtmlSanitizer.cleanRich(postDTO.getContent()));
         post.setCategory(postDTO.getCategory());
         post.setImages(finalImagesJson); // 直接使用处理后的图片数据
         post.setUpdatedAt(LocalDateTime.now());

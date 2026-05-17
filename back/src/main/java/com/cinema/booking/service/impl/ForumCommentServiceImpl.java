@@ -7,6 +7,7 @@ import com.cinema.booking.dto.ForumCommentQueryDTO;
 import com.cinema.booking.entity.ForumComment;
 import com.cinema.booking.entity.ForumCommentLike;
 import com.cinema.booking.exception.ServiceException;
+import com.cinema.booking.utils.HtmlSanitizer;
 import com.cinema.booking.mapper.ForumCommentLikeMapper;
 import com.cinema.booking.mapper.ForumCommentMapper;
 import com.cinema.booking.mapper.ForumPostMapper;
@@ -49,7 +50,7 @@ public class ForumCommentServiceImpl implements ForumCommentService {
                 .postId(commentDTO.getPostId())
                 .userId(userId)
                 .parentId(commentDTO.getParentId())
-                .content(commentDTO.getContent())
+                .content(HtmlSanitizer.cleanRich(commentDTO.getContent()))
                 .images(commentDTO.getImages())
                 .likeCount(0)
                 .status(1) // 默认通过，可根据需要修改为待审核
@@ -85,7 +86,7 @@ public class ForumCommentServiceImpl implements ForumCommentService {
         // 更新评论
         ForumComment comment = ForumComment.builder()
                 .id(id)
-                .content(commentDTO.getContent())
+                .content(HtmlSanitizer.cleanRich(commentDTO.getContent()))
                 .images(commentDTO.getImages())
                 .updatedAt(LocalDateTime.now())
                 .build();

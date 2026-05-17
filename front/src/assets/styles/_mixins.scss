@@ -1,0 +1,92 @@
+// ===========================================================
+// 响应式 / 触控混入
+// 引入方式：@use './mixins' as *;
+// ===========================================================
+
+// 断点变量
+$breakpoint-xs: 360px;
+$breakpoint-sm: 480px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 1024px;
+$breakpoint-xl: 1280px;
+
+// ----------------------------------------------------------
+// hover：仅在真正的鼠标设备生效
+// 解决移动端 tap 后 hover sticky 残留按下态的问题
+//   @include hover { color: red; }  ⇒  @media (hover: hover) and (pointer: fine) { &:hover { color: red; } }
+// ----------------------------------------------------------
+@mixin hover {
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      @content;
+    }
+  }
+}
+
+// hover-or-tap：hover + active 双触发（强调按压反馈）
+@mixin hover-or-tap {
+  @media (hover: hover) and (pointer: fine) {
+    &:hover { @content; }
+  }
+  &:active { @content; }
+}
+
+// ----------------------------------------------------------
+// respond：以三档断点为主的统一媒体查询
+//   @include respond(md) { ... }       ⇒ max-width: 767.98px
+//   @include respond(sm) { ... }       ⇒ max-width: 479.98px
+//   @include respond(lg) { ... }       ⇒ max-width: 1023.98px
+//   @include respond(min, md) { ... }  ⇒ min-width: 768px
+// ----------------------------------------------------------
+@mixin respond($bp, $direction: max) {
+  $value: null;
+  @if $bp == xs { $value: $breakpoint-xs; }
+  @else if $bp == sm { $value: $breakpoint-sm; }
+  @else if $bp == md { $value: $breakpoint-md; }
+  @else if $bp == lg { $value: $breakpoint-lg; }
+  @else if $bp == xl { $value: $breakpoint-xl; }
+  @else { $value: $bp; }
+
+  @if $direction == max {
+    @media (max-width: #{$value - 0.02px}) { @content; }
+  } @else {
+    @media (min-width: #{$value}) { @content; }
+  }
+}
+
+// 仅手机
+@mixin mobile {
+  @include respond(md) { @content; }
+}
+
+// 仅平板
+@mixin tablet {
+  @media (min-width: #{$breakpoint-md}) and (max-width: #{$breakpoint-lg - 0.02px}) {
+    @content;
+  }
+}
+
+// 仅桌面
+@mixin desktop {
+  @media (min-width: #{$breakpoint-lg}) { @content; }
+}
+
+// ----------------------------------------------------------
+// safe-area：刘海屏 / Home Indicator 避让
+// ----------------------------------------------------------
+@mixin safe-area-top($extra: 0px) {
+  padding-top: calc(#{$extra} + env(safe-area-inset-top, 0px));
+}
+@mixin safe-area-bottom($extra: 0px) {
+  padding-bottom: calc(#{$extra} + env(safe-area-inset-bottom, 0px));
+}
+@mixin safe-area-x($extra: 0px) {
+  padding-left: calc(#{$extra} + env(safe-area-inset-left, 0px));
+  padding-right: calc(#{$extra} + env(safe-area-inset-right, 0px));
+}
+
+// 触控目标最小 44x44（WCAG / iOS HIG）
+@mixin tap-target($size: 44px) {
+  min-width: $size;
+  min-height: $size;
+}

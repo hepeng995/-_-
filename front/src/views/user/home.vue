@@ -45,7 +45,7 @@
               </div>
             </div>
             <div class="overview-image">
-              <img :src="overviewData.image || 乡村概览" alt="乡村概览" />
+              <img :src="overviewData.image || 乡村概览" alt="乡村概览"  loading="lazy" decoding="async"/>
             </div>
           </div>
         </div>
@@ -69,7 +69,7 @@
                   @click="goToAttractionDetail(attraction.id)"
                 >
                   <div class="attraction-image">
-                    <img :src="attraction.coverImage || '/images/default-attraction.jpg'" :alt="attraction.name" />
+                    <img :src="attraction.coverImage || '/images/default-attraction.jpg'" :alt="attraction.name"  loading="lazy" decoding="async"/>
                     <div class="attraction-overlay">
                       <el-button type="primary" size="small">查看详情</el-button>
                     </div>
@@ -97,7 +97,7 @@
                   @click="goToProductDetail(product.id)"
                 >
                   <div class="product-image">
-                    <img :src="product.coverImage || '/images/default-product.jpg'" :alt="product.name" />
+                    <img :src="product.coverImage || '/images/default-product.jpg'" :alt="product.name"  loading="lazy" decoding="async"/>
                     <div class="product-badge" v-if="product.isFeatured">推荐</div>
                   </div>
                   <div class="product-info">
@@ -134,7 +134,7 @@
               @click="goToNewsDetail(news.id)"
             >
               <div class="news-image">
-                <img :src="news.coverImage || '/images/default-news.jpg'" :alt="news.title" />
+                <img :src="news.coverImage || '/images/default-news.jpg'" :alt="news.title"  loading="lazy" decoding="async"/>
               </div>
               <div class="news-content">
                 <h4>{{ news.title }}</h4>
@@ -1187,6 +1187,35 @@ section.latest-news {
   .product-info h3,
   .product-info h4 {
     font-size: 12px;
+  }
+}
+
+/* C14 - 360px 兜底（iPhone SE / 折叠屏） */
+@media (max-width: 360px) {
+  .container,
+  .page-container,
+  .content-container {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  .page-header {
+    padding: 28px 0 !important;
+  }
+  .page-header h1 {
+    font-size: 18px !important;
+  }
+  .page-header p {
+    font-size: 12px !important;
+  }
+  .products-grid,
+  .attractions-grid,
+  .news-grid,
+  .routes-grid,
+  .activities-grid {
+    gap: 8px !important;
+  }
+  .el-button:not(.is-circle):not(.is-text) {
+    min-height: 36px;
   }
 }
 </style>

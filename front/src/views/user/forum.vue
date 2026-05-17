@@ -77,7 +77,7 @@
               </div>
             </div>
             <h3 class="post-title">{{ post.title }}</h3>
-            <div class="post-content" v-html="post.content.substring(0, 200) + (post.content.length > 200 ? '...' : '')"></div>
+            <div class="post-content" v-html="sanitizeHtml(post.content.substring(0, 200) + (post.content.length > 200 ? '...' : ''))"></div>
             <div class="post-images" v-if="post.images && post.images.length > 0">
               <img
                 v-for="(image, index) in post.images.slice(0, 3)"
@@ -140,7 +140,7 @@
               </div>
             </div>
             <h3 class="post-title">{{ post.title }}</h3>
-            <div class="post-content" v-html="post.content.substring(0, 200) + (post.content.length > 200 ? '...' : '')"></div>
+            <div class="post-content" v-html="sanitizeHtml(post.content.substring(0, 200) + (post.content.length > 200 ? '...' : ''))"></div>
             <div class="post-images" v-if="post.images && post.images.length > 0">
               <img
                 v-for="(image, index) in post.images.slice(0, 3)"
@@ -273,6 +273,7 @@
 </template>
 
 <script setup>
+import { sanitizeHtml } from '@/utils/sanitize'
 import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
@@ -479,7 +480,6 @@ const resetPublishForm = () => {
 
 // 上传成功处理
 const handleUploadSuccess = (response) => {
-  console.log('上传成功响应:', response)
   if (response.code === 200) {
     publishForm.images.push(response.data)
     ElMessage.success('图片上传成功')
@@ -905,7 +905,7 @@ watch(() => userStore.isLoggedIn, (newVal) => {
 
 @media (max-width: 480px) {
   .forum-title {
-    font-size: 13px;
+    font-size: 18px;
   }
 
   .category-filter :deep(.el-radio-group) {
@@ -929,6 +929,65 @@ watch(() => userStore.isLoggedIn, (newVal) => {
   .more-images {
     width: 60px;
     height: 60px;
+  }
+}
+
+/* C7 - 分类 radio-button 横滑 */
+@media (max-width: 768px) {
+  .category-filter :deep(.el-radio-group) {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    padding: 4px 12px;
+    gap: 8px;
+    scrollbar-width: none;
+    width: 100%;
+  }
+  .category-filter :deep(.el-radio-group)::-webkit-scrollbar { display: none; }
+  .category-filter :deep(.el-radio-button) {
+    flex-shrink: 0;
+  }
+  .category-filter :deep(.el-radio-button__inner) {
+    padding: 8px 14px;
+    min-height: 36px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+}
+@media (max-width: 480px) {
+  .category-filter :deep(.el-radio-group) {
+    flex-wrap: nowrap;
+  }
+}
+
+/* C14 - 360px 兜底（iPhone SE / 折叠屏） */
+@media (max-width: 360px) {
+  .container,
+  .page-container,
+  .content-container {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  .page-header {
+    padding: 28px 0 !important;
+  }
+  .page-header h1 {
+    font-size: 18px !important;
+  }
+  .page-header p {
+    font-size: 12px !important;
+  }
+  .products-grid,
+  .attractions-grid,
+  .news-grid,
+  .routes-grid,
+  .activities-grid {
+    gap: 8px !important;
+  }
+  .el-button:not(.is-circle):not(.is-text) {
+    min-height: 36px;
   }
 }
 </style>

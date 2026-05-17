@@ -52,11 +52,11 @@
               <div class="article-body">
                 <!-- 封面图片 -->
                 <div class="cover-image" v-if="news.coverImage">
-                  <img :src="news.coverImage" :alt="news.title" />
+                  <img :src="news.coverImage" :alt="news.title"  loading="lazy" decoding="async"/>
                 </div>
                 
                 <!-- 正文内容 -->
-                <div class="content-text" v-html="news.content"></div>
+                <div class="content-text" v-html="sanitizeHtml(news.content)"></div>
               </div>
 
               <!-- 文章操作 -->
@@ -82,7 +82,7 @@
                     @click="goToNews(item.id)"
                   >
                     <div class="related-image">
-                      <img :src="item.coverImage || '/images/default-news.jpg'" :alt="item.title" />
+                      <img :src="item.coverImage || '/images/default-news.jpg'" :alt="item.title"  loading="lazy" decoding="async"/>
                     </div>
                     <div class="related-content">
                       <h4>{{ item.title }}</h4>
@@ -147,6 +147,7 @@
 </template>
 
 <script setup>
+import { sanitizeHtml } from '@/utils/sanitize'
 import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
@@ -210,6 +211,14 @@ const loadNews = async () => {
       loadRelatedNews(res.data.category, id)
       // 获取最新资讯
       loadLatestNews()
+      // 拉取点赞状态（基于Redis）
+      try {
+        const likeRes = await newsApi.getLikeInfo(id)
+        if (likeRes.code === 200 && likeRes.data) {
+          isLiked.value = !!likeRes.data.liked
+          news.value.likeCount = likeRes.data.likeCount || news.value.likeCount || 0
+        }
+      } catch (e) { /* 未登录或失败时忽略 */ }
     } else {
       ElMessage.error(res.message || '获取资讯详情失败')
     }
@@ -300,21 +309,19 @@ const fallbackShare = () => {
 // 点赞资讯
 const likeNews = async () => {
   try {
-    // 这里应该调用点赞API
-    // const res = await newsApi.likeNews(news.value.id)
-    // if (res.code === 200) {
-      isLiked.value = !isLiked.value
-      if (isLiked.value) {
-        news.value.likeCount = (news.value.likeCount || 0) + 1
-        ElMessage.success('点赞成功')
-      } else {
-        news.value.likeCount = Math.max((news.value.likeCount || 0) - 1, 0)
-        ElMessage.success('取消点赞')
-      }
-    // }
+    const res = await newsApi.toggleLike(news.value.id)
+    if (res.code === 200 && res.data) {
+      isLiked.value = !!res.data.liked
+      news.value.likeCount = res.data.likeCount || 0
+      ElMessage.success(isLiked.value ? '点赞成功' : '取消点赞')
+    }
   } catch (error) {
-    console.error('点赞失败:', error)
-    ElMessage.error('操作失败')
+    if (error?.response?.status === 401) {
+      ElMessage.warning('请先登录后再点赞')
+    } else {
+      console.error('点赞失败:', error)
+      ElMessage.error('操作失败')
+    }
   }
 }
 
@@ -835,6 +842,35 @@ watch(() => route.params.id, (newId) => {
 
   .article-content {
     padding: 16px 0 24px;
+  }
+}
+
+/* C14 - 360px 兜底（iPhone SE / 折叠屏） */
+@media (max-width: 360px) {
+  .container,
+  .page-container,
+  .content-container {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  .page-header {
+    padding: 28px 0 !important;
+  }
+  .page-header h1 {
+    font-size: 18px !important;
+  }
+  .page-header p {
+    font-size: 12px !important;
+  }
+  .products-grid,
+  .attractions-grid,
+  .news-grid,
+  .routes-grid,
+  .activities-grid {
+    gap: 8px !important;
+  }
+  .el-button:not(.is-circle):not(.is-text) {
+    min-height: 36px;
   }
 }
 </style>

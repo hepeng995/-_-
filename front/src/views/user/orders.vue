@@ -79,7 +79,7 @@
                 class="order-item"
               >
                 <div class="item-image">
-                  <img :src="item.productImage || '/images/default-product.jpg'" :alt="item.productName" />
+                  <img :src="item.productImage || '/images/default-product.jpg'" :alt="item.productName"  loading="lazy" decoding="async"/>
                 </div>
                 <div class="item-info">
                   <h4 class="item-name">{{ item.productName }}</h4>
@@ -956,6 +956,65 @@ onMounted(() => {
   .item-image {
     width: 100%;
     height: 200px;
+  }
+}
+
+/* C6 - 状态 tab 横滑 + 表格/卡片切换断点上调到 968 */
+@media (max-width: 968px) {
+  .order-items-table {
+    display: none;
+  }
+  .order-items-mobile {
+    display: block;
+  }
+}
+@media (max-width: 768px) {
+  .tabs-wrapper {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    justify-content: flex-start;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+  .tabs-wrapper::-webkit-scrollbar { display: none; }
+  .tab-item {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+  .order-tabs {
+    padding: 12px;
+  }
+}
+
+/* C14 - 360px 兜底（iPhone SE / 折叠屏） */
+@media (max-width: 360px) {
+  .container,
+  .page-container,
+  .content-container {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  .page-header {
+    padding: 28px 0 !important;
+  }
+  .page-header h1 {
+    font-size: 18px !important;
+  }
+  .page-header p {
+    font-size: 12px !important;
+  }
+  .products-grid,
+  .attractions-grid,
+  .news-grid,
+  .routes-grid,
+  .activities-grid {
+    gap: 8px !important;
+  }
+  .el-button:not(.is-circle):not(.is-text) {
+    min-height: 36px;
   }
 }
 </style>

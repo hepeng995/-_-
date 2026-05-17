@@ -102,6 +102,12 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
+        <!-- Spring Boot Actuator：健康检查 / 指标暴露 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
         <!-- Jsoup 网页正文抓取 -->
         <dependency>
             <groupId>org.jsoup</groupId>

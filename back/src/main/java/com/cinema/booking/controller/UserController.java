@@ -190,6 +190,40 @@ public class UserController {
             return Result.fail("更新用户状态失败");
         }
     }
+
+    /**
+     * 批量修改用户状态
+     */
+    @Operation(summary = "批量修改用户状态")
+    @SystemOperation(module = "用户管理", operation = "批量修改用户状态", description = "管理员批量启用/禁用用户账号")
+    @PostMapping("/batch-status")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Result<Map<String, Object>> batchUpdateUserStatus(@RequestBody Map<String, Object> params) {
+        @SuppressWarnings("unchecked")
+        java.util.List<Object> rawIds = (java.util.List<Object>) params.get("ids");
+        Boolean enabled = (Boolean) params.get("enabled");
+        if (rawIds == null || rawIds.isEmpty() || enabled == null) {
+            return Result.fail("参数缺失");
+        }
+        java.util.List<Long> ids = rawIds.stream()
+                .map(o -> Long.valueOf(o.toString()))
+                .collect(java.util.stream.Collectors.toList());
+        int success = 0;
+        int failed = 0;
+        for (Long id : ids) {
+            try {
+                if (userService.updateUserStatus(id, enabled)) success++;
+                else failed++;
+            } catch (Exception e) {
+                failed++;
+            }
+        }
+        Map<String, Object> data = new HashMap<>();
+        data.put("success", success);
+        data.put("failed", failed);
+        data.put("total", ids.size());
+        return Result.ok(data);
+    }
     
     /**
      * 分页获取用户列表

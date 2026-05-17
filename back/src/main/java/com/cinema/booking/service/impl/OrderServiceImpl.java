@@ -20,6 +20,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -210,14 +211,13 @@ public class OrderServiceImpl implements OrderService {
         if (order == null || order.getDeleted()) {
             throw new ServiceException("订单不存在");
         }
-        
-        orderMapper.updateOrderStatus(orderId, orderStatus);
-        
-        // 更新相关时间字段
+
+        // 一次性写入：状态 + 相关时间字段，避免对同一行执行两次 UPDATE
         Order updateOrder = new Order();
         updateOrder.setId(orderId);
+        updateOrder.setOrderStatus(orderStatus);
         updateOrder.setUpdatedAt(LocalDateTime.now());
-        
+
         switch (orderStatus) {
             case 3: // 已发货
                 updateOrder.setDeliveryTime(LocalDateTime.now());
@@ -229,7 +229,7 @@ public class OrderServiceImpl implements OrderService {
                 updateOrder.setCancelledTime(LocalDateTime.now());
                 break;
         }
-        
+
         orderMapper.updateById(updateOrder);
         return getOrderById(orderId);
     }
@@ -258,13 +258,10 @@ public class OrderServiceImpl implements OrderService {
             throw new ServiceException("只能取消待支付状态的订单");
         }
         
-        // 恢复商品库存
+        // 恢复商品库存（按 productId 升序，避免与并发取消/退款锁顺序不一致死锁）
         List<OrderItem> orderItems = orderItemMapper.selectByOrderId(orderId);
-        for (OrderItem item : orderItems) {
-            productMapper.updateStock(item.getProductId(), item.getQuantity());
-            productMapper.incrementSalesCount(item.getProductId(), -item.getQuantity());
-        }
-        
+        rollbackStockSorted(orderItems);
+
         // 更新订单状态
         Order updateOrder = new Order();
         updateOrder.setId(orderId);
@@ -281,6 +278,67 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public OrderDTO confirmReceived(Long orderId) {
         return updateOrderStatus(orderId, 4); // 已收货
+    }
+
+    @Override
+    @Transactional
+    public OrderDTO refundOrder(Long orderId, String refundReason) {
+        Order order = orderMapper.selectById(orderId);
+        if (order == null || order.getDeleted()) {
+            throw new ServiceException("订单不存在");
+        }
+
+        Integer status = order.getOrderStatus();
+        if (status == null || status == 1 || status == 5 || status == 6) {
+            // 1=待支付（应直接取消）；5=已取消；6=已退款（不可再退款）
+            throw new ServiceException("当前订单状态不支持退款");
+        }
+        if (order.getPaymentStatus() == null || order.getPaymentStatus() != 1) {
+            throw new ServiceException("订单尚未支付，无法退款");
+        }
+
+        // 恢复库存与销量（按 productId 升序，与 cancelOrder 保持一致避免死锁）
+        List<OrderItem> orderItems = orderItemMapper.selectByOrderId(orderId);
+        rollbackStockSorted(orderItems);
+
+        Order updateOrder = new Order();
+        updateOrder.setId(orderId);
+        updateOrder.setOrderStatus(6);                 // 已退款
+        updateOrder.setPaymentStatus(2);               // 支付状态：退款
+        updateOrder.setCancelReason(refundReason != null && !refundReason.isEmpty()
+                ? refundReason : "管理员退款");
+        updateOrder.setCancelledTime(LocalDateTime.now());
+        updateOrder.setUpdatedAt(LocalDateTime.now());
+        orderMapper.updateById(updateOrder);
+
+        return getOrderById(orderId);
+    }
+
+    @Override
+    @Transactional
+    public OrderDTO shipOrder(Long orderId, String trackingInfo) {
+        Order order = orderMapper.selectById(orderId);
+        if (order == null || order.getDeleted()) {
+            throw new ServiceException("订单不存在");
+        }
+        if (order.getOrderStatus() == null || order.getOrderStatus() != 2) {
+            throw new ServiceException("仅待发货订单可执行发货操作");
+        }
+
+        Order updateOrder = new Order();
+        updateOrder.setId(orderId);
+        updateOrder.setOrderStatus(3);                  // 已发货
+        updateOrder.setDeliveryTime(LocalDateTime.now());
+        updateOrder.setUpdatedAt(LocalDateTime.now());
+        if (trackingInfo != null && !trackingInfo.isEmpty()) {
+            // 追加备注（不破坏已有备注）
+            String existing = order.getRemark();
+            String append = "发货备注：" + trackingInfo;
+            updateOrder.setRemark((existing == null || existing.isEmpty()) ? append : existing + "；" + append);
+        }
+        orderMapper.updateById(updateOrder);
+
+        return getOrderById(orderId);
     }
     
     @Override
@@ -466,6 +524,57 @@ public class OrderServiceImpl implements OrderService {
             return itemDTO;
         }).collect(Collectors.toList());
     }
+
+    @Override
+    @Transactional
+    public int batchUpdateOrderStatus(List<Long> ids, Integer orderStatus) {
+        if (ids == null || ids.isEmpty() || orderStatus == null) {
+            return 0;
+        }
+        int count = 0;
+        for (Long id : ids) {
+            try {
+                updateOrderStatus(id, orderStatus);
+                count++;
+            } catch (Exception e) {
+                // 单条失败不影响其他条目
+            }
+        }
+        return count;
+    }
+
+    @Override
+    @Transactional
+    public int batchCancelOrders(List<Long> ids, String cancelReason) {
+        if (ids == null || ids.isEmpty()) {
+            return 0;
+        }
+        String reason = (cancelReason == null || cancelReason.isEmpty()) ? "管理员批量取消" : cancelReason;
+        int count = 0;
+        for (Long id : ids) {
+            try {
+                cancelOrder(id, reason);
+                count++;
+            } catch (Exception e) {
+                // 已支付/状态非法的订单跳过，不影响其它
+            }
+        }
+        return count;
+    }
+
+    @Override
+    @Transactional
+    public void deleteOrder(Long orderId) {
+        Order order = orderMapper.selectById(orderId);
+        if (order == null || order.getDeleted()) {
+            throw new ServiceException("订单不存在");
+        }
+        Order updateOrder = new Order();
+        updateOrder.setId(orderId);
+        updateOrder.setDeleted(true);
+        updateOrder.setUpdatedAt(LocalDateTime.now());
+        orderMapper.updateById(updateOrder);
+    }
     
     private OrderDTO convertToDTO(Order order) {
         OrderDTO dto = BeanCopyUtils.copyBean(order, OrderDTO.class);
@@ -491,5 +600,22 @@ public class OrderServiceImpl implements OrderService {
         return timestamp + random;
     }
 
-    
+    /**
+     * 按 productId 升序回滚库存与销量。
+     * 多个事务在同一时刻取消/退款不同订单时，
+     * 强制按相同顺序加锁（productId 升序）可避免死锁。
+     */
+    private void rollbackStockSorted(List<OrderItem> orderItems) {
+        if (orderItems == null || orderItems.isEmpty()) {
+            return;
+        }
+        List<OrderItem> sorted = new ArrayList<>(orderItems);
+        sorted.sort(Comparator.comparing(OrderItem::getProductId));
+        for (OrderItem item : sorted) {
+            productMapper.updateStock(item.getProductId(), item.getQuantity());
+            productMapper.incrementSalesCount(item.getProductId(), -item.getQuantity());
+        }
+    }
+
+
 }

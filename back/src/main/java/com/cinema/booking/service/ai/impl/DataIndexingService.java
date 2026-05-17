@@ -44,16 +44,49 @@ public class DataIndexingService implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
+        String mode = aiVectorProperties.getIndexingMode();
+        if (mode == null) mode = "incremental";
+        mode = mode.trim().toLowerCase();
+
+        if ("skip".equals(mode)) {
+            log.info("【数据索引】indexing-mode=skip，跳过启动构建（由独立 Job 触发）");
+            qdrantVectorSearchAdapter.enableVectorSearch();
+            return;
+        }
+
+        if ("incremental".equals(mode)) {
+            try {
+                boolean exists = qdrantClient.collectionExistsAsync(aiVectorProperties.getKnowledgeCollection())
+                        .get(15, TimeUnit.SECONDS);
+                long pointCount = exists
+                        ? qdrantClient.countAsync(aiVectorProperties.getKnowledgeCollection()).get(15, TimeUnit.SECONDS)
+                        : 0L;
+                if (exists && pointCount > 0) {
+                    log.info("【数据索引】indexing-mode=incremental，集合已存在且包含 {} 条点位，跳过向量重建（仅构建 BM25）", pointCount);
+                    indexAllData(false);
+                    qdrantVectorSearchAdapter.enableVectorSearch();
+                    return;
+                }
+                log.info("【数据索引】indexing-mode=incremental，集合为空，开始首次构建...");
+            } catch (Exception e) {
+                log.warn("【数据索引】incremental 检查失败，回退为全量构建：{}", e.getMessage());
+            }
+        }
+
         log.info("【数据索引】开始构建向量索引和 BM25 索引，Qdrant={} HTTP:{} gRPC:{}，目标集合={}",
                 aiVectorProperties.getQdrantHost(),
                 aiVectorProperties.getQdrantHttpPort(),
                 aiVectorProperties.getQdrantGrpcPort(),
                 aiVectorProperties.getKnowledgeCollection());
-        indexAllData();
+        indexAllData(true);
         log.info("【数据索引】构建完成！");
     }
 
     public void indexAllData() {
+        indexAllData(true);
+    }
+
+    public void indexAllData(boolean rebuildVector) {
         List<LuceneBM25Manager.LuceneDocument> luceneDocs = new ArrayList<>();
         List<TextSegment> textSegments = new ArrayList<>();
 
@@ -121,7 +154,11 @@ public class DataIndexingService implements CommandLineRunner {
         // 4. 先构建 BM25，保证向量库异常时仍可检索
         luceneBM25Manager.buildIndex(luceneDocs);
 
-        // 5. 再写入向量库。每次启动都重建知识库集合，避免旧维度和历史重复数据污染。
+        // 5. 再写入向量库（仅 rebuildVector=true 时执行）
+        if (!rebuildVector) {
+            log.info("【数据索引】rebuildVector=false，跳过向量库重建");
+            return;
+        }
         if (textSegments.isEmpty()) {
             log.warn("【数据索引】未发现可写入的知识片段，跳过向量索引构建");
             qdrantVectorSearchAdapter.disableVectorSearch("当前没有可建立向量索引的知识片段");

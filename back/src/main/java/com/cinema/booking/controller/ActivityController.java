@@ -5,6 +5,7 @@ import com.cinema.booking.annotation.SystemOperation;
 import com.cinema.booking.dto.ActivityDTO;
 import com.cinema.booking.dto.ActivityRegistrationDTO;
 import com.cinema.booking.dto.PageRequest;
+import com.cinema.booking.security.SecurityService;
 import com.cinema.booking.service.ActivityService;
 import com.cinema.booking.utils.Result;
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,6 +25,7 @@ import java.util.List;
 public class ActivityController {
 
     private final ActivityService activityService;
+    private final SecurityService securityService;
 
     @Operation(summary = "分页查询活动列表")
     @GetMapping("/page")
@@ -123,5 +125,26 @@ public class ActivityController {
     public Result<Void> cancelRegistration(@PathVariable Long id) {
         activityService.cancelRegistration(id);
         return Result.ok();
+    }
+
+    @Operation(summary = "用户取消我的报名")
+    @DeleteMapping("/registrations/{id}/self")
+    @PreAuthorize("isAuthenticated()")
+    @SystemOperation(module = "活动管理", operation = "取消我的报名", description = "用户取消自己的活动报名")
+    public Result<Void> cancelMyRegistration(@PathVariable Long id) {
+        Long userId = securityService.getCurrentUserId();
+        activityService.cancelMyRegistration(id, userId);
+        return Result.ok();
+    }
+
+    @Operation(summary = "查询我的活动报名")
+    @GetMapping("/registrations/my")
+    @PreAuthorize("isAuthenticated()")
+    public Result<IPage<ActivityRegistrationDTO>> getMyRegistrations(
+            @RequestParam(defaultValue = "1") Integer pageNum,
+            @RequestParam(defaultValue = "10") Integer pageSize,
+            @RequestParam(required = false) String status) {
+        Long userId = securityService.getCurrentUserId();
+        return Result.ok(activityService.getMyRegistrations(new PageRequest(pageNum, pageSize), userId, status));
     }
 }

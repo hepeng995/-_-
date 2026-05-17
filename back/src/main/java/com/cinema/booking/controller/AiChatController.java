@@ -1,5 +1,7 @@
 package com.cinema.booking.controller;
 
+
+import com.cinema.booking.annotation.RateLimit;
 import com.cinema.booking.config.AiConfigurationGuard;
 import com.cinema.booking.dto.AiChatResponse;
 import com.cinema.booking.dto.CommonCardDTO;
@@ -12,12 +14,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
 
 /**
  * AI智能对话统一接口（四大模块：商品/景点/资讯/建言）
@@ -34,6 +40,14 @@ public class AiChatController {
     private final RuralDigitalTools ruralDigitalTools;
     private final ObjectMapper objectMapper;
     private final AiConfigurationGuard aiConfigurationGuard;
+    private final com.cinema.booking.config.RedisChatMemoryStore chatMemoryStore;
+
+    /** SSE 流式输出执行线程池（每个连接独立执行） */
+    private static final ExecutorService SSE_EXECUTOR = Executors.newCachedThreadPool(r -> {
+        Thread t = new Thread(r, "ai-sse-" + System.nanoTime());
+        t.setDaemon(true);
+        return t;
+    });
 
     /**
      * AI 对话主接口（完全兼容你旧接口的返回格式）
@@ -41,6 +55,7 @@ public class AiChatController {
      * @param userMessage 用户提问
      * @return Result<AiChatResponse> 项目标准返回
      */
+    @RateLimit(window = 60, count = 30, key = RateLimit.KeyType.USER, message = "AI 调用过于频繁，请稍后再试")
     @PostMapping("/chat")
     public Result<AiChatResponse> chat(
             @RequestHeader("userId") Long userId,
@@ -95,6 +110,126 @@ public class AiChatController {
     @GetMapping("/health")
     public Result<Map<String, Object>> health() {
         return Result.ok(aiConfigurationGuard.healthStatus());
+    }
+
+    /**
+     * 获取当前用户的 AI 历史会话消息（基于 LangChain4j ChatMemory + Redis 持久化）
+     */
+    @GetMapping("/sessions/{userId}/messages")
+    public Result<List<Map<String, Object>>> getSessionMessages(@PathVariable Long userId) {
+        try {
+            List<dev.langchain4j.data.message.ChatMessage> messages = chatMemoryStore.getMessages(String.valueOf(userId));
+            List<Map<String, Object>> simplified = new ArrayList<>();
+            for (dev.langchain4j.data.message.ChatMessage m : messages) {
+                Map<String, Object> item = new java.util.HashMap<>();
+                String role = m.type() != null ? m.type().name() : "UNKNOWN";
+                item.put("role", role);
+                String text = "";
+                try {
+                    if (m instanceof dev.langchain4j.data.message.UserMessage um) {
+                        text = um.singleText();
+                    } else if (m instanceof dev.langchain4j.data.message.AiMessage am) {
+                        text = am.text() != null ? am.text() : "";
+                    } else if (m instanceof dev.langchain4j.data.message.SystemMessage sm) {
+                        text = sm.text();
+                    } else {
+                        text = m.toString();
+                    }
+                } catch (Exception ignored) { text = ""; }
+                item.put("content", text);
+                simplified.add(item);
+            }
+            return Result.ok(simplified);
+        } catch (Exception e) {
+            log.error("【拉取 AI 历史会话失败】", e);
+            return Result.fail("获取历史会话失败：" + e.getMessage());
+        }
+    }
+
+    /**
+     * 获取当前用户的会话概要（目前实现为单会话：sessionId = userId）
+     */
+    @GetMapping("/sessions/{userId}")
+    public Result<List<Map<String, Object>>> listSessions(@PathVariable Long userId) {
+        List<dev.langchain4j.data.message.ChatMessage> messages = chatMemoryStore.getMessages(String.valueOf(userId));
+        List<Map<String, Object>> sessions = new ArrayList<>();
+        Map<String, Object> session = new java.util.HashMap<>();
+        session.put("sessionId", String.valueOf(userId));
+        session.put("userId", userId);
+        session.put("messageCount", messages == null ? 0 : messages.size());
+        sessions.add(session);
+        return Result.ok(sessions);
+    }
+
+    /**
+     * 清空当前用户的 AI 会话历史
+     */
+    @DeleteMapping("/sessions/{userId}")
+    public Result<Void> clearSession(@PathVariable Long userId) {
+        chatMemoryStore.deleteMessages(String.valueOf(userId));
+        return Result.ok();
+    }
+
+    /**
+     * SSE 流式对话接口
+     * 事件类型：
+     *   meta    — 元数据 {sessionId, userId, moduleType}
+     *   delta   — 文本增量（每次推送一段 recommendText 子串）
+     *   cards   — 完整 CardList 数组（一次性推送）
+     *   done    — 结束标记
+     *   error   — 错误信息
+     */
+    @RateLimit(window = 60, count = 30, key = RateLimit.KeyType.USER, message = "AI 调用过于频繁，请稍后再试")
+    @PostMapping(value = "/chat/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter chatStream(
+            @RequestHeader("userId") Long userId,
+            @RequestBody String userMessage
+    ) {
+        SseEmitter emitter = new SseEmitter(120_000L); // 2 分钟超时
+        String normalizedMessage = normalizeUserMessage(userMessage);
+        log.info("【AI流式请求】用户ID：{}，内容：{}", userId, normalizedMessage);
+
+        SSE_EXECUTOR.submit(() -> {
+            try {
+                emitter.send(SseEmitter.event()
+                        .name("meta")
+                        .data(Map.of("sessionId", String.valueOf(userId), "userId", userId, "moduleType", "AUTO")));
+
+                String aiJson = routeByTool(normalizedMessage);
+                if (aiJson == null) {
+                    aiJson = ruralDigitalAgent.chat(String.valueOf(userId), normalizedMessage);
+                }
+                aiJson = stripMarkdownCodeBlock(aiJson);
+                Map<String, Object> aiResult = objectMapper.readValue(aiJson, new TypeReference<>() {});
+                String recommendText = stripMarkdownCodeBlock((String) aiResult.get("recommendText"));
+                List<CommonCardDTO> cards = parseAiResult(aiResult);
+
+                // 模拟流式：每 20 字符一段推送
+                if (recommendText != null && !recommendText.isEmpty()) {
+                    int chunkSize = 20;
+                    int len = recommendText.length();
+                    for (int i = 0; i < len; i += chunkSize) {
+                        String chunk = recommendText.substring(i, Math.min(i + chunkSize, len));
+                        emitter.send(SseEmitter.event().name("delta").data(chunk));
+                        try { Thread.sleep(50); } catch (InterruptedException ignored) {}
+                    }
+                }
+
+                emitter.send(SseEmitter.event().name("cards").data(cards));
+                emitter.send(SseEmitter.event().name("done").data("ok"));
+                emitter.complete();
+            } catch (Exception e) {
+                log.error("【AI流式异常】", e);
+                try {
+                    emitter.send(SseEmitter.event().name("error").data(e.getMessage() != null ? e.getMessage() : "AI 服务异常"));
+                    emitter.complete();
+                } catch (Exception ignored) {
+                    emitter.completeWithError(e);
+                }
+            }
+        });
+
+        return emitter;
     }
 
     private String normalizeUserMessage(String rawMessage) {

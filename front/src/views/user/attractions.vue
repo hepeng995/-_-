@@ -83,7 +83,7 @@
             @click="goToDetail(attraction.id)"
           >
             <div class="attraction-image">
-              <img :src="attraction.coverImage || '/images/default-attraction.jpg'" :alt="attraction.name" />
+              <img :src="attraction.coverImage || '/images/default-attraction.jpg'" :alt="attraction.name"  loading="lazy" decoding="async"/>
               <div class="attraction-overlay">
                 <el-button type="primary" size="small">查看详情</el-button>
               </div>
@@ -591,6 +591,35 @@ onMounted(() => {
 
   .location {
     font-size: 10px;
+  }
+}
+
+/* C14 - 360px 兜底（iPhone SE / 折叠屏） */
+@media (max-width: 360px) {
+  .container,
+  .page-container,
+  .content-container {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  .page-header {
+    padding: 28px 0 !important;
+  }
+  .page-header h1 {
+    font-size: 18px !important;
+  }
+  .page-header p {
+    font-size: 12px !important;
+  }
+  .products-grid,
+  .attractions-grid,
+  .news-grid,
+  .routes-grid,
+  .activities-grid {
+    gap: 8px !important;
+  }
+  .el-button:not(.is-circle):not(.is-text) {
+    min-height: 36px;
   }
 }
 </style>

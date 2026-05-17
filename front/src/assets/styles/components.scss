@@ -372,3 +372,185 @@
     gap: var(--space-3);
   }
 }
+
+// ============================================================
+// 移动端 H5 全局覆写
+// MB-5: el-form 标签顶部布局，避免窄屏挤压输入框
+// MB-6: 触控目标最小 44x44，按钮 / Tag / 链接整体放大
+// 仅在 max-width: 767px 生效，桌面/平板不受影响
+// ============================================================
+@media (max-width: 767px) {
+  // 1) 表单标签放到上方，输入框占满整行
+  .el-form:not(.el-form--inline) {
+    .el-form-item__label {
+      float: none !important;
+      display: block !important;
+      width: auto !important;
+      max-width: none !important;
+      text-align: left !important;
+      padding: 0 0 6px !important;
+      line-height: 1.5 !important;
+    }
+    .el-form-item__content {
+      margin-left: 0 !important;
+      width: 100%;
+    }
+    .el-form-item {
+      margin-bottom: 14px;
+    }
+  }
+
+  // 2) 触控目标 ≥ 44x44
+  .el-button {
+    min-height: 44px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    font-size: 15px;
+  }
+  .el-button--small,
+  .el-button.is-small {
+    min-height: 38px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    font-size: 14px;
+  }
+  .el-button--mini,
+  .el-button.is-mini {
+    min-height: 32px;
+  }
+  .el-input__inner,
+  .el-input__wrapper {
+    min-height: 42px;
+  }
+  .el-tag.is-clickable {
+    min-height: 32px;
+    line-height: 30px;
+    padding: 0 12px;
+  }
+
+  // 3) 表格横向滚动兜底（在没有改造为卡片时使用）
+  .mobile-scroll-x {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+// hover 状态仅在真鼠标设备生效，避免 H5 上 tap 后保持悬停态
+@media (hover: none) {
+  .el-button:hover,
+  .el-tag.is-clickable:hover,
+  a:hover {
+    background-color: revert;
+    color: revert;
+  }
+}
+
+
+// ============================================================
+// A6 - Element Plus 组件全局移动端覆盖
+// ============================================================
+@media (max-width: 767px) {
+  // el-drawer 兜底：宽度 + 安全区
+  .el-drawer {
+    max-width: 92vw;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    &.rtl, &.ltr { max-width: 92vw; }
+  }
+
+  // el-message-box（confirm / alert / prompt）
+  .el-message-box {
+    width: min(420px, calc(100vw - 24px)) !important;
+    .el-button { min-height: 44px; padding: 8px 18px; }
+  }
+
+  // el-picker / el-cascader 浮层（防超出视口）
+  .el-picker-panel,
+  .el-cascader-panel {
+    max-width: calc(100vw - 16px);
+    max-height: 60vh;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  // el-tabs 头部支持横向滚动（防溢出）
+  .el-tabs__nav-wrap {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    &::-webkit-scrollbar { display: none; }
+  }
+
+  // B3 - el-pagination 移动瘦身
+  .el-pagination {
+    .el-pagination__jump,
+    .el-pagination__sizes,
+    .el-pagination__total {
+      display: none !important;
+    }
+    .el-pager li,
+    .btn-prev, .btn-next {
+      min-width: 32px;
+      height: 32px;
+      line-height: 32px;
+    }
+  }
+
+  // el-dialog 兜底（未挂 .mobile-dialog 类时）
+  .el-dialog:not(.mobile-dialog) {
+    width: calc(100vw - 24px) !important;
+    max-width: calc(100vw - 24px) !important;
+    margin: 4vh auto !important;
+  }
+
+  // 上传图片卡片缩放
+  .el-upload--picture-card,
+  .el-upload-list--picture-card .el-upload-list__item {
+    --el-upload-list-picture-card-size: 96px;
+    width: var(--el-upload-list-picture-card-size) !important;
+    height: var(--el-upload-list-picture-card-size) !important;
+  }
+}
+
+// ============================================================
+// B1 - hover 残留全局兜底（H5 tap 后悬停态保留问题）
+// 列表卡片、状态条、可点击图块等统一 revert
+// ============================================================
+@media (hover: none), (pointer: coarse) {
+  [class*="-card"]:hover,
+  .post-item:hover, .news-item:hover, .order-card:hover, .stat-item:hover,
+  .nav-link:hover, .filter-tab:hover, .category-tab:hover, .tab-item:hover,
+  .gallery-item:hover, .review-image:hover, .timeline-card:hover,
+  .image-thumb:hover, .related-card:hover, .like-btn:hover,
+  .feature-card:hover, .product-item:hover, .attraction-item:hover,
+  .route-card:hover, .activity-card:hover, .address-card:hover,
+  .content-card:hover, .info-card:hover, .quick-action:hover {
+    transform: none !important;
+    box-shadow: revert !important;
+    background-color: revert !important;
+    border-color: revert !important;
+  }
+}
+
+// ============================================================
+// B2 - 富文本容器图片宽度兜底
+// 防后台塞 1200px 宽图导致 H5 横向溢出
+// ============================================================
+.detail-content,
+.content-text,
+.tips-content,
+.post-content,
+.article-content,
+.rich-text,
+.description-content {
+  img, video, iframe {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    box-sizing: border-box;
+  }
+  table { max-width: 100%; overflow-x: auto; display: block; }
+  pre, code { white-space: pre-wrap; word-break: break-all; }
+}
+// :deep 选择器版本（用于 scoped 样式中的富文本）
+:deep(.review-content) {
+  img, video, iframe { max-width: 100%; height: auto; display: block; }
+}

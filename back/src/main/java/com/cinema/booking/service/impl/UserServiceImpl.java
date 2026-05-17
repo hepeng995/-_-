@@ -10,6 +10,7 @@ import com.cinema.booking.entity.User;
 import com.cinema.booking.exception.ServiceException;
 import com.cinema.booking.mapper.UserMapper;
 import com.cinema.booking.service.UserService;
+import com.cinema.booking.security.HybridPasswordEncoder;
 import com.cinema.booking.utils.BeanCopyUtils;
 import com.cinema.booking.utils.JwtUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -111,6 +112,22 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             User user = userMapper.findByUsername(loginRequest.getUsername());
             if (user == null) {
                 throw new ServiceException("用户不存在");
+            }
+
+            // 历史明文密码透明升级为 BCrypt（一次性，仅对未升级的用户触发）
+            try {
+                if (passwordEncoder instanceof HybridPasswordEncoder hybrid
+                        && !hybrid.isBcrypt(user.getPassword())) {
+                    String upgraded = passwordEncoder.encode(loginRequest.getPassword());
+                    LambdaUpdateWrapper<User> uw = new LambdaUpdateWrapper<>();
+                    uw.eq(User::getId, user.getId())
+                      .set(User::getPassword, upgraded)
+                      .set(User::getUpdatedAt, LocalDateTime.now());
+                    update(uw);
+                    log.info("User {} password upgraded to BCrypt.", user.getUsername());
+                }
+            } catch (Exception ex) {
+                log.warn("Failed to upgrade legacy password for user {}: {}", user.getUsername(), ex.getMessage());
             }
             
             // 生成JWT令牌

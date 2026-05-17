@@ -156,6 +156,47 @@ public class TraceServiceImpl implements TraceService {
         return toBatchDTO(entity);
     }
 
+    @Override
+    @Transactional
+    public ProductBatchDTO updateBatch(Long id, ProductBatchDTO dto) {
+        ProductBatch entity = productBatchMapper.selectById(id);
+        if (entity == null) {
+            throw new ServiceException("批次不存在");
+        }
+        if (dto.getProductId() != null) entity.setProductId(dto.getProductId());
+        if (dto.getProductName() != null) entity.setProductName(dto.getProductName());
+        if (dto.getBatchNo() != null) entity.setBatchNo(dto.getBatchNo());
+        if (dto.getProductionDate() != null) entity.setProductionDate(dto.getProductionDate());
+        if (dto.getShelfLife() != null) entity.setShelfLife(dto.getShelfLife());
+        if (dto.getStatus() != null) entity.setStatus(dto.getStatus());
+        entity.setUpdatedAt(LocalDateTime.now());
+        productBatchMapper.updateById(entity);
+        return toBatchDTO(entity);
+    }
+
+    @Override
+    @Transactional
+    public void deleteBatch(Long id) {
+        ProductBatch entity = productBatchMapper.selectById(id);
+        if (entity == null) {
+            throw new ServiceException("批次不存在");
+        }
+        productBatchMapper.deleteById(id);
+    }
+
+    @Override
+    @Transactional
+    public ProductBatchDTO toggleBatchStatus(Long id, Integer status) {
+        ProductBatch entity = productBatchMapper.selectById(id);
+        if (entity == null) {
+            throw new ServiceException("批次不存在");
+        }
+        entity.setStatus(status != null ? status : (entity.getStatus() == 1 ? 0 : 1));
+        entity.setUpdatedAt(LocalDateTime.now());
+        productBatchMapper.updateById(entity);
+        return toBatchDTO(entity);
+    }
+
     private TraceRecordDTO toDTO(TraceRecord entity) {
         TraceRecordDTO dto = new TraceRecordDTO();
         dto.setId(entity.getId());

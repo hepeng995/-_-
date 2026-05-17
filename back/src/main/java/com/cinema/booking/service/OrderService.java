@@ -109,6 +109,29 @@ public interface OrderService {
      * @return 更新后的订单信息
      */
     OrderDTO cancelOrder(Long orderId, String cancelReason);
+
+    /**
+     * 订单退款（仅管理员）
+     * 适用场景：订单已支付（订单状态 2/3/4）需要全额退款
+     * - 订单状态置为 6（已退款）
+     * - 支付状态置为 2（退款）
+     * - 恢复商品库存与销量
+     *
+     * @param orderId      订单ID
+     * @param refundReason 退款原因
+     * @return 更新后的订单信息
+     */
+    OrderDTO refundOrder(Long orderId, String refundReason);
+
+    /**
+     * 发货（仅管理员）
+     * 仅允许从待发货（订单状态 2）流转到已发货（订单状态 3），同时写入发货时间
+     *
+     * @param orderId      订单ID
+     * @param trackingInfo 物流单号或备注（可选）
+     * @return 更新后的订单信息
+     */
+    OrderDTO shipOrder(Long orderId, String trackingInfo);
     
     /**
      * 确认收货
@@ -159,6 +182,21 @@ public interface OrderService {
      * @return 订单项列表
      */
     List<OrderItemDTO> getCartItemsForOrder(Long userId, List<Long> itemIds);
+
+    /**
+     * 批量更新订单状态（同时写入对应时间字段）
+     */
+    int batchUpdateOrderStatus(List<Long> ids, Integer orderStatus);
+
+    /**
+     * 批量取消订单
+     */
+    int batchCancelOrders(List<Long> ids, String cancelReason);
+
+    /**
+     * 逻辑删除订单（管理员）
+     */
+    void deleteOrder(Long orderId);
     
     /**
      * 订单统计DTO

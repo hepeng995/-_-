@@ -18,6 +18,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -50,6 +53,7 @@ public class ActivityServiceImpl implements ActivityService {
     private final SecurityService securityService;
 
     @Override
+    @Cacheable(value = "activities", key = "'page:' + #pageRequest.pageNum + ':' + #pageRequest.pageSize + ':' + (#keyword == null ? '' : #keyword) + ':' + (#category == null ? '' : #category) + ':' + (#status == null ? '' : #status)")
     public IPage<ActivityDTO> getActivityPage(PageRequest pageRequest, String keyword, String category, String status) {
         Page<Activity> page = new Page<>(pageRequest.getPageNum(), pageRequest.getPageSize());
         LambdaQueryWrapper<Activity> wrapper = new LambdaQueryWrapper<>();
@@ -68,6 +72,7 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
+    @Cacheable(value = "activities", key = "'detail:' + #id")
     public ActivityDTO getActivityById(Long id) {
         Activity activity = getActivityEntity(id);
         return toDTO(activity);
@@ -103,6 +108,7 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "activities", allEntries = true)
     public ActivityRegistrationDTO registerActivity(ActivityRegistrationDTO dto) {
         Activity activity = getActivityEntity(dto.getActivityId());
         String resolvedStatus = resolveStatus(activity);
@@ -160,6 +166,7 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "activities", allEntries = true)
     public ActivityDTO createActivity(ActivityDTO dto) {
         Activity entity = toEntity(dto);
         entity.setCurrentParticipants(dto.getCurrentParticipants() == null ? 0 : dto.getCurrentParticipants());
@@ -173,6 +180,7 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "activities", allEntries = true)
     public ActivityDTO updateActivity(Long id, ActivityDTO dto) {
         Activity existing = getActivityEntity(id);
         Activity entity = toEntity(dto);
@@ -188,6 +196,7 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "activities", allEntries = true)
     public void deleteActivity(Long id) {
         Activity existing = getActivityEntity(id);
         existing.setDeleted(true);
@@ -257,6 +266,57 @@ public class ActivityServiceImpl implements ActivityService {
         registration.setStatus("cancelled");
         registration.setUpdatedAt(LocalDateTime.now());
         activityRegistrationMapper.updateById(registration);
+    }
+
+    @Override
+    @Transactional
+    public void cancelMyRegistration(Long registrationId, Long userId) {
+        ActivityRegistration registration = getRegistrationEntity(registrationId);
+        if (!registration.getUserId().equals(userId)) {
+            throw new ServiceException("无权操作他人报名");
+        }
+        if ("cancelled".equals(registration.getStatus())) {
+            return;
+        }
+        Activity activity = getActivityEntity(registration.getActivityId());
+        int currentParticipants = activity.getCurrentParticipants() == null ? 0 : activity.getCurrentParticipants();
+        int nextParticipants = Math.max(0, currentParticipants - (registration.getParticipantCount() == null ? 0 : registration.getParticipantCount()));
+        activity.setCurrentParticipants(nextParticipants);
+        activity.setStatus(resolveStatus(activity));
+        activity.setUpdatedAt(LocalDateTime.now());
+        activityMapper.updateById(activity);
+
+        registration.setStatus("cancelled");
+        registration.setUpdatedAt(LocalDateTime.now());
+        activityRegistrationMapper.updateById(registration);
+    }
+
+    @Override
+    public IPage<ActivityRegistrationDTO> getMyRegistrations(PageRequest pageRequest, Long userId, String status) {
+        Page<ActivityRegistration> page = new Page<>(pageRequest.getPageNum(), pageRequest.getPageSize());
+        LambdaQueryWrapper<ActivityRegistration> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(ActivityRegistration::getDeleted, false);
+        wrapper.eq(ActivityRegistration::getUserId, userId);
+        if (status != null && !status.isEmpty()) {
+            wrapper.eq(ActivityRegistration::getStatus, status);
+        }
+        wrapper.orderByDesc(ActivityRegistration::getCreatedAt);
+
+        IPage<ActivityRegistration> registrationPage = activityRegistrationMapper.selectPage(page, wrapper);
+        java.util.List<Long> activityIds = registrationPage.getRecords().stream()
+                .map(ActivityRegistration::getActivityId)
+                .distinct()
+                .collect(Collectors.toList());
+        java.util.Map<Long, Activity> activityMap = activityIds.isEmpty()
+                ? java.util.Collections.emptyMap()
+                : activityMapper.selectBatchIds(activityIds).stream()
+                    .collect(Collectors.toMap(Activity::getId, a -> a));
+
+        Page<ActivityRegistrationDTO> result = new Page<>(registrationPage.getCurrent(), registrationPage.getSize(), registrationPage.getTotal());
+        result.setRecords(registrationPage.getRecords().stream()
+                .map(r -> toRegistrationDTO(r, activityMap.get(r.getActivityId())))
+                .collect(Collectors.toList()));
+        return result;
     }
 
     private Activity getActivityEntity(Long id) {

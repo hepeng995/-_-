@@ -19,7 +19,7 @@
             <!-- 商品图片 -->
             <div class="product-images">
               <div class="main-image">
-                <img :src="currentImage" :alt="product.name" @click="previewImage" />
+                <img :src="currentImage" :alt="product.name" @click="previewImage"  loading="lazy" decoding="async"/>
                 <div class="image-badges">
                   <div v-if="product.isFeatured" class="badge featured">推荐</div>
                   <div v-if="product.isNew" class="badge new">新品</div>
@@ -34,7 +34,7 @@
                   :class="{ active: currentImage === image }"
                   @click="currentImage = image"
                 >
-                  <img :src="image" :alt="`${product.name}图片${index + 1}`" />
+                  <img :src="image" :alt="`${product.name}图片${index + 1}`"  loading="lazy" decoding="async"/>
                 </div>
               </div>
             </div>
@@ -148,7 +148,7 @@
           <el-tabs v-model="activeTab" class="detail-tabs">
             <el-tab-pane label="商品详情" name="detail">
               <div class="detail-content">
-                <div v-if="product.content" v-html="product.content"></div>
+                <div v-if="product.content" v-html="sanitizeHtml(product.content)"></div>
                 <div v-else class="default-content">
                   <h3>商品介绍</h3>
                   <p>{{ product.description }}</p>
@@ -305,7 +305,7 @@
                             :src="image"
                             @click="previewReviewImages(parseImages(review.images), index)"
                             class="review-image"
-                          />
+                           loading="lazy" decoding="async"/>
                         </div>
                       </div>
 
@@ -365,7 +365,7 @@
               @click="goToProduct(item.id)"
             >
               <div class="related-image">
-                <img :src="item.coverImage || '/images/default-product.jpg'" :alt="item.name" />
+                <img :src="item.coverImage || '/images/default-product.jpg'" :alt="item.name"  loading="lazy" decoding="async"/>
               </div>
               <div class="related-info">
                 <h4>{{ item.name }}</h4>
@@ -440,6 +440,7 @@
 </template>
 
 <script setup>
+import { sanitizeHtml } from '@/utils/sanitize'
 import { ref, onMounted, nextTick, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElImageViewer } from 'element-plus'
@@ -956,24 +957,19 @@ const submitReview = async () => {
       try {
         for (const fileItem of reviewForm.value.imageList) {
           if (fileItem.raw) {
-            console.log('准备上传文件:', fileItem.raw.name, fileItem.raw.size)
             // 使用文件上传API
             const uploadRes = await fileApi.uploadFile(fileItem.raw)
-            console.log('上传响应完整数据:', uploadRes)
 
             // 处理不同的响应格式
             if (uploadRes.data) {
               if (uploadRes.data.code === 200 && uploadRes.data.data?.url) {
-                console.log('成功获取图片URL:', uploadRes.data.data.url)
                 imageUrls.push(uploadRes.data.data.url)
               } else if (uploadRes.data.code === 200) {
-                console.log('成功获取图片URL:', uploadRes.data)
                 imageUrls.push(uploadRes.data)
               }
             }
           }
         }
-        console.log('最终图片URL列表:', imageUrls)
       } catch (uploadError) {
         console.error('图片上传失败:', uploadError)
         ElMessage.error('图片上传失败，请重试')
@@ -1949,6 +1945,35 @@ watch(
 
   .related-products {
     padding: 16px 0;
+  }
+}
+
+/* C14 - 360px 兜底（iPhone SE / 折叠屏） */
+@media (max-width: 360px) {
+  .container,
+  .page-container,
+  .content-container {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  .page-header {
+    padding: 28px 0 !important;
+  }
+  .page-header h1 {
+    font-size: 18px !important;
+  }
+  .page-header p {
+    font-size: 12px !important;
+  }
+  .products-grid,
+  .attractions-grid,
+  .news-grid,
+  .routes-grid,
+  .activities-grid {
+    gap: 8px !important;
+  }
+  .el-button:not(.is-circle):not(.is-text) {
+    min-height: 36px;
   }
 }
 </style>

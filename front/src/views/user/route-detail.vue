@@ -18,7 +18,7 @@
           <div class="hero-layout">
             <!-- 左侧封面 -->
             <div class="hero-cover">
-              <img :src="routeData.coverImage" :alt="routeData.name" />
+              <img :src="routeData.coverImage" :alt="routeData.name"  loading="lazy" decoding="async"/>
             </div>
             <!-- 右侧信息 -->
             <div class="hero-info">
@@ -164,7 +164,7 @@
                       <!-- 景点卡片 -->
                       <div class="spot-card">
                         <div class="spot-cover">
-                          <img :src="item.attractionCover" :alt="item.attractionName" />
+                          <img :src="item.attractionCover" :alt="item.attractionName"  loading="lazy" decoding="async"/>
                         </div>
                         <div class="spot-info">
                           <h4 class="spot-name">{{ item.attractionName }}</h4>
@@ -204,7 +204,7 @@
         <div class="container">
           <div class="section-card">
             <h2 class="section-title">旅行小贴士</h2>
-            <div class="tips-content" v-html="routeData.tips"></div>
+            <div class="tips-content" v-html="sanitizeHtml(routeData.tips)"></div>
           </div>
         </div>
       </div>
@@ -227,6 +227,7 @@
 </template>
 
 <script setup>
+import { sanitizeHtml } from '@/utils/sanitize'
 import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
@@ -331,6 +332,13 @@ const loadRouteDetail = async () => {
       routeData.value = res.data
       document.title = `${res.data.name} - 旅游路线`
       initExpandedDays()
+      // 拉取收藏状态
+      try {
+        const favRes = await tourRouteApi.getFavoriteInfo(id)
+        if (favRes.code === 200 && favRes.data) {
+          isCollected.value = !!favRes.data.favorited
+        }
+      } catch (e) { /* 未登录时忽略 */ }
     } else {
       routeData.value = null
     }
@@ -343,9 +351,22 @@ const loadRouteDetail = async () => {
 }
 
 // 收藏切换
-const toggleCollect = () => {
-  isCollected.value = !isCollected.value
-  ElMessage.success(isCollected.value ? '已收藏该路线' : '已取消收藏')
+const toggleCollect = async () => {
+  if (!routeData.value?.id) return
+  try {
+    const res = await tourRouteApi.toggleFavorite(routeData.value.id)
+    if (res.code === 200 && res.data) {
+      isCollected.value = !!res.data.favorited
+      ElMessage.success(isCollected.value ? '已收藏该路线' : '已取消收藏')
+    }
+  } catch (error) {
+    if (error?.response?.status === 401) {
+      ElMessage.warning('请先登录后再收藏')
+    } else {
+      console.error('收藏失败:', error)
+      ElMessage.error('操作失败')
+    }
+  }
 }
 
 // 分享
@@ -1167,5 +1188,34 @@ watch(
 
 .tips-content li {
   margin-bottom: 10px;
+}
+
+/* C14 - 360px 兜底（iPhone SE / 折叠屏） */
+@media (max-width: 360px) {
+  .container,
+  .page-container,
+  .content-container {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  .page-header {
+    padding: 28px 0 !important;
+  }
+  .page-header h1 {
+    font-size: 18px !important;
+  }
+  .page-header p {
+    font-size: 12px !important;
+  }
+  .products-grid,
+  .attractions-grid,
+  .news-grid,
+  .routes-grid,
+  .activities-grid {
+    gap: 8px !important;
+  }
+  .el-button:not(.is-circle):not(.is-text) {
+    min-height: 36px;
+  }
 }
 </style>

@@ -17,7 +17,7 @@
         <div class="container">
           <div class="hero-content">
             <div class="hero-image">
-              <img :src="attraction.coverImage || attraction.cover_image || '/images/default-attraction.jpg'" :alt="attraction.name" />
+              <img :src="attraction.coverImage || attraction.cover_image || '/images/default-attraction.jpg'" :alt="attraction.name"  loading="lazy" decoding="async"/>
             </div>
             <div class="hero-info">
               <div class="attraction-category">
@@ -57,7 +57,7 @@
             <!-- 详细描述 -->
             <div class="detail-section">
               <h2>详细介绍</h2>
-              <div class="detail-content" v-html="attraction.content || attraction.description"></div>
+              <div class="detail-content" v-html="sanitizeHtml(attraction.content || attraction.description)"></div>
             </div>
 
             <!-- 基本信息 -->
@@ -112,7 +112,7 @@
               class="gallery-item"
               @click="previewImage(index)"
             >
-              <img :src="image" :alt="`${attraction.name}图片${index + 1}`" />
+              <img :src="image" :alt="`${attraction.name}图片${index + 1}`"  loading="lazy" decoding="async"/>
             </div>
           </div>
         </div>
@@ -130,7 +130,7 @@
               @click="goToAttraction(item.id)"
             >
               <div class="related-image">
-                <img :src="item.coverImage || item.cover_image || '/images/default-attraction.jpg'" :alt="item.name" />
+                <img :src="item.coverImage || item.cover_image || '/images/default-attraction.jpg'" :alt="item.name"  loading="lazy" decoding="async"/>
               </div>
               <div class="related-info">
                 <h4>{{ item.name }}</h4>
@@ -165,6 +165,7 @@
 </template>
 
 <script setup>
+import { sanitizeHtml } from '@/utils/sanitize'
 import { ref, onMounted, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElImageViewer } from 'element-plus'
@@ -793,6 +794,35 @@ watch(
 
   .related-attractions {
     padding: 16px 0;
+  }
+}
+
+/* C14 - 360px 兜底（iPhone SE / 折叠屏） */
+@media (max-width: 360px) {
+  .container,
+  .page-container,
+  .content-container {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  .page-header {
+    padding: 28px 0 !important;
+  }
+  .page-header h1 {
+    font-size: 18px !important;
+  }
+  .page-header p {
+    font-size: 12px !important;
+  }
+  .products-grid,
+  .attractions-grid,
+  .news-grid,
+  .routes-grid,
+  .activities-grid {
+    gap: 8px !important;
+  }
+  .el-button:not(.is-circle):not(.is-text) {
+    min-height: 36px;
   }
 }
 </style>

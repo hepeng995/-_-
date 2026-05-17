@@ -38,7 +38,7 @@
           <div class="products-list">
             <div v-for="item in orderItems" :key="item.id" class="product-item">
               <div class="product-image">
-                <img :src="item.productImage || '/images/default-product.jpg'" :alt="item.productName" />
+                <img :src="item.productImage || '/images/default-product.jpg'" :alt="item.productName"  loading="lazy" decoding="async"/>
               </div>
               <div class="product-info">
                 <h3>{{ item.productName }}</h3>
@@ -791,5 +791,55 @@ onMounted(() => {
   .dialog-footer > * {
     flex: 1 1 100%;
   }
+}
+
+/* C2 - 移动端三档断点 + sticky 底栏 */
+@media (max-width: 768px) {
+  /* 让结算栏在 H5 上变成 sticky 底栏（避免被 MobileTabBar 遮挡） */
+  .order-summary {
+    position: sticky;
+    bottom: calc(56px + env(safe-area-inset-bottom, 0px));
+    z-index: 50;
+    background: var(--color-bg-body);
+    margin: 0 -12px -12px;
+    padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px));
+    box-shadow: 0 -4px 14px rgba(0, 0, 0, 0.06);
+  }
+  .summary-card {
+    padding: 12px;
+    border-radius: 8px;
+  }
+  .summary-items { display: none; } /* H5 隐藏明细，仅留总价 */
+  .summary-total {
+    margin: 0 0 8px;
+    padding: 0;
+    border-top: none;
+    font-size: 14px;
+  }
+  .total-amount { font-size: 18px; }
+  .submit-btn {
+    min-height: 44px;
+    width: 100%;
+    margin-top: 4px;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-header h1 { font-size: 20px; }
+  .container { padding: 8px; }
+  .product-item { gap: 10px; padding: 10px; }
+  .product-name { font-size: 14px; }
+  .order-summary {
+    bottom: calc(56px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+@media (max-width: 360px) {
+  .container { padding: 6px; gap: 14px; }
+  .page-header h1 { font-size: 18px; }
+  .product-item { grid-template-columns: 48px 1fr; gap: 8px; padding: 8px; }
+  .summary-card { padding: 10px; }
+  .total-amount { font-size: 16px; }
+  .submit-btn { font-size: 14px; }
 }
 </style>

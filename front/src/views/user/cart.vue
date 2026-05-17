@@ -46,7 +46,7 @@
                 </div>
                 
                 <div class="item-image">
-                  <img :src="item.productImage || '/images/default-product.jpg'" :alt="item.productName" />
+                  <img :src="item.productImage || '/images/default-product.jpg'" :alt="item.productName"  loading="lazy" decoding="async"/>
                 </div>
                 
                 <div class="item-info">
@@ -151,7 +151,7 @@
             @click="goToProduct(product.id)"
           >
             <div class="product-image">
-              <img :src="product.coverImage || '/images/default-product.jpg'" :alt="product.name" />
+              <img :src="product.coverImage || '/images/default-product.jpg'" :alt="product.name"  loading="lazy" decoding="async"/>
             </div>
             <div class="product-info">
               <h4>{{ product.name }}</h4>
@@ -824,6 +824,48 @@ onMounted(() => {
 
   .products-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* C3 - 移动端 fixed 结算栏 */
+@media (max-width: 768px) {
+  .cart-summary {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: calc(56px + env(safe-area-inset-bottom, 0px));
+    z-index: 50;
+    margin: 0;
+    border-radius: 12px 12px 0 0;
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
+    box-shadow: 0 -6px 18px rgba(20, 83, 45, 0.10);
+    background: var(--color-bg-surface);
+  }
+  .cart-summary .checkout-btn {
+    min-height: 44px;
+    width: 100%;
+  }
+  .cart-list {
+    padding-bottom: 160px;
+  }
+  .cart-summary .summary-row {
+    margin: 4px 0;
+  }
+}
+@media (max-width: 480px) {
+  .cart-summary {
+    padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px));
+  }
+  .cart-list {
+    padding-bottom: 150px;
+  }
+}
+@media (max-width: 360px) {
+  .cart-list {
+    padding-bottom: 140px;
+  }
+  .cart-summary .summary-row {
+    font-size: 13px;
   }
 }
 </style>

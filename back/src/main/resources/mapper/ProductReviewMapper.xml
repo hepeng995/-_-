@@ -89,13 +89,34 @@
         </where>
         <choose>
             <when test="query.sortBy == 'helpful'">
-                ORDER BY r.helpful_count ${query.sortOrder}, r.created_at DESC
+                <choose>
+                    <when test="query.sortOrder == 'asc'">
+                        ORDER BY r.helpful_count ASC, r.created_at DESC
+                    </when>
+                    <otherwise>
+                        ORDER BY r.helpful_count DESC, r.created_at DESC
+                    </otherwise>
+                </choose>
             </when>
             <when test="query.sortBy == 'rating'">
-                ORDER BY r.rating ${query.sortOrder}, r.created_at DESC
+                <choose>
+                    <when test="query.sortOrder == 'asc'">
+                        ORDER BY r.rating ASC, r.created_at DESC
+                    </when>
+                    <otherwise>
+                        ORDER BY r.rating DESC, r.created_at DESC
+                    </otherwise>
+                </choose>
             </when>
             <otherwise>
-                ORDER BY r.created_at ${query.sortOrder}
+                <choose>
+                    <when test="query.sortOrder == 'asc'">
+                        ORDER BY r.created_at ASC
+                    </when>
+                    <otherwise>
+                        ORDER BY r.created_at DESC
+                    </otherwise>
+                </choose>
             </otherwise>
         </choose>
     </select>

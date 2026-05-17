@@ -28,7 +28,7 @@ export default function Attractions() {
   const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
   const [editingItem, setEditingItem] = useState<Attraction | null>(null);
   const [saving, setSaving] = useState(false);
-  const [formData, setFormData] = useState({ name: '', categoryId: 0, address: '', ticketPrice: 0, description: '', coverImage: '', status: 1 });
+  const [formData, setFormData] = useState({ name: '', categoryId: 0, address: '', ticketPrice: 0, description: '', coverImage: '', status: 1, longitude: 0, latitude: 0, trafficGuide: '', openingHours: '' });
 
   const fetchData = async () => {
     setLoading(true);
@@ -53,8 +53,8 @@ export default function Attractions() {
   const handleSearch = () => { setCurrent(1); fetchData(); };
   const handleReset = () => { setFilterName(''); setFilterCategory(''); setFilterStatus(''); setCurrent(1); };
 
-  const handleOpenAdd = () => { setEditingItem(null); setFormData({ name: '', categoryId: 0, address: '', ticketPrice: 0, description: '', coverImage: '', status: 1 }); setModalMode('add'); setIsModalOpen(true); };
-  const handleOpenEdit = (item: Attraction) => { setEditingItem(item); setFormData({ name: item.name, categoryId: item.categoryId, address: item.address, ticketPrice: item.ticketPrice, description: item.description, coverImage: item.coverImage, status: item.status }); setModalMode('edit'); setIsModalOpen(true); };
+  const handleOpenAdd = () => { setEditingItem(null); setFormData({ name: '', categoryId: 0, address: '', ticketPrice: 0, description: '', coverImage: '', status: 1, longitude: 0, latitude: 0, trafficGuide: '', openingHours: '' }); setModalMode('add'); setIsModalOpen(true); };
+  const handleOpenEdit = (item: Attraction) => { setEditingItem(item); setFormData({ name: item.name, categoryId: item.categoryId, address: item.address, ticketPrice: item.ticketPrice, description: item.description, coverImage: item.coverImage, status: item.status, longitude: item.longitude || 0, latitude: item.latitude || 0, trafficGuide: item.trafficGuide || '', openingHours: item.openingHours || '' }); setModalMode('edit'); setIsModalOpen(true); };
 
   const handleSave = async () => {
     if (!formData.name) return;
@@ -247,6 +247,21 @@ export default function Attractions() {
           <div><label className="block text-sm font-medium text-gray-700 mb-1">分类</label><select value={formData.categoryId} onChange={(e) => setFormData({...formData, categoryId: Number(e.target.value)})} className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-bamboo-500/40 focus-visible:border-bamboo-500 bg-white"><option value={0}>请选择</option>{categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</select></div>
           <div><label className="block text-sm font-medium text-gray-700 mb-1">地址</label><input type="text" value={formData.address} onChange={(e) => setFormData({...formData, address: e.target.value})} className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-bamboo-500/40 focus-visible:border-bamboo-500" /></div>
           <div><label className="block text-sm font-medium text-gray-700 mb-1">票价</label><input type="number" value={formData.ticketPrice} onChange={(e) => setFormData({...formData, ticketPrice: Number(e.target.value)})} className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-bamboo-500/40 focus-visible:border-bamboo-500" /></div>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">经度 (longitude)</label>
+              <input type="number" step="0.000001" value={formData.longitude} onChange={(e) => setFormData({...formData, longitude: Number(e.target.value)})} placeholder="例如 116.397428" className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-bamboo-500/40 focus-visible:border-bamboo-500" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">纬度 (latitude)</label>
+              <input type="number" step="0.000001" value={formData.latitude} onChange={(e) => setFormData({...formData, latitude: Number(e.target.value)})} placeholder="例如 39.90923" className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-bamboo-500/40 focus-visible:border-bamboo-500" />
+            </div>
+          </div>
+          <div className="rounded border border-bamboo-100 bg-bamboo-50/40 p-3 text-xs text-bamboo-600">
+            提示：可前往 <a href="https://lbs.amap.com/tools/picker" target="_blank" rel="noreferrer" className="underline">高德地图坐标拾取器</a> 输入景点地址获取经纬度后回填，前台地图组件需要这两个字段才能定位。
+          </div>
+          <div><label className="block text-sm font-medium text-gray-700 mb-1">交通指引</label><textarea value={formData.trafficGuide} onChange={(e) => setFormData({...formData, trafficGuide: e.target.value})} rows={2} placeholder="自驾/公交/地铁路线说明" className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-bamboo-500/40 focus-visible:border-bamboo-500 resize-y"></textarea></div>
+          <div><label className="block text-sm font-medium text-gray-700 mb-1">开放时间</label><input type="text" value={formData.openingHours} onChange={(e) => setFormData({...formData, openingHours: e.target.value})} placeholder="例如 08:00-18:00（周一闭馆）" className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-bamboo-500/40 focus-visible:border-bamboo-500" /></div>
           <div><label className="block text-sm font-medium text-gray-700 mb-1">封面图片</label><div className="flex flex-col gap-3 sm:flex-row sm:items-center">{formData.coverImage && <img src={formData.coverImage} alt="" className="h-16 w-16 rounded object-cover" />}<label className="w-full cursor-pointer rounded-2xl border border-gray-300 bg-white px-4 py-2 text-center text-sm text-gray-600 hover:text-bamboo-500 sm:w-auto sm:rounded">上传<input type="file" accept="image/*" onChange={handleFileUpload} className="hidden" /></label></div></div>
           <div><label className="block text-sm font-medium text-gray-700 mb-1">描述</label><textarea value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})} rows={3} className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-bamboo-500/40 focus-visible:border-bamboo-500 resize-y"></textarea></div>
           <div><label className="block text-sm font-medium text-gray-700 mb-1">状态</label><select value={formData.status} onChange={(e) => setFormData({...formData, status: Number(e.target.value)})} className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-bamboo-500/40 focus-visible:border-bamboo-500 bg-white"><option value={1}>启用</option><option value={0}>禁用</option></select></div>

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Card } from '../components/ui/Card';
 import { Modal } from '../components/ui/Modal';
+import { MobileFilterPanel } from '../components/ui/MobileFilterPanel';
+import { MobileDataCard } from '../components/ui/MobileDataCard';
 import { getActivityPage, createActivity, updateActivity, deleteActivity } from '../api/activity';
 import type { Activity } from '../types';
 import { useToast } from '../contexts/ToastContext';
@@ -201,81 +203,39 @@ export default function Activities() {
       {confirmDialog}
 
       {/* 筛选区域 */}
-      <Card className="p-6">
-        <div className="flex flex-wrap items-center gap-6 mb-6">
-          <div className="flex items-center gap-2">
-            <label className="text-sm text-gray-600">关键词</label>
-            <input
-              type="text"
-              value={filterKeyword}
-              onChange={(e) => setFilterKeyword(e.target.value)}
-              placeholder="搜索活动标题"
-              className="border border-gray-300 rounded px-3 py-1.5 text-sm w-48 focus:outline-none focus-visible:ring-2 focus-visible:ring-bamboo-500/40 focus-visible:border-bamboo-500"
-              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-            />
+      <MobileFilterPanel title="活动筛选与操作">
+        <div className="flex flex-col gap-4">
+          <div className="grid grid-cols-1 gap-3 md:flex md:flex-wrap md:items-center md:gap-6">
+            <div className="flex flex-col gap-1 md:flex-row md:items-center md:gap-2">
+              <label className="text-sm text-gray-600">关键词</label>
+              <input type="text" value={filterKeyword} onChange={(e) => setFilterKeyword(e.target.value)} placeholder="搜索活动标题" className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-bamboo-500/40 focus-visible:border-bamboo-500 md:w-48 md:py-1.5" onKeyDown={(e) => e.key === 'Enter' && handleSearch()} />
+            </div>
+            <div className="flex flex-col gap-1 md:flex-row md:items-center md:gap-2">
+              <label className="text-sm text-gray-600">分类</label>
+              <select value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)} className="w-full rounded border border-gray-300 bg-white px-3 py-2 text-sm md:w-32 md:py-1.5">
+                <option value="">全部</option>
+                {CATEGORY_OPTIONS.map((c) => (<option key={c.key} value={c.key}>{c.label}</option>))}
+              </select>
+            </div>
+            <div className="flex flex-col gap-1 md:flex-row md:items-center md:gap-2">
+              <label className="text-sm text-gray-600">状态</label>
+              <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="w-full rounded border border-gray-300 bg-white px-3 py-2 text-sm md:w-32 md:py-1.5">
+                <option value="">全部</option>
+                {STATUS_OPTIONS.map((s) => (<option key={s.key} value={s.key}>{s.label}</option>))}
+              </select>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <label className="text-sm text-gray-600">分类</label>
-            <select
-              value={filterCategory}
-              onChange={(e) => setFilterCategory(e.target.value)}
-              className="border border-gray-300 rounded px-3 py-1.5 text-sm w-32 bg-white"
-            >
-              <option value="">全部</option>
-              {CATEGORY_OPTIONS.map((c) => (
-                <option key={c.key} value={c.key}>
-                  {c.label}
-                </option>
-              ))}
-            </select>
+          <div className="grid grid-cols-2 gap-3 md:flex md:flex-wrap md:items-center">
+            <button onClick={handleSearch} className="rounded-2xl bg-bamboo-500 px-4 py-2 text-sm text-white md:rounded md:py-1.5 md:flex md:items-center md:gap-1"><Search size={14} /> 查询</button>
+            <button onClick={handleReset} className="rounded-2xl border border-gray-300 bg-white px-4 py-2 text-sm text-gray-600 md:rounded md:py-1.5">重置</button>
+            <button onClick={handleOpenAdd} className="rounded-2xl bg-bamboo-500 px-4 py-2 text-sm text-white md:rounded md:py-1.5 md:flex md:items-center md:gap-1"><Plus size={14} /> 新增活动</button>
+            <button onClick={handleBatchDelete} disabled={selectedIds.length === 0} className="rounded-2xl bg-terracotta-500 px-4 py-2 text-sm text-white disabled:opacity-50 disabled:cursor-not-allowed md:rounded md:py-1.5 md:flex md:items-center md:gap-1"><Trash2 size={14} /> 批量删除</button>
           </div>
-          <div className="flex items-center gap-2">
-            <label className="text-sm text-gray-600">状态</label>
-            <select
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
-              className="border border-gray-300 rounded px-3 py-1.5 text-sm w-32 bg-white"
-            >
-              <option value="">全部</option>
-              {STATUS_OPTIONS.map((s) => (
-                <option key={s.key} value={s.key}>
-                  {s.label}
-                </option>
-              ))}
-            </select>
-          </div>
-          <button
-            onClick={handleSearch}
-            className="bg-bamboo-500 hover:bg-bamboo-400 text-white px-4 py-1.5 rounded text-sm flex items-center gap-1"
-          >
-            <Search size={14} /> 查询
-          </button>
-          <button
-            onClick={handleReset}
-            className="bg-white border border-gray-300 text-gray-600 px-4 py-1.5 rounded text-sm"
-          >
-            重置
-          </button>
         </div>
-        <div className="flex items-center gap-3">
-          <button
-            onClick={handleOpenAdd}
-            className="bg-bamboo-500 hover:bg-bamboo-400 text-white px-4 py-1.5 rounded text-sm flex items-center gap-1"
-          >
-            <Plus size={14} /> 新增活动
-          </button>
-          <button
-            onClick={handleBatchDelete}
-            disabled={selectedIds.length === 0}
-            className="bg-terracotta-500 hover:bg-terracotta-400 text-white px-4 py-1.5 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
-          >
-            <Trash2 size={14} /> 批量删除
-          </button>
-        </div>
-      </Card>
+      </MobileFilterPanel>
 
       {/* 表格区域 */}
-      <Card className="p-0 overflow-hidden">
+      <Card className="hidden p-0 overflow-hidden md:block">
         {loading && <div className="p-4 text-center text-sm text-gray-400">加载中...</div>}
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse border border-gray-300">
@@ -406,6 +366,53 @@ export default function Activities() {
             >
               &gt;
             </button>
+          </div>
+        </div>
+      </Card>
+
+
+      {/* 移动端卡片列表 */}
+      <div className="space-y-3 md:hidden">
+        {loading && <Card className="p-4 text-center text-sm text-gray-400">加载中...</Card>}
+        {!loading && list.length === 0 && <Card className="p-8 text-center text-sm text-gray-500">暂无数据</Card>}
+        {list.map((item) => {
+          const progress = item.maxParticipants ? Math.min(100, Math.round((item.currentParticipants / item.maxParticipants) * 100)) : 0;
+          return (
+            <MobileDataCard
+              key={item.id}
+              title={item.title}
+              subtitle={`${item.startTime || ''} ~ ${item.endTime || ''}`}
+              selected={selectedIds.includes(item.id)}
+              onSelect={() => handleSelectOne(item.id)}
+              tags={[
+                <span key="cat" className={`rounded-full border px-2 py-0.5 text-[11px] ${CATEGORY_MAP[item.category]?.color || ''}`}>{CATEGORY_MAP[item.category]?.label || item.category}</span>,
+                <span key="status" className={`rounded-full border px-2 py-0.5 text-[11px] ${STATUS_MAP[item.status]?.color || ''}`}>{STATUS_MAP[item.status]?.label || item.status}</span>,
+                item.fee === 0
+                  ? <span key="fee" className="rounded-full border border-sprout-200 bg-sprout-50 px-2 py-0.5 text-[11px] text-sprout-500">免费</span>
+                  : <span key="fee" className="rounded-full border border-terracotta-200 bg-terracotta-50 px-2 py-0.5 text-[11px] text-terracotta-500">¥{item.fee}</span>,
+              ]}
+              fields={[
+                { label: '报名', value: `${item.currentParticipants}/${item.maxParticipants || '不限'}` },
+                ...(item.maxParticipants ? [{ label: '进度', value: `${progress}%` }] : []),
+              ]}
+              actions={[
+                { label: '编辑', onClick: () => handleOpenEdit(item), tone: 'primary' as const },
+                { label: '删除', onClick: () => handleDelete(item.id), tone: 'danger' as const },
+              ]}
+            />
+          );
+        })}
+      </div>
+
+      <Card className="p-4 md:hidden">
+        <div className="flex flex-col gap-3 text-sm text-gray-600">
+          <div className="flex items-center justify-between"><span>共 {total} 条</span><span>{current}/{totalPages || 1}</span></div>
+          <div className="flex items-center justify-between gap-3">
+            <select value={pageSize} onChange={(e) => { setPageSize(Number(e.target.value)); setCurrent(1); }} className="rounded border border-gray-300 bg-white px-3 py-2"><option value={10}>10条/页</option><option value={20}>20条/页</option><option value={50}>50条/页</option></select>
+            <div className="flex items-center gap-2">
+              <button onClick={() => setCurrent(Math.max(1, current - 1))} disabled={current <= 1} className="rounded border border-gray-300 bg-white px-3 py-2 disabled:opacity-50">&lt;</button>
+              <button onClick={() => setCurrent(Math.min(totalPages, current + 1))} disabled={current >= totalPages} className="rounded border border-gray-300 bg-white px-3 py-2 disabled:opacity-50">&gt;</button>
+            </div>
           </div>
         </div>
       </Card>

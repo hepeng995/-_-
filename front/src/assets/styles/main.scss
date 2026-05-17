@@ -2,6 +2,10 @@
 // 全局样式入口
 // ============================================================
 
+// 响应式 mixin（hover / respond / safe-area / tap-target）
+// 注意：scoped 样式无法共享，组件内仍需自行 @use '@/assets/styles/mixins' as *;
+@use './mixins' as *;
+
 // 设计Token (CSS自定义属性)
 @use './tokens.scss';
 

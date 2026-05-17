@@ -31,6 +31,16 @@ export function deleteOrder(id: number) {
   return request.delete<void>(`/orders/${id}`);
 }
 
+/** 订单退款（管理员） */
+export function refundOrder(id: number, reason?: string) {
+  return request.post<Order>(`/orders/${id}/refund`, { reason: reason || '' });
+}
+
+/** 订单发货（管理员） */
+export function shipOrder(id: number, trackingInfo?: string) {
+  return request.post<Order>(`/orders/${id}/ship`, { trackingInfo: trackingInfo || '' });
+}
+
 /** 获取订单统计 */
 export function getOrderStats(params?: Record<string, any>) {
   return request.get<OrderStats>('/orders/stats', { params });
@@ -50,4 +60,5 @@ export default {
   getOrderPage, getOrderById, updateOrderStatus,
   cancelOrder, confirmOrder, deleteOrder, getOrderStats,
   batchUpdateOrderStatus, batchCancelOrders,
+  refundOrder, shipOrder,
 };

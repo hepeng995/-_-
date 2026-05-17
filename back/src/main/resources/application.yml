@@ -26,7 +26,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:village}?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
     username: ${DB_USERNAME:root}
-    password: ${DB_PASSWORD:}
+    password: ${DB_PASSWORD:1234}
 
   # 文件上传配置
   servlet:
@@ -90,6 +90,7 @@ cinema:
     smoke-test-query: ${QDRANT_SMOKE_TEST_QUERY:有什么特色特产推荐？}
     legacy-collections:
       - village_knowledge_base
+    indexing-mode: ${AI_INDEXING_MODE:incremental}
 
 # 和风天气 API 配置
 qweather:
@@ -123,3 +124,30 @@ file:
 
 app:
   public-base-url: ${APP_PUBLIC_BASE_URL:}
+
+# Spring Boot Actuator 健康检查 / 指标
+management:
+  endpoints:
+    web:
+      base-path: /actuator
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when_authorized
+      probes:
+        enabled: true
+  health:
+    redis:
+      enabled: true
+    db:
+      enabled: true
+  info:
+    env:
+      enabled: true
+    java:
+      enabled: true
+info:
+  app:
+    name: village-revival
+    version: 0.0.1-SNAPSHOT

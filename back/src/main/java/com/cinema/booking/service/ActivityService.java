@@ -32,4 +32,14 @@ public interface ActivityService {
     void confirmRegistration(Long id);
 
     void cancelRegistration(Long id);
+
+    /**
+     * 用户取消自己的活动报名（仅本人可操作）
+     */
+    void cancelMyRegistration(Long registrationId, Long userId);
+
+    /**
+     * 查询当前用户的活动报名列表
+     */
+    IPage<ActivityRegistrationDTO> getMyRegistrations(PageRequest pageRequest, Long userId, String status);
 }

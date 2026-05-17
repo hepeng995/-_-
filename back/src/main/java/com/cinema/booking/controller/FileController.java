@@ -1,5 +1,7 @@
 package com.cinema.booking.controller;
 
+
+import com.cinema.booking.annotation.RateLimit;
 import com.cinema.booking.dto.FileUploadResultDTO;
 import com.cinema.booking.utils.Result;
 import lombok.extern.slf4j.Slf4j;
@@ -16,20 +18,28 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 import jakarta.servlet.http.HttpServletResponse;
 
-/**
- * 文件上传下载控制器
- */
 @Slf4j
 @RestController
 @RequestMapping("/file")
 @CrossOrigin
 public class FileController {
+
+    private static final long MAX_FILE_SIZE = 10L * 1024 * 1024;
+    private static final Set<String> ALLOWED_EXTENSIONS =
+            Set.of("jpg", "jpeg", "png", "webp", "gif", "pdf");
+    private static final Pattern SAFE_NAME = Pattern.compile(
+            "^(?:\\d{4}-\\d{2}/)?[a-zA-Z0-9._-]{1,128}\\.[a-zA-Z0-9]{1,8}$");
 
     @Value("${server.port:7070}")
     private String port;
@@ -37,45 +47,38 @@ public class FileController {
     @Value("${file.upload.path:files}")
     private String uploadPath;
 
-    /**
-     * 上传文件
-     * @param file 文件
-     * @return 文件访问URL
-     * @throws IOException IO异常
-     */
+    @RateLimit(window = 60, count = 10, key = RateLimit.KeyType.USER, message = "上传过于频繁，请稍后再试")
     @PostMapping("/upload")
-    public Result<FileUploadResultDTO> uploadFile(@RequestParam("file") MultipartFile file) throws IOException {
-        if (file.isEmpty()) {
+    public Result<FileUploadResultDTO> uploadFile(@RequestParam("file") MultipartFile file) {
+        if (file == null || file.isEmpty()) {
             return Result.fail("文件为空");
         }
-
-        // 获取文件名和扩展名
-        String originalFilename = file.getOriginalFilename();
-        String fileExtension = originalFilename != null ? 
-                originalFilename.substring(originalFilename.lastIndexOf(".")) : "";
-        
-        // 使用UUID生成新文件名，避免文件名冲突
-        String newFileName = UUID.randomUUID().toString() + fileExtension;
-        
-        // 确保上传目录存在
-        File uploadDir = new File(uploadPath);
-        if (!uploadDir.exists() && !uploadDir.mkdirs()) {
-            log.error("创建上传目录失败");
-            return Result.fail("服务器错误，创建上传目录失败");
+        if (file.getSize() > MAX_FILE_SIZE) {
+            return Result.fail("文件大小不得超过 10MB");
         }
 
-        // 构建文件保存路径
-        Path filePath = Paths.get(uploadPath, newFileName);
-        
+        String originalFilename = file.getOriginalFilename();
+        String ext = extractExtension(originalFilename);
+        if (ext == null || !ALLOWED_EXTENSIONS.contains(ext)) {
+            return Result.fail("不支持的文件类型，仅允许：" + ALLOWED_EXTENSIONS);
+        }
+
+        String subDir = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM"));
+        String storedName = subDir + "/" + UUID.randomUUID().toString().replace("-", "") + "." + ext;
+
         try {
-            // 保存文件
-            Files.copy(file.getInputStream(), filePath);
-            
-            // 修改为返回相对路径，而不是完整URL，这样可以被前端代理正确处理
-            String fileUrl = "/api/file/download/" + newFileName;
-            FileUploadResultDTO uploadResult = new FileUploadResultDTO(fileUrl, newFileName, originalFilename);
-            
-            log.info("文件上传成功: {}, URL: {}", originalFilename, fileUrl);
+            Path baseDir = Paths.get(uploadPath).toAbsolutePath().normalize();
+            Path target = baseDir.resolve(storedName).normalize();
+            if (!target.startsWith(baseDir)) {
+                log.warn("拒绝越权写入: {}", target);
+                return Result.fail("非法文件名");
+            }
+            Files.createDirectories(target.getParent());
+            Files.copy(file.getInputStream(), target);
+
+            String fileUrl = "/api/file/download/" + storedName;
+            FileUploadResultDTO uploadResult = new FileUploadResultDTO(fileUrl, storedName, originalFilename);
+            log.info("文件上传成功: {} -> {}", originalFilename, storedName);
             return Result.success(uploadResult);
         } catch (IOException e) {
             log.error("文件上传失败", e);
@@ -83,46 +86,39 @@ public class FileController {
         }
     }
 
-    /**
-     * 下载文件
-     * @param fileName 文件名
-     * @param response HTTP响应
-     * @throws IOException IO异常
-     */
     @GetMapping("/download/{fileName}")
     public void downloadFile(@PathVariable String fileName, HttpServletResponse response) throws IOException {
-        Path filePath = Paths.get(uploadPath, fileName);
-        File file = filePath.toFile();
-        
+        Path target = resolveSafe(fileName);
+        if (target == null) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
+        File file = target.toFile();
         if (!file.exists() || !file.isFile()) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
 
         try (FileInputStream fileInputStream = new FileInputStream(file)) {
-            // 判断文件类型，设置正确的content-type
             String contentType = determineContentType(fileName);
             response.setContentType(contentType);
-            
-            // 如果是图片，直接显示，否则作为附件下载
+
+            String dispName = file.getName();
             if (contentType.startsWith("image/")) {
-                response.setHeader("Content-Disposition", "inline;filename=" + 
-                        URLEncoder.encode(fileName, StandardCharsets.UTF_8));
+                response.setHeader("Content-Disposition", "inline;filename=" +
+                        URLEncoder.encode(dispName, StandardCharsets.UTF_8));
             } else {
-                response.setHeader("Content-Disposition", "attachment;filename=" + 
-                        URLEncoder.encode(fileName, StandardCharsets.UTF_8));
+                response.setHeader("Content-Disposition", "attachment;filename=" +
+                        URLEncoder.encode(dispName, StandardCharsets.UTF_8));
             }
-            
             response.setContentLength((int) file.length());
-            
-            // 写入响应流
+
             OutputStream outputStream = response.getOutputStream();
             byte[] buffer = new byte[4096];
             int bytesRead;
             while ((bytesRead = fileInputStream.read(buffer)) != -1) {
                 outputStream.write(buffer, 0, bytesRead);
             }
-            
             outputStream.flush();
             log.info("文件下载成功: {}", fileName);
         } catch (IOException e) {
@@ -130,72 +126,77 @@ public class FileController {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
-    
-    /**
-     * 根据文件名判断内容类型
-     * @param fileName 文件名
-     * @return 内容类型
-     */
-    private String determineContentType(String fileName) {
-        fileName = fileName.toLowerCase();
-        if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg")) {
-            return "image/jpeg";
-        } else if (fileName.endsWith(".png")) {
-            return "image/png";
-        } else if (fileName.endsWith(".gif")) {
-            return "image/gif";
-        } else if (fileName.endsWith(".bmp")) {
-            return "image/bmp";
-        } else if (fileName.endsWith(".webp")) {
-            return "image/webp";
-        } else if (fileName.endsWith(".pdf")) {
-            return "application/pdf";
-        } else {
-            return "application/octet-stream";
-        }
-    }
 
-    /**
-     * 批量上传文件
-     * @param files 文件列表
-     * @return 文件访问URL列表
-     */
+    @RateLimit(window = 60, count = 5, key = RateLimit.KeyType.USER, message = "批量上传过于频繁，请稍后再试")
     @PostMapping("/upload/batch")
     public Result<List<FileUploadResultDTO>> uploadFiles(@RequestParam("files") MultipartFile[] files) {
         if (files == null || files.length == 0) {
             return Result.fail("未选择任何文件");
         }
-        
         List<FileUploadResultDTO> uploadedFiles = new ArrayList<>();
-        for (int i = 0; i < files.length; i++) {
-            try {
-                Result<FileUploadResultDTO> result = uploadFile(files[i]);
-                if (result.getCode() == 200) {
-                    uploadedFiles.add(result.getData());
-                } else {
-                    return Result.fail("批量上传失败：" + result.getMessage());
-                }
-            } catch (IOException e) {
-                log.error("批量上传失败", e);
-                return Result.fail("批量上传失败");
+        for (MultipartFile f : files) {
+            Result<FileUploadResultDTO> result = uploadFile(f);
+            if (result.getCode() == 200) {
+                uploadedFiles.add(result.getData());
+            } else {
+                return Result.fail("批量上传失败：" + result.getMessage());
             }
         }
-        
         return Result.success(uploadedFiles);
     }
 
     @DeleteMapping("/delete/{fileName}")
     public Result<Void> deleteFile(@PathVariable String fileName) {
+        Path target = resolveSafe(fileName);
+        if (target == null) {
+            return Result.fail("非法文件名");
+        }
         try {
-            Path filePath = Paths.get(uploadPath, fileName);
-            if (!Files.exists(filePath)) {
+            if (!Files.exists(target)) {
                 return Result.fail("文件不存在");
             }
-            Files.delete(filePath);
+            Files.delete(target);
             return Result.success();
         } catch (IOException e) {
             log.error("文件删除失败", e);
             return Result.fail("文件删除失败");
         }
     }
-} 
+
+    private Path resolveSafe(String name) {
+        if (name == null || name.isBlank()) return null;
+        String normalized = name.replace('\\', '/');
+        if (!SAFE_NAME.matcher(normalized).matches()) {
+            log.warn("拒绝非法文件名: {}", name);
+            return null;
+        }
+        Path baseDir = Paths.get(uploadPath).toAbsolutePath().normalize();
+        Path target = baseDir.resolve(normalized).normalize();
+        if (!target.startsWith(baseDir)) {
+            log.warn("拒绝越权访问: {}", target);
+            return null;
+        }
+        return target;
+    }
+
+    private String extractExtension(String filename) {
+        if (filename == null) return null;
+        int idx = filename.lastIndexOf('.');
+        if (idx < 0 || idx == filename.length() - 1) return null;
+        return filename.substring(idx + 1).toLowerCase(Locale.ROOT);
+    }
+
+    private String determineContentType(String fileName) {
+        String ext = extractExtension(fileName);
+        if (ext == null) return "application/octet-stream";
+        return switch (ext) {
+            case "jpg", "jpeg" -> "image/jpeg";
+            case "png" -> "image/png";
+            case "gif" -> "image/gif";
+            case "bmp" -> "image/bmp";
+            case "webp" -> "image/webp";
+            case "pdf" -> "application/pdf";
+            default -> "application/octet-stream";
+        };
+    }
+}

@@ -107,5 +107,25 @@ export default {
       url: '/news/stats',
       method: 'get'
     })
+  },
+
+  /**
+   * 切换资讯点赞状态
+   */
+  toggleLike(id) {
+    return request({
+      url: `/news/${id}/like`,
+      method: 'post'
+    })
+  },
+
+  /**
+   * 获取当前用户对资讯的点赞状态
+   */
+  getLikeInfo(id) {
+    return request({
+      url: `/news/${id}/like-info`,
+      method: 'get'
+    })
   }
 }

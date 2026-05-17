@@ -7,6 +7,7 @@ import com.cinema.booking.dto.NewsDTO;
 import com.cinema.booking.dto.PageRequest;
 import com.cinema.booking.entity.News;
 import com.cinema.booking.mapper.NewsMapper;
+import com.cinema.booking.security.SecurityService;
 import com.cinema.booking.service.NewsService;
 import com.cinema.booking.service.TianApiNewsService;
 import com.cinema.booking.utils.Result;
@@ -14,11 +15,13 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -35,6 +38,11 @@ public class NewsController {
     private final NewsService newsService;
     private final TianApiNewsService tianApiNewsService;
     private final NewsMapper newsMapper;
+    private final SecurityService securityService;
+    private final RedisTemplate<String, String> redisTemplate;
+
+    private static final String LIKE_USER_SET = "news:like:user:";
+    private static final String LIKE_COUNT_KEY = "news:likeCount:";
     
     @Operation(summary = "分页查询资讯列表")
     @GetMapping("/page")
@@ -175,6 +183,63 @@ public class NewsController {
     public Result<Void> increaseViewCount(@PathVariable Long id) {
         newsService.incrementViewCount(id);
         return Result.ok();
+    }
+
+    @Operation(summary = "点赞/取消点赞 资讯（基于 Redis）")
+    @PostMapping("/{id}/like")
+    @PreAuthorize("isAuthenticated()")
+    @SystemOperation(module = "资讯管理", operation = "资讯点赞", description = "切换当前用户对资讯的点赞状态")
+    public Result<Map<String, Object>> toggleNewsLike(@PathVariable Long id) {
+        Long userId = securityService.getCurrentUserId();
+        String userSetKey = LIKE_USER_SET + userId;
+        String countKey = LIKE_COUNT_KEY + id;
+        Boolean isMember = redisTemplate.opsForSet().isMember(userSetKey, String.valueOf(id));
+        boolean liked;
+        long count;
+        if (Boolean.TRUE.equals(isMember)) {
+            redisTemplate.opsForSet().remove(userSetKey, String.valueOf(id));
+            Long c = redisTemplate.opsForValue().decrement(countKey);
+            if (c != null && c < 0) {
+                redisTemplate.opsForValue().set(countKey, "0");
+                count = 0L;
+            } else {
+                count = c == null ? 0L : c;
+            }
+            liked = false;
+        } else {
+            redisTemplate.opsForSet().add(userSetKey, String.valueOf(id));
+            Long c = redisTemplate.opsForValue().increment(countKey);
+            count = c == null ? 1L : c;
+            liked = true;
+        }
+        Map<String, Object> data = new HashMap<>();
+        data.put("liked", liked);
+        data.put("likeCount", count);
+        return Result.ok(data);
+    }
+
+    @Operation(summary = "查询当前用户对资讯的点赞状态")
+    @GetMapping("/{id}/like-info")
+    public Result<Map<String, Object>> getNewsLikeInfo(@PathVariable Long id) {
+        Long userId = null;
+        try {
+            userId = securityService.getCurrentUserId();
+        } catch (Exception ignore) { /* 未登录 */ }
+        String countKey = LIKE_COUNT_KEY + id;
+        String countStr = redisTemplate.opsForValue().get(countKey);
+        long count = 0L;
+        if (countStr != null) {
+            try { count = Long.parseLong(countStr); } catch (NumberFormatException ignore) {}
+        }
+        boolean liked = false;
+        if (userId != null) {
+            Boolean m = redisTemplate.opsForSet().isMember(LIKE_USER_SET + userId, String.valueOf(id));
+            liked = Boolean.TRUE.equals(m);
+        }
+        Map<String, Object> data = new HashMap<>();
+        data.put("liked", liked);
+        data.put("likeCount", count);
+        return Result.ok(data);
     }
     
     @Operation(summary = "获取公告列表")
